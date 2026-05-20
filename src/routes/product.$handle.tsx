@@ -58,7 +58,7 @@ function ProductPage() {
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Gallery */}
           <div className="lg:col-span-7 grid md:grid-cols-2 gap-3 md:gap-4">
-            {product.images.map((img, i) => (
+            {product.images.map((img: string, i: number) => (
               <div key={i} className="aspect-[4/5] bg-warm-grey img-zoom">
                 <img src={img} alt={product.title} loading={i === 0 ? "eager" : "lazy"} className="w-full h-full object-cover" />
               </div>
