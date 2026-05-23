@@ -54,13 +54,21 @@ function CartRow({
   return (
     <div className="flex gap-4 py-4">
       <div className="w-20 h-24 bg-warm-grey shrink-0">
-        <img src={line.image} alt={line.title} className="w-full h-full object-cover" loading="lazy" />
+        <img
+          src={line.image}
+          alt={line.title}
+          className="w-full h-full object-cover"
+          loading="lazy"
+        />
       </div>
       <div className="flex-1 flex flex-col justify-between">
         <div>
           <div className="flex items-start justify-between gap-2">
             <h4 className="text-sm font-display">{line.title}</h4>
-            <button onClick={() => onRemove(line.lineId)} className="font-mono-xs opacity-60 hover:opacity-100">
+            <button
+              onClick={() => onRemove(line.lineId)}
+              className="font-mono-xs opacity-60 hover:opacity-100"
+            >
               Remove
             </button>
           </div>
@@ -70,11 +78,17 @@ function CartRow({
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center border border-border">
-            <button className="h-8 w-8 grid place-items-center" onClick={() => onQty(line.lineId, line.quantity - 1)}>
+            <button
+              className="h-8 w-8 grid place-items-center"
+              onClick={() => onQty(line.lineId, line.quantity - 1)}
+            >
               <Minus className="h-3 w-3" />
             </button>
             <span className="w-6 text-center text-sm tabular-nums">{line.quantity}</span>
-            <button className="h-8 w-8 grid place-items-center" onClick={() => onQty(line.lineId, line.quantity + 1)}>
+            <button
+              className="h-8 w-8 grid place-items-center"
+              onClick={() => onQty(line.lineId, line.quantity + 1)}
+            >
               <Plus className="h-3 w-3" />
             </button>
           </div>

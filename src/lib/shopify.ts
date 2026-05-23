@@ -11,7 +11,12 @@
  *   VITE_SHOPIFY_API_VERSION        e.g. 2024-10
  */
 
-import { products as mockProducts, collections as mockCollections, type Product, type Collection } from "./mock-data";
+import {
+  products as mockProducts,
+  collections as mockCollections,
+  type Product,
+  type Collection,
+} from "./mock-data";
 
 export const shopifyConfig = {
   domain: import.meta.env.VITE_SHOPIFY_STORE_DOMAIN as string | undefined,
@@ -19,12 +24,14 @@ export const shopifyConfig = {
   apiVersion: (import.meta.env.VITE_SHOPIFY_API_VERSION as string | undefined) ?? "2024-10",
 };
 
-export const isShopifyConfigured = () =>
-  Boolean(shopifyConfig.domain && shopifyConfig.token);
+export const isShopifyConfigured = () => Boolean(shopifyConfig.domain && shopifyConfig.token);
 
 // ---------- Storefront query helper (placeholder) ----------
 
-async function storefrontFetch<T>(_query: string, _variables?: Record<string, unknown>): Promise<T> {
+async function storefrontFetch<T>(
+  _query: string,
+  _variables?: Record<string, unknown>,
+): Promise<T> {
   // TODO: implement fetch to
   // `https://${shopifyConfig.domain}/api/${shopifyConfig.apiVersion}/graphql.json`
   // with header `X-Shopify-Storefront-Access-Token: ${shopifyConfig.token}`
@@ -42,7 +49,9 @@ export async function fetchProducts(): Promise<Product[]> {
 export async function fetchProductByHandle(handle: string): Promise<Product | undefined> {
   if (!isShopifyConfigured()) return mockProducts.find((p) => p.handle === handle);
   // TODO: GraphQL query `productByHandle(handle: $handle) { ... }`
-  return storefrontFetch<Product | undefined>("query productByHandle($handle: String!) { ... }", { handle });
+  return storefrontFetch<Product | undefined>("query productByHandle($handle: String!) { ... }", {
+    handle,
+  });
 }
 
 // ---------- Collections ----------

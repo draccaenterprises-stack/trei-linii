@@ -23,7 +23,10 @@ export function Hero() {
               >
                 Shop Volume I →
               </Link>
-              <Link to="/lookbook" className="font-mono-xs hover:opacity-60 underline underline-offset-4">
+              <Link
+                to="/lookbook"
+                className="font-mono-xs hover:opacity-60 underline underline-offset-4"
+              >
                 See lookbook
               </Link>
             </div>

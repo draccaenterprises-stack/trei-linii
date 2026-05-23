@@ -27,7 +27,9 @@ export const Route = createFileRoute("/product/$handle")({
   notFoundComponent: () => (
     <div className="px-5 py-32 text-center">
       <h1 className="font-display text-5xl">Not found</h1>
-      <Link to="/shop" className="font-mono-xs underline mt-6 inline-block">Back to shop</Link>
+      <Link to="/shop" className="font-mono-xs underline mt-6 inline-block">
+        Back to shop
+      </Link>
     </div>
   ),
 });
@@ -35,7 +37,7 @@ export const Route = createFileRoute("/product/$handle")({
 function ProductPage() {
   const { product } = Route.useLoaderData();
   const { addItem } = useCart();
-  const [size, setSize] = useState<typeof product.sizes[number] | null>(null);
+  const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
   const [color, setColor] = useState<string>(product.colors[0].name);
 
   const handleAdd = () => {
@@ -50,7 +52,9 @@ function ProductPage() {
     <div className="px-5 md:px-10 py-8 md:py-12">
       <div className="mx-auto max-w-[1600px]">
         <nav className="font-mono-xs opacity-60 mb-8">
-          <Link to="/shop" className="hover:opacity-100">Shop</Link>
+          <Link to="/shop" className="hover:opacity-100">
+            Shop
+          </Link>
           <span className="mx-2">/</span>
           <span>{product.title}</span>
         </nav>
@@ -60,7 +64,12 @@ function ProductPage() {
           <div className="lg:col-span-7 grid md:grid-cols-2 gap-3 md:gap-4">
             {product.images.map((img: string, i: number) => (
               <div key={i} className="aspect-[4/5] bg-warm-grey img-zoom">
-                <img src={img} alt={product.title} loading={i === 0 ? "eager" : "lazy"} className="w-full h-full object-cover" />
+                <img
+                  src={img}
+                  alt={product.title}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  className="w-full h-full object-cover"
+                />
               </div>
             ))}
           </div>
@@ -69,7 +78,9 @@ function ProductPage() {
           <aside className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
             <div className="flex items-center gap-3 mb-3">
               {product.badge && (
-                <span className="font-mono-xs bg-charcoal text-cream px-2 py-1">{product.badge}</span>
+                <span className="font-mono-xs bg-charcoal text-cream px-2 py-1">
+                  {product.badge}
+                </span>
               )}
               <span className="font-mono-xs opacity-60">{product.collection}</span>
             </div>
@@ -89,9 +100,16 @@ function ProductPage() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono-xs">Size</span>
-                  <button className="font-mono-xs underline underline-offset-4 opacity-60">Size guide</button>
+                  <button className="font-mono-xs underline underline-offset-4 opacity-60">
+                    Size guide
+                  </button>
                 </div>
-                <SizeSelector sizes={product.sizes} stock={product.stock} value={size} onChange={setSize} />
+                <SizeSelector
+                  sizes={product.sizes}
+                  stock={product.stock}
+                  value={size}
+                  onChange={setSize}
+                />
                 {size && (
                   <p className="font-mono-xs mt-3 opacity-60">
                     {product.stock[size] > 0
@@ -114,9 +132,18 @@ function ProductPage() {
             </div>
 
             <ul className="mt-10 grid grid-cols-3 gap-4 pt-6 border-t border-border">
-              <li className="flex flex-col items-start gap-2"><Truck className="h-4 w-4" strokeWidth={1.25} /><span className="font-mono-xs">EU shipping</span></li>
-              <li className="flex flex-col items-start gap-2"><RotateCcw className="h-4 w-4" strokeWidth={1.25} /><span className="font-mono-xs">30-day returns</span></li>
-              <li className="flex flex-col items-start gap-2"><Shield className="h-4 w-4" strokeWidth={1.25} /><span className="font-mono-xs">Secure checkout</span></li>
+              <li className="flex flex-col items-start gap-2">
+                <Truck className="h-4 w-4" strokeWidth={1.25} />
+                <span className="font-mono-xs">EU shipping</span>
+              </li>
+              <li className="flex flex-col items-start gap-2">
+                <RotateCcw className="h-4 w-4" strokeWidth={1.25} />
+                <span className="font-mono-xs">30-day returns</span>
+              </li>
+              <li className="flex flex-col items-start gap-2">
+                <Shield className="h-4 w-4" strokeWidth={1.25} />
+                <span className="font-mono-xs">Secure checkout</span>
+              </li>
             </ul>
           </aside>
         </div>

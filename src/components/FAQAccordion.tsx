@@ -15,7 +15,11 @@ export function FAQAccordion({ items = faqs }: { items?: typeof faqs }) {
               className="w-full py-6 flex items-center justify-between gap-6 text-left"
             >
               <span className="font-display text-lg md:text-xl">{f.q}</span>
-              {isOpen ? <Minus className="h-4 w-4 shrink-0" /> : <Plus className="h-4 w-4 shrink-0" />}
+              {isOpen ? (
+                <Minus className="h-4 w-4 shrink-0" />
+              ) : (
+                <Plus className="h-4 w-4 shrink-0" />
+              )}
             </button>
             {isOpen && (
               <p className="pb-6 max-w-2xl text-muted-foreground leading-relaxed">{f.a}</p>

@@ -54,7 +54,9 @@ export function VariantSelector({
         >
           <span
             className={`h-8 w-8 rounded-full border transition-all ${
-              value === c.name ? "ring-2 ring-charcoal ring-offset-2 ring-offset-background border-charcoal" : "border-border"
+              value === c.name
+                ? "ring-2 ring-charcoal ring-offset-2 ring-offset-background border-charcoal"
+                : "border-border"
             }`}
             style={{ backgroundColor: c.hex }}
           />

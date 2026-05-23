@@ -192,8 +192,7 @@ export const faqs = [
   },
 ];
 
-export const announcement =
-  "Free shipping in RO over 350 RON · Volume I now shipping worldwide";
+export const announcement = "Free shipping in RO over 350 RON · Volume I now shipping worldwide";
 
 export const homepageSections = [
   { id: "hero", label: "Hero", enabled: true },

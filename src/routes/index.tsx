@@ -33,7 +33,10 @@ function Index() {
                 <p className="font-mono-xs opacity-60">01 · Featured</p>
                 <h2 className="font-display text-4xl md:text-6xl mt-3">Volume I.</h2>
               </div>
-              <Link to="/shop" className="font-mono-xs hover:opacity-60 underline underline-offset-4">
+              <Link
+                to="/shop"
+                className="font-mono-xs hover:opacity-60 underline underline-offset-4"
+              >
                 See all
               </Link>
             </div>
@@ -48,11 +51,17 @@ function Index() {
             <div className="flex items-end justify-between mb-12">
               <div>
                 <p className="font-mono-xs opacity-60">02 · Collections</p>
-                <h2 className="font-display text-4xl md:text-6xl mt-3">Three lines.<br />One language.</h2>
+                <h2 className="font-display text-4xl md:text-6xl mt-3">
+                  Three lines.
+                  <br />
+                  One language.
+                </h2>
               </div>
             </div>
             <div className="grid md:grid-cols-3 gap-6">
-              {featuredCols.map((c) => <CollectionCard key={c.handle} collection={c} />)}
+              {featuredCols.map((c) => (
+                <CollectionCard key={c.handle} collection={c} />
+              ))}
             </div>
           </div>
         </section>
@@ -66,7 +75,10 @@ function Index() {
                 <p className="font-mono-xs opacity-60">03 · Lookbook</p>
                 <h2 className="font-display text-4xl md:text-6xl mt-3">In the field.</h2>
               </div>
-              <Link to="/lookbook" className="font-mono-xs hover:opacity-60 underline underline-offset-4">
+              <Link
+                to="/lookbook"
+                className="font-mono-xs hover:opacity-60 underline underline-offset-4"
+              >
                 Open Volume I
               </Link>
             </div>
@@ -101,7 +113,10 @@ function Index() {
             <div className="md:col-span-4">
               <p className="font-mono-xs opacity-60">04 · FAQ</p>
               <h2 className="font-display text-4xl md:text-6xl mt-3">Asked often.</h2>
-              <Link to="/faq" className="inline-block mt-6 font-mono-xs underline underline-offset-4">
+              <Link
+                to="/faq"
+                className="inline-block mt-6 font-mono-xs underline underline-offset-4"
+              >
                 Full FAQ →
               </Link>
             </div>

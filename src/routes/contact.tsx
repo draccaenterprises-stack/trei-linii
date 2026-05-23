@@ -6,7 +6,10 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact — BLANK ATELIER" },
-      { name: "description", content: "Reach the studio. Press, wholesale, returns and general inquiries." },
+      {
+        name: "description",
+        content: "Reach the studio. Press, wholesale, returns and general inquiries.",
+      },
     ],
   }),
 });
@@ -22,7 +25,11 @@ function Contact() {
           <div className="mt-12 space-y-8 font-mono-xs">
             <div>
               <h3 className="opacity-50 mb-2">Studio</h3>
-              <p>Str. Lipscani 12<br />Bucharest, 030031</p>
+              <p>
+                Str. Lipscani 12
+                <br />
+                Bucharest, 030031
+              </p>
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Email</h3>
@@ -41,12 +48,21 @@ function Contact() {
 
         <div className="md:col-span-6 md:col-start-7">
           <form
-            onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSent(true);
+            }}
             className="space-y-8"
           >
-            <Field label="Name"><input required className="input" /></Field>
-            <Field label="Email"><input type="email" required className="input" /></Field>
-            <Field label="Subject"><input className="input" /></Field>
+            <Field label="Name">
+              <input required className="input" />
+            </Field>
+            <Field label="Email">
+              <input type="email" required className="input" />
+            </Field>
+            <Field label="Subject">
+              <input className="input" />
+            </Field>
             <Field label="Message">
               <textarea rows={6} required className="input resize-none" />
             </Field>

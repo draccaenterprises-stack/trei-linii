@@ -14,7 +14,10 @@ export const Route = createFileRoute("/shop")({
   head: () => ({
     meta: [
       { title: "Shop — BLANK ATELIER" },
-      { name: "description", content: "All Volume I oversized tees. Heavyweight cotton, made in Portugal." },
+      {
+        name: "description",
+        content: "All Volume I oversized tees. Heavyweight cotton, made in Portugal.",
+      },
     ],
   }),
 });
@@ -37,7 +40,9 @@ function Shop() {
         <header className="mb-12 md:mb-20">
           <p className="font-mono-xs opacity-60">Shop</p>
           <h1 className="font-display text-5xl md:text-8xl mt-2">
-            {collection ? collections.find(c => c.handle === collection)?.title ?? "Shop" : "All pieces."}
+            {collection
+              ? (collections.find((c) => c.handle === collection)?.title ?? "Shop")
+              : "All pieces."}
           </h1>
         </header>
 
@@ -73,7 +78,15 @@ function Shop() {
   );
 }
 
-function FilterChip({ children, active, onClick }: { children: React.ReactNode; active: boolean; onClick: () => void }) {
+function FilterChip({
+  children,
+  active,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active: boolean;
+  onClick: () => void;
+}) {
   return (
     <button
       onClick={onClick}

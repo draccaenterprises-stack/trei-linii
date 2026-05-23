@@ -10,11 +10,7 @@ const badgeStyles: Record<string, string> = {
 
 export function ProductCard({ product }: { product: Product }) {
   return (
-    <Link
-      to="/product/$handle"
-      params={{ handle: product.handle }}
-      className="group block"
-    >
+    <Link to="/product/$handle" params={{ handle: product.handle }} className="group block">
       <div className="relative img-zoom aspect-[4/5] bg-warm-grey">
         <img
           src={product.images[0]}
@@ -40,9 +36,7 @@ export function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="pt-4 flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm md:text-base font-display tracking-tight">
-            {product.title}
-          </h3>
+          <h3 className="text-sm md:text-base font-display tracking-tight">{product.title}</h3>
           <p className="font-mono-xs opacity-50 mt-1">
             {product.colors.length} colors · {product.sizes.length} sizes
           </p>

@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { announcement as defaultAnnouncement, homepageSections as defaultSections } from "./mock-data";
+import {
+  announcement as defaultAnnouncement,
+  homepageSections as defaultSections,
+} from "./mock-data";
 
 export interface SiteSettings {
   logoText: string;

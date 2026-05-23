@@ -40,12 +40,17 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">Try again or head home.</p>
         <div className="mt-6 flex justify-center gap-3">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="bg-charcoal text-cream px-6 py-3 font-mono-xs"
           >
             Try again
           </button>
-          <a href="/" className="border border-border px-6 py-3 font-mono-xs">Go home</a>
+          <a href="/" className="border border-border px-6 py-3 font-mono-xs">
+            Go home
+          </a>
         </div>
       </div>
     </div>
@@ -58,9 +63,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "BLANK ATELIER — Quiet uniforms for loud cities" },
-      { name: "description", content: "Heavyweight oversized tees from BLANK ATELIER. Volume I — Spring 2026. Made in Portugal, dressed on the street." },
+      {
+        name: "description",
+        content:
+          "Heavyweight oversized tees from BLANK ATELIER. Volume I — Spring 2026. Made in Portugal, dressed on the street.",
+      },
       { property: "og:title", content: "BLANK ATELIER" },
-      { property: "og:description", content: "Quiet uniforms for loud cities. Heavyweight oversized tees, Volume I." },
+      {
+        property: "og:description",
+        content: "Quiet uniforms for loud cities. Heavyweight oversized tees, Volume I.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],

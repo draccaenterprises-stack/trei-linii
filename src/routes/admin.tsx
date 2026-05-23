@@ -4,7 +4,9 @@ import { products, collections } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
-  head: () => ({ meta: [{ title: "Admin — BLANK ATELIER" }, { name: "robots", content: "noindex" }] }),
+  head: () => ({
+    meta: [{ title: "Admin — BLANK ATELIER" }, { name: "robots", content: "noindex" }],
+  }),
 });
 
 function Admin() {
@@ -73,7 +75,11 @@ function Admin() {
 
             <Panel title="Hero">
               <Row label="Eyebrow">
-                <input className="input" value={site.heroEyebrow} onChange={(e) => site.update({ heroEyebrow: e.target.value })} />
+                <input
+                  className="input"
+                  value={site.heroEyebrow}
+                  onChange={(e) => site.update({ heroEyebrow: e.target.value })}
+                />
               </Row>
               <Row label="Headline">
                 <textarea
@@ -127,12 +133,17 @@ function Admin() {
             </Panel>
 
             <Panel title="Featured products">
-              <p className="font-mono-xs opacity-60 mb-3">Toggle which products appear on the home page.</p>
+              <p className="font-mono-xs opacity-60 mb-3">
+                Toggle which products appear on the home page.
+              </p>
               <ul className="space-y-2">
                 {products.map((p) => {
                   const on = site.featuredProductIds.includes(p.id);
                   return (
-                    <li key={p.id} className="flex items-center justify-between border border-border px-3 py-2">
+                    <li
+                      key={p.id}
+                      className="flex items-center justify-between border border-border px-3 py-2"
+                    >
                       <span className="text-sm">{p.title}</span>
                       <button
                         onClick={() =>
@@ -157,7 +168,10 @@ function Admin() {
                 {collections.map((c) => {
                   const on = site.featuredCollectionHandles.includes(c.handle);
                   return (
-                    <li key={c.handle} className="flex items-center justify-between border border-border px-3 py-2">
+                    <li
+                      key={c.handle}
+                      className="flex items-center justify-between border border-border px-3 py-2"
+                    >
                       <span className="text-sm">{c.title}</span>
                       <button
                         onClick={() =>
@@ -178,10 +192,15 @@ function Admin() {
             </Panel>
 
             <Panel title="Product badges">
-              <p className="font-mono-xs opacity-60 mb-3">Read-only preview. Hook into Shopify metafields when wiring up.</p>
+              <p className="font-mono-xs opacity-60 mb-3">
+                Read-only preview. Hook into Shopify metafields when wiring up.
+              </p>
               <ul className="space-y-2">
                 {products.map((p) => (
-                  <li key={p.id} className="flex items-center justify-between border border-border px-3 py-2">
+                  <li
+                    key={p.id}
+                    className="flex items-center justify-between border border-border px-3 py-2"
+                  >
                     <span className="text-sm">{p.title}</span>
                     <span className="font-mono-xs opacity-70">{p.badge ?? "— no badge —"}</span>
                   </li>
@@ -190,10 +209,22 @@ function Admin() {
             </Panel>
 
             <Panel title="Static content">
-              <p className="font-mono-xs opacity-60 mb-3">Banners · Lookbook · FAQ · Footer · About</p>
+              <p className="font-mono-xs opacity-60 mb-3">
+                Banners · Lookbook · FAQ · Footer · About
+              </p>
               <div className="grid grid-cols-2 gap-2">
-                {["Edit banners","Edit lookbook","Edit FAQ","Edit reviews","Edit footer","Edit static pages"].map(t => (
-                  <button key={t} className="font-mono-xs border border-border px-3 py-3 text-left hover:border-charcoal">
+                {[
+                  "Edit banners",
+                  "Edit lookbook",
+                  "Edit FAQ",
+                  "Edit reviews",
+                  "Edit footer",
+                  "Edit static pages",
+                ].map((t) => (
+                  <button
+                    key={t}
+                    className="font-mono-xs border border-border px-3 py-3 text-left hover:border-charcoal"
+                  >
                     {t} →
                   </button>
                 ))}

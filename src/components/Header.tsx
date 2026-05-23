@@ -70,11 +70,7 @@ export function Header() {
             <ShoppingBag className="h-4 w-4" strokeWidth={1.25} />
             <span>Cart ({count})</span>
           </button>
-          <button
-            onClick={() => setMobile(true)}
-            className="md:hidden"
-            aria-label="Open menu"
-          >
+          <button onClick={() => setMobile(true)} className="md:hidden" aria-label="Open menu">
             <Menu className="h-5 w-5" strokeWidth={1.25} />
           </button>
         </div>
@@ -100,11 +96,7 @@ export function Header() {
                 {n.label}
               </Link>
             ))}
-            <Link
-              to="/admin"
-              onClick={() => setMobile(false)}
-              className="font-mono-xs mt-6"
-            >
+            <Link to="/admin" onClick={() => setMobile(false)} className="font-mono-xs mt-6">
               Admin Dashboard
             </Link>
           </nav>

@@ -9,7 +9,9 @@ export function Footer() {
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
             <div className="font-display text-3xl md:text-5xl leading-[0.95]">
-              Quiet uniforms,<br />loud cities.
+              Quiet uniforms,
+              <br />
+              loud cities.
             </div>
             <p className="font-mono-xs mt-6 opacity-60">{logoText} · EST. 2026 · BUCUREȘTI</p>
           </div>
@@ -17,18 +19,42 @@ export function Footer() {
           <div className="md:col-span-2">
             <h4 className="font-mono-xs opacity-50 mb-4">Shop</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/shop" className="hover:opacity-60">All Products</Link></li>
-              <li><Link to="/collections" className="hover:opacity-60">Collections</Link></li>
-              <li><Link to="/lookbook" className="hover:opacity-60">Lookbook</Link></li>
+              <li>
+                <Link to="/shop" className="hover:opacity-60">
+                  All Products
+                </Link>
+              </li>
+              <li>
+                <Link to="/collections" className="hover:opacity-60">
+                  Collections
+                </Link>
+              </li>
+              <li>
+                <Link to="/lookbook" className="hover:opacity-60">
+                  Lookbook
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div className="md:col-span-2">
             <h4 className="font-mono-xs opacity-50 mb-4">Studio</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="hover:opacity-60">About</Link></li>
-              <li><Link to="/contact" className="hover:opacity-60">Contact</Link></li>
-              <li><Link to="/faq" className="hover:opacity-60">FAQ</Link></li>
+              <li>
+                <Link to="/about" className="hover:opacity-60">
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:opacity-60">
+                  Contact
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:opacity-60">
+                  FAQ
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -50,7 +76,9 @@ export function Footer() {
         </div>
 
         <div className="mt-16 pt-6 border-t border-cream/15 flex flex-col md:flex-row justify-between gap-3 font-mono-xs opacity-50">
-          <span>© {new Date().getFullYear()} {logoText}. All rights reserved.</span>
+          <span>
+            © {new Date().getFullYear()} {logoText}. All rights reserved.
+          </span>
           <span>Demo build — Shopify checkout connects later.</span>
         </div>
       </div>
