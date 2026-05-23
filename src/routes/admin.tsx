@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { collections, products } from "@/lib/mock-data";
 import { useSite } from "@/lib/site-context";
-import { products, collections } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
   head: () => ({
-    meta: [{ title: "Admin — BLANK ATELIER" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Admin — Trei Linii" }, { name: "robots", content: "noindex" }],
   }),
 });
 
@@ -18,34 +18,34 @@ function Admin() {
         <div className="mx-auto max-w-[1400px]">
           <div className="flex flex-wrap items-end justify-between gap-4 mb-12 pb-6 border-b border-border">
             <div>
-              <p className="font-mono-xs opacity-60">Admin · Demo mockup (no auth)</p>
-              <h1 className="font-display text-5xl md:text-7xl mt-2">Studio control.</h1>
+              <p className="font-mono-xs opacity-60">Admin · Demo fără autentificare</p>
+              <h1 className="font-display text-5xl md:text-7xl mt-2">Control site.</h1>
             </div>
             <button
               onClick={site.reset}
               className="font-mono-xs border border-border px-4 py-2 hover:border-charcoal"
             >
-              Reset to defaults
+              Resetează setările
             </button>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-6">
             <Panel title="Brand">
-              <Row label="Logo text">
+              <Row label="Text logo">
                 <input
                   className="input"
                   value={site.logoText}
                   onChange={(e) => site.update({ logoText: e.target.value })}
                 />
               </Row>
-              <Row label="Favicon URL">
+              <Row label="URL favicon">
                 <input
                   className="input"
                   value={site.favicon}
                   onChange={(e) => site.update({ favicon: e.target.value })}
                 />
               </Row>
-              <Row label="Primary color">
+              <Row label="Culoare principală">
                 <input
                   type="color"
                   className="h-10 w-20 cursor-pointer"
@@ -53,7 +53,7 @@ function Admin() {
                   onChange={(e) => site.update({ primaryColor: e.target.value })}
                 />
               </Row>
-              <Row label="Accent color">
+              <Row label="Culoare accent">
                 <input
                   type="color"
                   className="h-10 w-20 cursor-pointer"
@@ -61,7 +61,7 @@ function Admin() {
                   onChange={(e) => site.update({ accentColor: e.target.value })}
                 />
               </Row>
-              <Row label="Font system">
+              <Row label="Sistem font">
                 <select
                   className="input"
                   value={site.font}
@@ -74,14 +74,14 @@ function Admin() {
             </Panel>
 
             <Panel title="Hero">
-              <Row label="Eyebrow">
+              <Row label="Text mic de sus">
                 <input
                   className="input"
                   value={site.heroEyebrow}
                   onChange={(e) => site.update({ heroEyebrow: e.target.value })}
                 />
               </Row>
-              <Row label="Headline">
+              <Row label="Titlu">
                 <textarea
                   rows={3}
                   className="input resize-none"
@@ -89,7 +89,7 @@ function Admin() {
                   onChange={(e) => site.update({ heroHeadline: e.target.value })}
                 />
               </Row>
-              <Row label="Subcopy">
+              <Row label="Descriere">
                 <textarea
                   rows={3}
                   className="input resize-none"
@@ -97,15 +97,15 @@ function Admin() {
                   onChange={(e) => site.update({ heroSubcopy: e.target.value })}
                 />
               </Row>
-              <Row label="Hero image">
+              <Row label="Imagine hero">
                 <button className="font-mono-xs border border-border px-3 py-2 hover:border-charcoal">
-                  Replace image (placeholder)
+                  Înlocuiește imaginea (placeholder)
                 </button>
               </Row>
             </Panel>
 
-            <Panel title="Announcement bar">
-              <Row label="Message">
+            <Panel title="Bară anunț">
+              <Row label="Mesaj">
                 <input
                   className="input"
                   value={site.announcement}
@@ -114,7 +114,7 @@ function Admin() {
               </Row>
             </Panel>
 
-            <Panel title="Homepage sections">
+            <Panel title="Secțiuni homepage">
               <ul className="divide-y divide-border">
                 {site.sections.map((s) => (
                   <li key={s.id} className="flex items-center justify-between py-3">
@@ -132,10 +132,8 @@ function Admin() {
               </ul>
             </Panel>
 
-            <Panel title="Featured products">
-              <p className="font-mono-xs opacity-60 mb-3">
-                Toggle which products appear on the home page.
-              </p>
+            <Panel title="Produse recomandate">
+              <p className="font-mono-xs opacity-60 mb-3">Alege ce produse apar pe homepage.</p>
               <ul className="space-y-2">
                 {products.map((p) => {
                   const on = site.featuredProductIds.includes(p.id);
@@ -155,7 +153,7 @@ function Admin() {
                         }
                         className="font-mono-xs"
                       >
-                        {on ? "● Featured" : "○ Hidden"}
+                        {on ? "● Recomandat" : "○ Ascuns"}
                       </button>
                     </li>
                   );
@@ -163,7 +161,7 @@ function Admin() {
               </ul>
             </Panel>
 
-            <Panel title="Featured collections">
+            <Panel title="Categorii recomandate">
               <ul className="space-y-2">
                 {collections.map((c) => {
                   const on = site.featuredCollectionHandles.includes(c.handle);
@@ -183,7 +181,7 @@ function Admin() {
                         }
                         className="font-mono-xs"
                       >
-                        {on ? "● Featured" : "○ Hidden"}
+                        {on ? "● Recomandată" : "○ Ascunsă"}
                       </button>
                     </li>
                   );
@@ -191,9 +189,9 @@ function Admin() {
               </ul>
             </Panel>
 
-            <Panel title="Product badges">
+            <Panel title="Badge-uri produse">
               <p className="font-mono-xs opacity-60 mb-3">
-                Read-only preview. Hook into Shopify metafields when wiring up.
+                Preview momentan. În producție se pot administra prin Shopify metafields.
               </p>
               <ul className="space-y-2">
                 {products.map((p) => (
@@ -202,24 +200,24 @@ function Admin() {
                     className="flex items-center justify-between border border-border px-3 py-2"
                   >
                     <span className="text-sm">{p.title}</span>
-                    <span className="font-mono-xs opacity-70">{p.badge ?? "— no badge —"}</span>
+                    <span className="font-mono-xs opacity-70">{p.badge ?? "— fără badge —"}</span>
                   </li>
                 ))}
               </ul>
             </Panel>
 
-            <Panel title="Static content">
+            <Panel title="Conținut static">
               <p className="font-mono-xs opacity-60 mb-3">
-                Banners · Lookbook · FAQ · Footer · About
+                Bannere · Editorial · FAQ · Footer · Despre
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  "Edit banners",
-                  "Edit lookbook",
-                  "Edit FAQ",
-                  "Edit reviews",
-                  "Edit footer",
-                  "Edit static pages",
+                  "Editează bannere",
+                  "Editează editorial",
+                  "Editează FAQ",
+                  "Editează recenzii",
+                  "Editează footer",
+                  "Editează pagini statice",
                 ].map((t) => (
                   <button
                     key={t}

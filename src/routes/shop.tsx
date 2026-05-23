@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProductGrid } from "@/components/ProductCard";
-import { products, collections } from "@/lib/mock-data";
+import { collections, products } from "@/lib/mock-data";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -13,10 +13,10 @@ export const Route = createFileRoute("/shop")({
   component: Shop,
   head: () => ({
     meta: [
-      { title: "Shop — BLANK ATELIER" },
+      { title: "Magazin — Trei Linii" },
       {
         name: "description",
-        content: "All Volume I oversized tees. Heavyweight cotton, made in Portugal.",
+        content: "Tricouri oversized Trei Linii: bumbac greu, croială curată și printuri simple.",
       },
     ],
   }),
@@ -38,18 +38,18 @@ function Shop() {
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1600px]">
         <header className="mb-12 md:mb-20">
-          <p className="font-mono-xs opacity-60">Shop</p>
+          <p className="font-mono-xs opacity-60">Magazin</p>
           <h1 className="font-display text-5xl md:text-8xl mt-2">
             {collection
-              ? (collections.find((c) => c.handle === collection)?.title ?? "Shop")
-              : "All pieces."}
+              ? (collections.find((c) => c.handle === collection)?.title ?? "Magazin")
+              : "Toate produsele."}
           </h1>
         </header>
 
         <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-4 border-b border-border">
           <div className="flex flex-wrap gap-2">
             <FilterChip active={!collection} onClick={() => navigate({ search: {} })}>
-              All
+              Toate
             </FilterChip>
             {collections.map((c) => (
               <FilterChip
@@ -66,9 +66,9 @@ function Shop() {
             onChange={(e) => setSort(e.target.value as typeof sort)}
             className="font-mono-xs bg-transparent border border-border px-3 py-2 outline-none"
           >
-            <option value="featured">Sort: Featured</option>
-            <option value="price-asc">Price: low → high</option>
-            <option value="price-desc">Price: high → low</option>
+            <option value="featured">Sortare: recomandate</option>
+            <option value="price-asc">Preț: mic → mare</option>
+            <option value="price-desc">Preț: mare → mic</option>
           </select>
         </div>
 

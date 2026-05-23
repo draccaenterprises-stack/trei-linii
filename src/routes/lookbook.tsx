@@ -6,10 +6,10 @@ export const Route = createFileRoute("/lookbook")({
   component: Lookbook,
   head: () => ({
     meta: [
-      { title: "Lookbook — Volume I — BLANK ATELIER" },
+      { title: "Editorial — Lansarea 01 — Trei Linii" },
       {
         name: "description",
-        content: "Volume I — Spring 2026 lookbook. Editorial photography by BLANK ATELIER.",
+        content: "Editorial Trei Linii pentru Lansarea 01: tricouri oversized în context urban.",
       },
     ],
   }),
@@ -20,19 +20,18 @@ function Lookbook() {
   return (
     <div className="py-12 md:py-20">
       <header className="px-5 md:px-10 mb-16 md:mb-24 max-w-[1600px] mx-auto">
-        <p className="font-mono-xs opacity-60">Lookbook</p>
+        <p className="font-mono-xs opacity-60">Editorial</p>
         <h1 className="font-display text-5xl md:text-[10vw] leading-[0.95] mt-2">
-          Volume I.
+          Lansarea 01.
           <br />
-          <span className="opacity-50">Spring 2026.</span>
+          <span className="opacity-50">Trei Linii.</span>
         </h1>
         <p className="mt-6 text-muted-foreground max-w-xl">
-          Shot on 35mm in Bucharest over three days in March. No retouching beyond color.
+          Cadre editoriale pentru direcția brandului: piese simple, spațiu mult și styling urban.
         </p>
       </header>
 
       <div className="max-w-[1600px] mx-auto px-5 md:px-10 space-y-3 md:space-y-6">
-        {/* Editorial spread layout */}
         <div className="grid md:grid-cols-12 gap-3 md:gap-6">
           <div className="md:col-span-8 img-zoom">
             <img
@@ -49,7 +48,7 @@ function Lookbook() {
               loading="lazy"
               className="w-full aspect-[3/4] object-cover"
             />
-            <p className="font-mono-xs opacity-60 mt-3">FIG. 01 · Concrete Hours</p>
+            <p className="font-mono-xs opacity-60 mt-3">FIG. 01 · Ore de beton</p>
           </div>
         </div>
 
@@ -61,14 +60,15 @@ function Lookbook() {
               loading="lazy"
               className="w-full aspect-[3/4] object-cover"
             />
-            <p className="font-mono-xs opacity-60 mt-3">FIG. 02 · Field Notes</p>
+            <p className="font-mono-xs opacity-60 mt-3">FIG. 02 · Note de teren</p>
           </div>
           <div className="md:col-span-5 md:pt-32 self-start">
             <p className="font-display text-3xl md:text-5xl leading-tight">
-              “We don't dress the city —<br />
-              we wear it back.”
+              “Simplu de purtat.
+              <br />
+              Ușor de recunoscut.”
             </p>
-            <p className="font-mono-xs opacity-50 mt-6">— Studio note, March 2026</p>
+            <p className="font-mono-xs opacity-50 mt-6">— Notă de studio, 2026</p>
           </div>
         </div>
 
@@ -80,7 +80,7 @@ function Lookbook() {
               loading="lazy"
               className="w-full aspect-[5/6] object-cover"
             />
-            <p className="font-mono-xs opacity-60 mt-3">FIG. 03 · Crossings</p>
+            <p className="font-mono-xs opacity-60 mt-3">FIG. 03 · Traversări</p>
           </div>
         </div>
       </div>

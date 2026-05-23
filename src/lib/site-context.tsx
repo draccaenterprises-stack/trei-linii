@@ -7,8 +7,8 @@ import {
 export interface SiteSettings {
   logoText: string;
   favicon: string;
-  primaryColor: string; // hex
-  accentColor: string; // hex
+  primaryColor: string;
+  accentColor: string;
   font: "Serif Editorial" | "Sans Modern";
   announcement: string;
   heroHeadline: string;
@@ -20,19 +20,19 @@ export interface SiteSettings {
 }
 
 const defaults: SiteSettings = {
-  logoText: "BLANK / ATELIER",
-  favicon: "/favicon.ico",
+  logoText: "Trei Linii",
+  favicon: "/favicon.png",
   primaryColor: "#2b2a28",
-  accentColor: "#6b7a3a",
+  accentColor: "#ff006f",
   font: "Serif Editorial",
   announcement: defaultAnnouncement,
-  heroEyebrow: "Volume I — Spring 2026",
-  heroHeadline: "Quiet uniforms\nfor loud cities.",
+  heroEyebrow: "Lansarea 01 — Trei Linii",
+  heroHeadline: "Tricouri simple\ncu spate puternic.",
   heroSubcopy:
-    "Heavyweight cotton, oversized cuts, restrained marks. Built in Portugal, dressed on the street.",
+    "Streetwear curat pentru purtare zilnică: bumbac dens, croială oversized, logo mic pe față și grafică mai puternică pe spate.",
   sections: defaultSections,
   featuredProductIds: ["p1", "p3", "p2", "p4"],
-  featuredCollectionHandles: ["essentials", "washed", "graphics"],
+  featuredCollectionHandles: ["tricouri", "spalate", "printuri"],
 };
 
 interface Ctx extends SiteSettings {
@@ -42,7 +42,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "blank-atelier-site";
+const STORAGE_KEY = "trei-linii-site-v2";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

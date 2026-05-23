@@ -4,7 +4,7 @@ import { products } from "@/lib/mock-data";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
-import { Truck, RotateCcw, Shield } from "lucide-react";
+import { RotateCcw, Shield, Truck } from "lucide-react";
 
 export const Route = createFileRoute("/product/$handle")({
   loader: ({ params }) => {
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/product/$handle")({
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: `${loaderData.product.title} — BLANK ATELIER` },
+          { title: `${loaderData.product.title} — Trei Linii` },
           { name: "description", content: loaderData.product.description },
           { property: "og:title", content: loaderData.product.title },
           { property: "og:description", content: loaderData.product.description },
@@ -26,9 +26,9 @@ export const Route = createFileRoute("/product/$handle")({
   component: ProductPage,
   notFoundComponent: () => (
     <div className="px-5 py-32 text-center">
-      <h1 className="font-display text-5xl">Not found</h1>
+      <h1 className="font-display text-5xl">Produsul nu a fost găsit</h1>
       <Link to="/shop" className="font-mono-xs underline mt-6 inline-block">
-        Back to shop
+        Înapoi la magazin
       </Link>
     </div>
   ),
@@ -42,7 +42,7 @@ function ProductPage() {
 
   const handleAdd = () => {
     if (!size) {
-      alert("Please select a size.");
+      alert("Alege o mărime înainte de a adăuga produsul în coș.");
       return;
     }
     addItem(product, size, color);
@@ -53,14 +53,13 @@ function ProductPage() {
       <div className="mx-auto max-w-[1600px]">
         <nav className="font-mono-xs opacity-60 mb-8">
           <Link to="/shop" className="hover:opacity-100">
-            Shop
+            Magazin
           </Link>
           <span className="mx-2">/</span>
           <span>{product.title}</span>
         </nav>
 
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Gallery */}
           <div className="lg:col-span-7 grid md:grid-cols-2 gap-3 md:gap-4">
             {product.images.map((img: string, i: number) => (
               <div key={i} className="aspect-[4/5] bg-warm-grey img-zoom">
@@ -74,7 +73,6 @@ function ProductPage() {
             ))}
           </div>
 
-          {/* Info */}
           <aside className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
             <div className="flex items-center gap-3 mb-3">
               {product.badge && (
@@ -92,16 +90,16 @@ function ProductPage() {
             <div className="mt-10 space-y-6">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono-xs">Color · {color}</span>
+                  <span className="font-mono-xs">Culoare · {color}</span>
                 </div>
                 <VariantSelector colors={product.colors} value={color} onChange={setColor} />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono-xs">Size</span>
+                  <span className="font-mono-xs">Mărime</span>
                   <button className="font-mono-xs underline underline-offset-4 opacity-60">
-                    Size guide
+                    Ghid mărimi
                   </button>
                 </div>
                 <SizeSelector
@@ -114,9 +112,9 @@ function ProductPage() {
                   <p className="font-mono-xs mt-3 opacity-60">
                     {product.stock[size] > 0
                       ? product.stock[size] < 5
-                        ? `Only ${product.stock[size]} left`
-                        : "In stock"
-                      : "Out of stock"}
+                        ? `Doar ${product.stock[size]} rămase`
+                        : "În stoc"
+                      : "Stoc epuizat"}
                   </p>
                 )}
               </div>
@@ -125,24 +123,24 @@ function ProductPage() {
                 onClick={handleAdd}
                 className="w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors"
               >
-                Add to cart — {formatRON(product.price)}
+                Adaugă în coș — {formatRON(product.price)}
               </button>
 
-              <p className="font-mono-xs opacity-60">Fit: {product.fitNote}</p>
+              <p className="font-mono-xs opacity-60">Croială: {product.fitNote}</p>
             </div>
 
             <ul className="mt-10 grid grid-cols-3 gap-4 pt-6 border-t border-border">
               <li className="flex flex-col items-start gap-2">
                 <Truck className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">EU shipping</span>
+                <span className="font-mono-xs">Livrare RO/EU</span>
               </li>
               <li className="flex flex-col items-start gap-2">
                 <RotateCcw className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">30-day returns</span>
+                <span className="font-mono-xs">Retur 14 zile</span>
               </li>
               <li className="flex flex-col items-start gap-2">
                 <Shield className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">Secure checkout</span>
+                <span className="font-mono-xs">Plată securizată</span>
               </li>
             </ul>
           </aside>

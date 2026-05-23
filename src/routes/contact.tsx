@@ -5,10 +5,10 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({
     meta: [
-      { title: "Contact — BLANK ATELIER" },
+      { title: "Contact — Trei Linii" },
       {
         name: "description",
-        content: "Reach the studio. Press, wholesale, returns and general inquiries.",
+        content: "Contact Trei Linii pentru comenzi, retururi, colaborări și întrebări generale.",
       },
     ],
   }),
@@ -21,27 +21,23 @@ function Contact() {
       <div className="mx-auto max-w-[1400px] grid md:grid-cols-12 gap-12">
         <div className="md:col-span-5">
           <p className="font-mono-xs opacity-60">Contact</p>
-          <h1 className="font-display text-5xl md:text-7xl mt-2 leading-[0.95]">Say hello.</h1>
+          <h1 className="font-display text-5xl md:text-7xl mt-2 leading-[0.95]">Scrie-ne.</h1>
           <div className="mt-12 space-y-8 font-mono-xs">
             <div>
               <h3 className="opacity-50 mb-2">Studio</h3>
-              <p>
-                Str. Lipscani 12
-                <br />
-                Bucharest, 030031
-              </p>
+              <p>București, România</p>
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Email</h3>
-              <p>hello@blank-atelier.demo</p>
+              <p>contact@treilinii.ro</p>
             </div>
             <div>
-              <h3 className="opacity-50 mb-2">Press</h3>
-              <p>press@blank-atelier.demo</p>
+              <h3 className="opacity-50 mb-2">Comenzi</h3>
+              <p>support@treilinii.ro</p>
             </div>
             <div>
-              <h3 className="opacity-50 mb-2">Wholesale</h3>
-              <p>wholesale@blank-atelier.demo</p>
+              <h3 className="opacity-50 mb-2">Colaborări</h3>
+              <p>collab@treilinii.ro</p>
             </div>
           </div>
         </div>
@@ -54,20 +50,20 @@ function Contact() {
             }}
             className="space-y-8"
           >
-            <Field label="Name">
+            <Field label="Nume">
               <input required className="input" />
             </Field>
             <Field label="Email">
               <input type="email" required className="input" />
             </Field>
-            <Field label="Subject">
+            <Field label="Subiect">
               <input className="input" />
             </Field>
-            <Field label="Message">
+            <Field label="Mesaj">
               <textarea rows={6} required className="input resize-none" />
             </Field>
             <button className="bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90">
-              {sent ? "Sent ✓" : "Send message →"}
+              {sent ? "Trimis ✓" : "Trimite mesajul →"}
             </button>
           </form>
         </div>

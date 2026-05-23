@@ -1,14 +1,14 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ShoppingBag, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { ShoppingBag, Menu } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
+import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
 
 const nav = [
-  { to: "/shop", label: "Shop" },
-  { to: "/collections", label: "Collections" },
-  { to: "/lookbook", label: "Lookbook" },
-  { to: "/about", label: "About" },
+  { to: "/shop", label: "Magazin" },
+  { to: "/collections", label: "Categorii" },
+  { to: "/lookbook", label: "Editorial" },
+  { to: "/about", label: "Despre" },
   { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
 ] as const;
@@ -32,13 +32,12 @@ export function Header() {
   const { count, open } = useCart();
   const { logoText } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const [mobile, setMobile] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-border">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 h-16 flex items-center justify-between gap-6">
-        <Link to="/" className="font-display text-lg md:text-xl tracking-tight">
-          {logoText}
+        <Link to="/" className="inline-flex items-center" aria-label={logoText}>
+          <img src={logoFull} alt={logoText} className="h-8 md:h-10 w-auto object-contain" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
@@ -55,53 +54,33 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link
-            to="/admin"
-            className="hidden md:inline font-mono-xs hover:opacity-60"
-            activeProps={{ className: "font-mono-xs underline underline-offset-4" }}
-          >
-            Admin
-          </Link>
           <button
             onClick={open}
             className="font-mono-xs flex items-center gap-1.5 hover:opacity-60 transition-opacity"
-            aria-label="Open cart"
+            aria-label="Deschide coșul"
           >
             <ShoppingBag className="h-4 w-4" strokeWidth={1.25} />
-            <span>Cart ({count})</span>
+            <span>Coș ({count})</span>
           </button>
-          <button onClick={() => setMobile(true)} className="md:hidden" aria-label="Open menu">
-            <Menu className="h-5 w-5" strokeWidth={1.25} />
-          </button>
+          <details className="md:hidden">
+            <summary
+              className="list-none cursor-pointer [&::-webkit-details-marker]:hidden"
+              aria-label="Deschide meniul"
+            >
+              <Menu className="h-5 w-5" strokeWidth={1.25} />
+            </summary>
+            <div className="fixed left-0 right-0 top-[96px] z-50 bg-background border-b border-border shadow-sm">
+              <nav className="flex flex-col px-5 py-6 gap-5">
+                {nav.map((n) => (
+                  <Link key={n.to} to={n.to} className="font-display text-3xl">
+                    {n.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </details>
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {mobile && (
-        <div className="fixed inset-0 z-50 bg-background flex flex-col">
-          <div className="h-16 px-5 flex items-center justify-between border-b border-border">
-            <span className="font-display text-lg">{logoText}</span>
-            <button onClick={() => setMobile(false)} aria-label="Close menu">
-              <X className="h-5 w-5" strokeWidth={1.25} />
-            </button>
-          </div>
-          <nav className="flex flex-col px-5 py-8 gap-5">
-            {nav.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                onClick={() => setMobile(false)}
-                className="font-display text-3xl"
-              >
-                {n.label}
-              </Link>
-            ))}
-            <Link to="/admin" onClick={() => setMobile(false)} className="font-mono-xs mt-6">
-              Admin Dashboard
-            </Link>
-          </nav>
-        </div>
-      )}
       {/* hide highlight warning */}
       <span className="sr-only">{pathname}</span>
     </header>

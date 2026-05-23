@@ -21,31 +21,31 @@ export function Hero() {
                 to="/shop"
                 className="inline-flex items-center gap-2 bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90 transition-colors"
               >
-                Shop Volume I →
+                Vezi produsele →
               </Link>
               <Link
                 to="/lookbook"
                 className="font-mono-xs hover:opacity-60 underline underline-offset-4"
               >
-                See lookbook
+                Vezi editorialul
               </Link>
             </div>
           </div>
           <div className="font-mono-xs opacity-50 hidden md:block">
-            01 — Cotton 240gsm · Made in Portugal
+            01 — Bumbac 240gsm · Croială oversized
           </div>
         </div>
 
         <div className="md:col-span-7 relative img-zoom min-h-[70vh] md:min-h-full">
           <img
             src={heroImg}
-            alt="Model wearing the Atelier 01 Oversized Tee on an urban street"
+            alt="Model purtând un tricou oversized Trei Linii pe o stradă urbană"
             width={1600}
             height={1200}
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute bottom-5 right-5 font-mono-xs text-cream bg-charcoal/70 backdrop-blur px-3 py-1.5">
-            ATL/01 · CREAM
+            TL/01 · CREM
           </div>
         </div>
       </div>

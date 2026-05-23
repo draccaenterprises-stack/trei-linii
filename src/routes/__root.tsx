@@ -1,29 +1,29 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+  HeadContent,
+  Link,
   Outlet,
+  Scripts,
   createRootRouteWithContext,
   useRouter,
-  HeadContent,
-  Scripts,
-  Link,
 } from "@tanstack/react-router";
 
-import appCss from "../styles.css?url";
+import { CartDrawer } from "@/components/CartDrawer";
+import { Footer } from "@/components/Footer";
+import { Announcement, Header } from "@/components/Header";
 import { CartProvider } from "@/lib/cart-context";
 import { SiteProvider } from "@/lib/site-context";
-import { Announcement, Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
-import { CartDrawer } from "@/components/CartDrawer";
+import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="font-display text-7xl">404</h1>
-        <h2 className="mt-4 text-xl">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">This page doesn't exist.</p>
+        <h2 className="mt-4 text-xl">Pagina nu a fost găsită</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Pagina pe care o cauți nu există.</p>
         <Link to="/" className="inline-block mt-6 bg-charcoal text-cream px-6 py-3 font-mono-xs">
-          Go home
+          Înapoi acasă
         </Link>
       </div>
     </div>
@@ -36,8 +36,8 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   return (
     <div className="flex min-h-[80vh] items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="font-display text-3xl">Something broke.</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Try again or head home.</p>
+        <h1 className="font-display text-3xl">A apărut o eroare.</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Încearcă din nou sau revino acasă.</p>
         <div className="mt-6 flex justify-center gap-3">
           <button
             onClick={() => {
@@ -46,10 +46,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             }}
             className="bg-charcoal text-cream px-6 py-3 font-mono-xs"
           >
-            Try again
+            Încearcă din nou
           </button>
           <a href="/" className="border border-border px-6 py-3 font-mono-xs">
-            Go home
+            Acasă
           </a>
         </div>
       </div>
@@ -62,21 +62,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BLANK ATELIER — Quiet uniforms for loud cities" },
+      { title: "Trei Linii — Tricouri oversized și streetwear curat" },
       {
         name: "description",
         content:
-          "Heavyweight oversized tees from BLANK ATELIER. Volume I — Spring 2026. Made in Portugal, dressed on the street.",
+          "Trei Linii creează tricouri oversized și streetwear curat, cu logo mic pe față și print mai puternic pe spate.",
       },
-      { property: "og:title", content: "BLANK ATELIER" },
+      { property: "og:title", content: "Trei Linii" },
       {
         property: "og:description",
-        content: "Quiet uniforms for loud cities. Heavyweight oversized tees, Volume I.",
+        content: "Tricouri oversized, bumbac dens și grafică simplă pentru purtare zilnică.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.png" },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -86,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="ro">
       <head>
         <HeadContent />
       </head>

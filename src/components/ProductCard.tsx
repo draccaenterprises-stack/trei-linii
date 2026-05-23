@@ -3,9 +3,9 @@ import type { Product } from "@/lib/mock-data";
 import { formatRON } from "@/lib/format";
 
 const badgeStyles: Record<string, string> = {
-  "new drop": "bg-charcoal text-cream",
-  limited: "bg-washed-red text-cream",
-  "best seller": "bg-olive text-cream",
+  noutate: "bg-charcoal text-cream",
+  limitat: "bg-washed-red text-cream",
+  "cel mai vândut": "bg-olive text-cream",
 };
 
 export function ProductCard({ product }: { product: Product }) {
@@ -38,7 +38,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div>
           <h3 className="text-sm md:text-base font-display tracking-tight">{product.title}</h3>
           <p className="font-mono-xs opacity-50 mt-1">
-            {product.colors.length} colors · {product.sizes.length} sizes
+            {product.colors.length} culori · {product.sizes.length} mărimi
           </p>
         </div>
         <div className="text-sm tabular-nums">{formatRON(product.price)}</div>

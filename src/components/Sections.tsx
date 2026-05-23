@@ -5,7 +5,7 @@ export function Reviews() {
     <section className="px-5 md:px-10 py-20 md:py-32">
       <div className="mx-auto max-w-[1600px]">
         <div className="flex items-end justify-between mb-12">
-          <h2 className="font-display text-4xl md:text-6xl">Worn & rated.</h2>
+          <h2 className="font-display text-4xl md:text-6xl">Purtate și apreciate.</h2>
           <span className="font-mono-xs opacity-50 hidden md:inline">★★★★★ · 4.9 / 5</span>
         </div>
         <div className="grid md:grid-cols-3 gap-8 md:gap-12">
@@ -30,12 +30,12 @@ export function Newsletter() {
   return (
     <section className="px-5 md:px-10 py-20 md:py-32 bg-cream border-t border-border">
       <div className="mx-auto max-w-3xl text-center">
-        <p className="font-mono-xs opacity-60">Join the list</p>
+        <p className="font-mono-xs opacity-60">Newsletter</p>
         <h2 className="font-display text-4xl md:text-6xl mt-4">
-          The next drop, before the next drop.
+          Află primul când apare următoarea lansare.
         </h2>
         <p className="mt-6 text-muted-foreground max-w-lg mx-auto">
-          One email per release. No spam, no fluff — just the date, the look, and the link.
+          Un email pentru fiecare lansare. Fără spam, doar data, produsele și linkul.
         </p>
         <form
           onSubmit={(e) => e.preventDefault()}
@@ -43,10 +43,10 @@ export function Newsletter() {
         >
           <input
             type="email"
-            placeholder="your@email.com"
+            placeholder="email@exemplu.ro"
             className="flex-1 bg-transparent py-3 outline-none placeholder:opacity-40"
           />
-          <button className="font-mono-xs px-4 hover:opacity-60">Subscribe →</button>
+          <button className="font-mono-xs px-4 hover:opacity-60">Abonează-te →</button>
         </form>
       </div>
     </section>

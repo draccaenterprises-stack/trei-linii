@@ -1,21 +1,21 @@
 /**
- * Shopify Storefront API service module.
+ * Modul pentru Shopify Storefront API.
  *
- * This is a clean placeholder layer. The demo currently uses local mock data
- * (see `mock-data.ts`). When the brand is ready to go live, wire these
- * functions to the real Shopify Storefront API and remove the mock fallbacks.
+ * Demo-ul folosește momentan date mock din `mock-data.ts`.
+ * Pentru producție, produsele se adaugă în Shopify Admin, iar frontend-ul citește
+ * produsele, variantele, stocul și checkoutUrl prin Storefront API.
  *
- * Required environment variables (do NOT hardcode):
- *   VITE_SHOPIFY_STORE_DOMAIN       e.g. blank-atelier.myshopify.com
- *   VITE_SHOPIFY_STOREFRONT_TOKEN   public Storefront API access token
- *   VITE_SHOPIFY_API_VERSION        e.g. 2024-10
+ * Variabile necesare:
+ *   VITE_SHOPIFY_STORE_DOMAIN       ex. trei-linii.myshopify.com
+ *   VITE_SHOPIFY_STOREFRONT_TOKEN   token public Storefront API
+ *   VITE_SHOPIFY_API_VERSION        ex. 2024-10
  */
 
 import {
-  products as mockProducts,
   collections as mockCollections,
-  type Product,
+  products as mockProducts,
   type Collection,
+  type Product,
 } from "./mock-data";
 
 export const shopifyConfig = {
@@ -26,43 +26,60 @@ export const shopifyConfig = {
 
 export const isShopifyConfigured = () => Boolean(shopifyConfig.domain && shopifyConfig.token);
 
-// ---------- Storefront query helper (placeholder) ----------
+type ShopifyGraphQlResponse<T> = {
+  data?: T;
+  errors?: Array<{ message: string }>;
+};
 
-async function storefrontFetch<T>(
-  _query: string,
-  _variables?: Record<string, unknown>,
-): Promise<T> {
-  // TODO: implement fetch to
-  // `https://${shopifyConfig.domain}/api/${shopifyConfig.apiVersion}/graphql.json`
-  // with header `X-Shopify-Storefront-Access-Token: ${shopifyConfig.token}`
-  throw new Error("Shopify Storefront not yet wired. Using mock data.");
+async function storefrontFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
+  if (!shopifyConfig.domain || !shopifyConfig.token) {
+    throw new Error("Shopify nu este configurat.");
+  }
+
+  const response = await fetch(
+    `https://${shopifyConfig.domain}/api/${shopifyConfig.apiVersion}/graphql.json`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Shopify-Storefront-Access-Token": shopifyConfig.token,
+      },
+      body: JSON.stringify({ query, variables }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Shopify a răspuns cu status ${response.status}.`);
+  }
+
+  const payload = (await response.json()) as ShopifyGraphQlResponse<T>;
+  if (payload.errors?.length) {
+    throw new Error(payload.errors.map((error) => error.message).join("; "));
+  }
+  if (!payload.data) {
+    throw new Error("Răspuns Shopify fără data.");
+  }
+
+  return payload.data;
 }
-
-// ---------- Products ----------
 
 export async function fetchProducts(): Promise<Product[]> {
   if (!isShopifyConfigured()) return mockProducts;
-  // TODO: GraphQL query `products(first: 50) { ... }`
-  return storefrontFetch<Product[]>("query { products }");
+  // Următorul pas: mapare Product Shopify -> Product intern.
+  return mockProducts;
 }
 
 export async function fetchProductByHandle(handle: string): Promise<Product | undefined> {
   if (!isShopifyConfigured()) return mockProducts.find((p) => p.handle === handle);
-  // TODO: GraphQL query `productByHandle(handle: $handle) { ... }`
-  return storefrontFetch<Product | undefined>("query productByHandle($handle: String!) { ... }", {
-    handle,
-  });
+  // Următorul pas: productByHandle + mapare variant IDs.
+  return mockProducts.find((p) => p.handle === handle);
 }
-
-// ---------- Collections ----------
 
 export async function fetchCollections(): Promise<Collection[]> {
   if (!isShopifyConfigured()) return mockCollections;
-  // TODO: GraphQL query `collections(first: 20) { ... }`
-  return storefrontFetch<Collection[]>("query { collections }");
+  // Următorul pas: mapare Collection Shopify -> Collection intern.
+  return mockCollections;
 }
-
-// ---------- Cart ----------
 
 export interface ShopifyCart {
   id: string;
@@ -70,36 +87,71 @@ export interface ShopifyCart {
 }
 
 export async function createCart(): Promise<ShopifyCart> {
-  if (!isShopifyConfigured()) {
-    // Demo placeholder — real flow would call `cartCreate` mutation.
-    return {
-      id: "demo-cart",
-      checkoutUrl: "https://checkout.shopify.com/demo-checkout-redirect",
+  const data = await storefrontFetch<{
+    cartCreate: {
+      cart: ShopifyCart | null;
+      userErrors: Array<{ message: string }>;
     };
+  }>(`
+    mutation CartCreate {
+      cartCreate {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `);
+
+  if (data.cartCreate.userErrors.length) {
+    throw new Error(data.cartCreate.userErrors.map((error) => error.message).join("; "));
   }
-  // TODO: mutation `cartCreate { cart { id checkoutUrl } }`
-  return storefrontFetch<ShopifyCart>("mutation { cartCreate { cart { id checkoutUrl } } }");
+  if (!data.cartCreate.cart) {
+    throw new Error("Shopify nu a returnat coșul.");
+  }
+
+  return data.cartCreate.cart;
 }
 
 export async function addCartLines(
-  _cartId: string,
-  _lines: Array<{ merchandiseId: string; quantity: number }>,
+  cartId: string,
+  lines: Array<{ merchandiseId: string; quantity: number }>,
 ): Promise<ShopifyCart> {
-  if (!isShopifyConfigured()) {
-    return {
-      id: "demo-cart",
-      checkoutUrl: "https://checkout.shopify.com/demo-checkout-redirect",
+  const data = await storefrontFetch<{
+    cartLinesAdd: {
+      cart: ShopifyCart | null;
+      userErrors: Array<{ message: string }>;
     };
+  }>(
+    `
+    mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+      cartLinesAdd(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `,
+    { cartId, lines },
+  );
+
+  if (data.cartLinesAdd.userErrors.length) {
+    throw new Error(data.cartLinesAdd.userErrors.map((error) => error.message).join("; "));
   }
-  // TODO: mutation `cartLinesAdd(cartId: $cartId, lines: $lines) { cart { id checkoutUrl } }`
-  return storefrontFetch<ShopifyCart>("mutation cartLinesAdd { ... }");
+  if (!data.cartLinesAdd.cart) {
+    throw new Error("Shopify nu a returnat coșul actualizat.");
+  }
+
+  return data.cartLinesAdd.cart;
 }
 
-/**
- * Redirect the browser to Shopify's hosted checkout.
- * In production: pass `cart.checkoutUrl` returned by `cartCreate`.
- * Never build a custom checkout — Shopify handles payment.
- */
 export function redirectToShopifyCheckout(checkoutUrl: string) {
   window.location.href = checkoutUrl;
 }

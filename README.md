@@ -1,75 +1,75 @@
-# BLANK ATELIER storefront
+# Trei Linii storefront
 
-Custom ecommerce frontend generated in Lovable for a minimal streetwear brand.
+Frontend ecommerce custom generat în Lovable pentru brandul Trei Linii.
 
-## Local development
+## Dezvoltare locală
 
 ```bash
 npm install
 npm run dev
 ```
 
-Production checks:
+Verificări:
 
 ```bash
 npm run build
 npm run lint
 ```
 
-## Current demo data
+## Date demo
 
-The project currently uses mock products, collections, FAQ, reviews and homepage controls from:
+Proiectul folosește momentan produse, categorii, FAQ, recenzii și setări homepage mock din:
 
 ```text
 src/lib/mock-data.ts
 src/lib/site-context.tsx
 ```
 
-This is temporary. It lets us refine the design before connecting Shopify.
+Aceste date sunt temporare până conectăm Shopify.
 
-## Shopify product workflow
+## Cum se adaugă produse
 
-Yes: production products should be added directly in Shopify.
+Da: în producție produsele se adaugă direct din Shopify Admin.
 
-Shopify should manage:
+Shopify trebuie să gestioneze:
 
-- products
-- titles and descriptions
-- prices
-- images
-- variants such as size and color
-- stock/inventory
-- discounts
+- produse
+- titluri și descrieri
+- prețuri
+- imagini
+- variante precum mărime și culoare
+- stoc
+- reduceri
 - checkout
-- payments
-- orders
-- taxes
-- shipping and delivery integrations
+- plăți
+- comenzi
+- taxe
+- livrare și integrări cu firme de curierat
 
-The custom frontend should only read product/catalog data from Shopify and send the customer to Shopify Checkout.
+Frontend-ul custom citește catalogul din Shopify și trimite clientul la Shopify Checkout.
 
-## Shopify integration points
+## Integrare Shopify
 
-The placeholder integration layer is here:
+Layer-ul de integrare este aici:
 
 ```text
 src/lib/shopify.ts
 ```
 
-Expected environment variables:
+Variabile necesare:
 
 ```text
-VITE_SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
-VITE_SHOPIFY_STOREFRONT_TOKEN=your_storefront_public_token
+VITE_SHOPIFY_STORE_DOMAIN=magazinul-tau.myshopify.com
+VITE_SHOPIFY_STOREFRONT_TOKEN=token_public_storefront
 VITE_SHOPIFY_API_VERSION=2024-10
 ```
 
-Next production step:
+Pașii următori:
 
-1. Replace mock product reads with Shopify Storefront API queries.
-2. Map Shopify product handles to `/product/$handle`.
-3. Use Shopify variant IDs for cart lines.
-4. Use `cartCreate` and `cartLinesAdd`.
-5. Redirect to Shopify `checkoutUrl`.
+1. Înlocuim citirea produselor mock cu query-uri Shopify Storefront API.
+2. Mapăm handle-urile Shopify la ruta `/product/$handle`.
+3. Folosim ID-urile variantelor Shopify pentru coș.
+4. Folosim `cartCreate` și `cartLinesAdd`.
+5. Redirecționăm către `checkoutUrl` primit de la Shopify.
 
-Do not build a custom checkout for this storefront.
+Nu construim checkout custom.

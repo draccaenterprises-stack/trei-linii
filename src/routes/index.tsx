@@ -3,10 +3,9 @@ import { Hero } from "@/components/Hero";
 import { ProductGrid } from "@/components/ProductCard";
 import { CollectionCard } from "@/components/CollectionCard";
 import { FAQAccordion } from "@/components/FAQAccordion";
-import { Reviews, Newsletter } from "@/components/Sections";
-import { products, collections, faqs, lookbookImages } from "@/lib/mock-data";
-import { sectionEnabled } from "@/lib/site-context";
-import { useSite } from "@/lib/site-context";
+import { Newsletter, Reviews } from "@/components/Sections";
+import { collections, faqs, lookbookImages, products } from "@/lib/mock-data";
+import { sectionEnabled, useSite } from "@/lib/site-context";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -30,14 +29,14 @@ function Index() {
           <div className="mx-auto max-w-[1600px]">
             <div className="flex items-end justify-between mb-12">
               <div>
-                <p className="font-mono-xs opacity-60">01 · Featured</p>
-                <h2 className="font-display text-4xl md:text-6xl mt-3">Volume I.</h2>
+                <p className="font-mono-xs opacity-60">01 · Recomandate</p>
+                <h2 className="font-display text-4xl md:text-6xl mt-3">Lansarea 01.</h2>
               </div>
               <Link
                 to="/shop"
                 className="font-mono-xs hover:opacity-60 underline underline-offset-4"
               >
-                See all
+                Vezi tot
               </Link>
             </div>
             <ProductGrid products={featured} />
@@ -50,11 +49,11 @@ function Index() {
           <div className="mx-auto max-w-[1600px]">
             <div className="flex items-end justify-between mb-12">
               <div>
-                <p className="font-mono-xs opacity-60">02 · Collections</p>
+                <p className="font-mono-xs opacity-60">02 · Categorii</p>
                 <h2 className="font-display text-4xl md:text-6xl mt-3">
-                  Three lines.
+                  Trei direcții.
                   <br />
-                  One language.
+                  Același limbaj.
                 </h2>
               </div>
             </div>
@@ -72,14 +71,14 @@ function Index() {
           <div className="mx-auto max-w-[1600px]">
             <div className="flex items-end justify-between mb-12">
               <div>
-                <p className="font-mono-xs opacity-60">03 · Lookbook</p>
-                <h2 className="font-display text-4xl md:text-6xl mt-3">In the field.</h2>
+                <p className="font-mono-xs opacity-60">03 · Editorial</p>
+                <h2 className="font-display text-4xl md:text-6xl mt-3">În oraș.</h2>
               </div>
               <Link
                 to="/lookbook"
                 className="font-mono-xs hover:opacity-60 underline underline-offset-4"
               >
-                Open Volume I
+                Deschide Lansarea 01
               </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
@@ -112,12 +111,12 @@ function Index() {
           <div className="mx-auto max-w-[1600px] grid md:grid-cols-12 gap-12">
             <div className="md:col-span-4">
               <p className="font-mono-xs opacity-60">04 · FAQ</p>
-              <h2 className="font-display text-4xl md:text-6xl mt-3">Asked often.</h2>
+              <h2 className="font-display text-4xl md:text-6xl mt-3">Întrebări frecvente.</h2>
               <Link
                 to="/faq"
                 className="inline-block mt-6 font-mono-xs underline underline-offset-4"
               >
-                Full FAQ →
+                Vezi toate întrebările →
               </Link>
             </div>
             <div className="md:col-span-8">
