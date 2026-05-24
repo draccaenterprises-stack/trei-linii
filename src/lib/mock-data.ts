@@ -12,7 +12,7 @@ import lb1 from "@/assets/lookbook-1.jpg";
 import lb2 from "@/assets/lookbook-2.jpg";
 import lb3 from "@/assets/lookbook-3.jpg";
 
-export type Badge = "noutate" | "limitat" | "cel mai vândut";
+export type Badge = "noutate" | "limitat" | "stoc limitat";
 export type Size = "S" | "M" | "L" | "XL";
 
 export interface ColorVariant {
@@ -61,7 +61,7 @@ export const products: Product[] = [
     title: "Tricou Spălat Urban",
     price: 219,
     collection: "spalate",
-    badge: "cel mai vândut",
+    badge: "stoc limitat",
     images: [p2b, p2a],
     description:
       "Tricou garment-dyed, spălat pentru o textură moale și un aspect purtat natural. Print pe spate cu grafică urbană estompată.",

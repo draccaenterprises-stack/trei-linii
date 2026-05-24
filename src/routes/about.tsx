@@ -30,12 +30,12 @@ function About() {
         <div className="mt-16 grid md:grid-cols-12 gap-12">
           <div className="md:col-span-7 space-y-6 text-lg leading-relaxed text-muted-foreground">
             <p>
-              Trei Linii este un proiect de streetwear curat, construit pentru piese ușor de purtat:
-              tricouri oversized, bumbac dens și grafică simplă.
+              Trei Linii există pentru oamenii care vor un tricou simplu, dar nu plictisitor: bumbac
+              dens, croială oversized și grafică suficient de clară încât să rămână purtabilă.
             </p>
             <p>
-              Direcția este clară: logo mic pe față, print mai puternic pe spate, culori purtabile
-              și o prezentare premium fără să pară un magazin standard.
+              Direcția este directă: semn mic pe față, print mai puternic pe spate, culori ușor de
+              purtat și lansări limitate care nu se bazează pe reduceri permanente.
             </p>
             <p>
               Produsele finale, stocul, finalizarea comenzii și comenzile vor fi administrate în

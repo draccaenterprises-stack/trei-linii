@@ -6,10 +6,10 @@ export const Route = createFileRoute("/lookbook")({
   component: Lookbook,
   head: () => ({
     meta: [
-      { title: "Editorial — Lansarea 01 — Trei Linii" },
+      { title: "Pe stradă — Lansarea 01 — Trei Linii" },
       {
         name: "description",
-        content: "Editorial Trei Linii pentru Lansarea 01: tricouri oversized în context urban.",
+        content: "Trei Linii pe stradă: tricouri oversized în context urban.",
       },
     ],
   }),
@@ -20,7 +20,7 @@ function Lookbook() {
   return (
     <div className="py-12 md:py-20">
       <header className="px-5 md:px-10 mb-16 md:mb-24 max-w-[1600px] mx-auto">
-        <p className="font-mono-xs opacity-60">Editorial</p>
+        <p className="font-mono-xs opacity-60">Pe stradă</p>
         <h1 className="font-display text-5xl md:text-[10vw] leading-[0.95] mt-2">
           Lansarea 01.
           <br />

@@ -3,7 +3,13 @@ import { Hero } from "@/components/Hero";
 import { ProductGrid } from "@/components/ProductCard";
 import { CollectionCard } from "@/components/CollectionCard";
 import { FAQAccordion } from "@/components/FAQAccordion";
-import { Newsletter, Reviews } from "@/components/Sections";
+import {
+  BundleBanner,
+  Newsletter,
+  Reviews,
+  SocialProofGrid,
+  TrustStrip,
+} from "@/components/Sections";
 import { collections, faqs, lookbookImages, products } from "@/lib/mock-data";
 import { sectionEnabled, useSite } from "@/lib/site-context";
 
@@ -23,6 +29,23 @@ function Index() {
   return (
     <>
       {sectionEnabled(sections, "hero") && <Hero />}
+
+      <TrustStrip />
+
+      <section className="px-5 md:px-10 py-16 md:py-24 border-b border-border">
+        <div className="mx-auto max-w-[1600px] grid md:grid-cols-12 gap-10">
+          <p className="md:col-span-3 font-mono-xs opacity-60">Manifest</p>
+          <div className="md:col-span-8">
+            <h2 className="font-display text-3xl md:text-6xl leading-tight">
+              Tricouri pentru oameni care vor ceva simplu, dar nu plictisitor.
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
+              Bumbac dens, croială oversized care cade curat și grafică gândită să rămână purtabilă.
+              Trei Linii nu încearcă să acopere tot dulapul. Începem cu tricoul bun.
+            </p>
+          </div>
+        </div>
+      </section>
 
       {sectionEnabled(sections, "featured-products") && (
         <section className="px-5 md:px-10 py-20 md:py-32">
@@ -44,14 +67,16 @@ function Index() {
         </section>
       )}
 
+      <BundleBanner />
+
       {sectionEnabled(sections, "collections") && (
         <section className="px-5 md:px-10 py-20 md:py-32 bg-cream border-y border-border">
           <div className="mx-auto max-w-[1600px]">
             <div className="flex items-end justify-between mb-12">
               <div>
-                <p className="font-mono-xs opacity-60">02 · Categorii</p>
+                <p className="font-mono-xs opacity-60">02 · Lansări</p>
                 <h2 className="font-display text-4xl md:text-6xl mt-3">
-                  Trei direcții.
+                  Direcțiile lansării.
                   <br />
                   Același limbaj.
                 </h2>
@@ -71,7 +96,7 @@ function Index() {
           <div className="mx-auto max-w-[1600px]">
             <div className="flex items-end justify-between mb-12">
               <div>
-                <p className="font-mono-xs opacity-60">03 · Editorial</p>
+                <p className="font-mono-xs opacity-60">03 · Pe stradă</p>
                 <h2 className="font-display text-4xl md:text-6xl mt-3">În oraș.</h2>
               </div>
               <Link
@@ -105,6 +130,8 @@ function Index() {
       )}
 
       {sectionEnabled(sections, "reviews") && <Reviews />}
+
+      <SocialProofGrid />
 
       {sectionEnabled(sections, "faq") && (
         <section className="px-5 md:px-10 py-20 md:py-32 bg-cream border-y border-border">

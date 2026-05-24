@@ -6,10 +6,9 @@ import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
 
 const nav = [
   { to: "/shop", label: "Magazin" },
-  { to: "/collections", label: "Categorii" },
-  { to: "/lookbook", label: "Editorial" },
+  { to: "/collections", label: "Lansări" },
+  { to: "/lookbook", label: "Pe stradă" },
   { to: "/about", label: "Despre" },
-  { to: "/faq", label: "FAQ" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -18,7 +17,7 @@ export function Announcement() {
   return (
     <div className="bg-charcoal text-cream overflow-hidden border-b border-charcoal">
       <div className="marquee-track py-2 font-mono-xs">
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: 3 }).map((_, i) => (
           <span key={i} className="px-8 inline-block">
             {announcement} <span className="opacity-50 mx-3">/</span>
           </span>

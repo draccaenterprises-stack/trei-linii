@@ -9,9 +9,13 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as ReturnsRouteImport } from './routes/returns'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LookbookRouteImport } from './routes/lookbook'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as CartRouteImport } from './routes/cart'
@@ -20,9 +24,24 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
   path: '/shop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturnsRoute = ReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LookbookRoute = LookbookRouteImport.update({
@@ -33,6 +52,11 @@ const LookbookRoute = LookbookRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CookiesRoute = CookiesRouteImport.update({
+  id: '/cookies',
+  path: '/cookies',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -78,9 +102,13 @@ export interface FileRoutesByFullPath {
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lookbook': typeof LookbookRoute
+  '/privacy': typeof PrivacyRoute
+  '/returns': typeof ReturnsRoute
   '/shop': typeof ShopRoute
+  '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
 export interface FileRoutesByTo {
@@ -90,9 +118,13 @@ export interface FileRoutesByTo {
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lookbook': typeof LookbookRoute
+  '/privacy': typeof PrivacyRoute
+  '/returns': typeof ReturnsRoute
   '/shop': typeof ShopRoute
+  '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
 export interface FileRoutesById {
@@ -103,9 +135,13 @@ export interface FileRoutesById {
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
+  '/cookies': typeof CookiesRoute
   '/faq': typeof FaqRoute
   '/lookbook': typeof LookbookRoute
+  '/privacy': typeof PrivacyRoute
+  '/returns': typeof ReturnsRoute
   '/shop': typeof ShopRoute
+  '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
 export interface FileRouteTypes {
@@ -117,9 +153,13 @@ export interface FileRouteTypes {
     | '/cart'
     | '/collections'
     | '/contact'
+    | '/cookies'
     | '/faq'
     | '/lookbook'
+    | '/privacy'
+    | '/returns'
     | '/shop'
+    | '/terms'
     | '/product/$handle'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -129,9 +169,13 @@ export interface FileRouteTypes {
     | '/cart'
     | '/collections'
     | '/contact'
+    | '/cookies'
     | '/faq'
     | '/lookbook'
+    | '/privacy'
+    | '/returns'
     | '/shop'
+    | '/terms'
     | '/product/$handle'
   id:
     | '__root__'
@@ -141,9 +185,13 @@ export interface FileRouteTypes {
     | '/cart'
     | '/collections'
     | '/contact'
+    | '/cookies'
     | '/faq'
     | '/lookbook'
+    | '/privacy'
+    | '/returns'
     | '/shop'
+    | '/terms'
     | '/product/$handle'
   fileRoutesById: FileRoutesById
 }
@@ -154,19 +202,44 @@ export interface RootRouteChildren {
   CartRoute: typeof CartRoute
   CollectionsRoute: typeof CollectionsRoute
   ContactRoute: typeof ContactRoute
+  CookiesRoute: typeof CookiesRoute
   FaqRoute: typeof FaqRoute
   LookbookRoute: typeof LookbookRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ReturnsRoute: typeof ReturnsRoute
   ShopRoute: typeof ShopRoute
+  TermsRoute: typeof TermsRoute
   ProductHandleRoute: typeof ProductHandleRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop': {
       id: '/shop'
       path: '/shop'
       fullPath: '/shop'
       preLoaderRoute: typeof ShopRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/returns': {
+      id: '/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof ReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lookbook': {
@@ -181,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cookies': {
+      id: '/cookies'
+      path: '/cookies'
+      fullPath: '/cookies'
+      preLoaderRoute: typeof CookiesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -242,9 +322,13 @@ const rootRouteChildren: RootRouteChildren = {
   CartRoute: CartRoute,
   CollectionsRoute: CollectionsRoute,
   ContactRoute: ContactRoute,
+  CookiesRoute: CookiesRoute,
   FaqRoute: FaqRoute,
   LookbookRoute: LookbookRoute,
+  PrivacyRoute: PrivacyRoute,
+  ReturnsRoute: ReturnsRoute,
   ShopRoute: ShopRoute,
+  TermsRoute: TermsRoute,
   ProductHandleRoute: ProductHandleRoute,
 }
 export const routeTree = rootRouteImport

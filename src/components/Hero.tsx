@@ -21,13 +21,13 @@ export function Hero() {
                 to="/shop"
                 className="inline-flex items-center gap-2 bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90 transition-colors"
               >
-                Vezi produsele →
+                Comandă Lansarea 01 →
               </Link>
               <Link
                 to="/lookbook"
                 className="font-mono-xs hover:opacity-60 underline underline-offset-4"
               >
-                Vezi editorialul
+                Vezi pe stradă
               </Link>
             </div>
           </div>

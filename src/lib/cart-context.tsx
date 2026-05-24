@@ -28,7 +28,7 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "trei-linii-cart-v2";
+const STORAGE_KEY = "trei-linii-cart-v3";
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);

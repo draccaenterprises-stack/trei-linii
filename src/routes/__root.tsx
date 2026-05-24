@@ -66,12 +66,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Trei Linii creează tricouri oversized și streetwear curat, cu logo mic pe față și print mai puternic pe spate.",
+          "Trei Linii — tricouri oversized din bumbac dens, cu față curată și print mai puternic pe spate. Lansarea 01 disponibilă în curând.",
       },
       { property: "og:title", content: "Trei Linii — Tricouri oversized și streetwear curat" },
       {
         property: "og:description",
-        content: "Tricouri oversized, bumbac dens și grafică simplă pentru purtare zilnică.",
+        content:
+          "Tricouri oversized din bumbac dens, cu față curată și print mai puternic pe spate.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

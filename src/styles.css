@@ -98,6 +98,8 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    max-width: 100%;
+    overflow-x: hidden;
     text-rendering: optimizeLegibility;
   }
 
@@ -107,7 +109,7 @@
   h4 {
     font-family: var(--font-display);
     font-weight: 400;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: 1.02;
   }
 
@@ -117,7 +119,7 @@
   .font-mono-xs {
     font-family: var(--font-mono);
     font-size: 0.7rem;
-    letter-spacing: 0.12em;
+    letter-spacing: 0;
     text-transform: uppercase;
   }
 

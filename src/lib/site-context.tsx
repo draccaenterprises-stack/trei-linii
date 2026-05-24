@@ -27,9 +27,9 @@ const defaults: SiteSettings = {
   font: "Serif Editorial",
   announcement: defaultAnnouncement,
   heroEyebrow: "Lansarea 01 — Trei Linii",
-  heroHeadline: "Tricouri simple\ncu spate puternic.",
+  heroHeadline: "Față curată.\nSpate care vorbește.",
   heroSubcopy:
-    "Streetwear curat pentru purtare zilnică: bumbac dens, croială oversized, logo mic pe față și grafică mai puternică pe spate.",
+    "Tricouri oversized din bumbac dens, create pentru purtare zilnică: semn discret în față, grafică mai puternică pe spate.",
   sections: defaultSections,
   featuredProductIds: ["p1", "p3", "p2", "p4"],
   featuredCollectionHandles: ["tricouri", "spalate", "printuri"],
@@ -42,7 +42,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v2";
+const STORAGE_KEY = "trei-linii-site-v3";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

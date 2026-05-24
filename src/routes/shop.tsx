@@ -16,7 +16,8 @@ export const Route = createFileRoute("/shop")({
       { title: "Magazin — Trei Linii" },
       {
         name: "description",
-        content: "Tricouri oversized Trei Linii: bumbac greu, croială curată și printuri simple.",
+        content:
+          "Tricouri oversized Trei Linii din bumbac dens, cu față curată și printuri puternice pe spate.",
       },
     ],
   }),
