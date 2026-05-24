@@ -67,7 +67,7 @@ type ShopifyProductNode = {
   title: string;
   description: string;
   availableForSale: boolean;
-  totalInventory: number | null;
+  totalInventory?: number | null;
   tags: string[];
   featuredImage: ShopifyImage | null;
   priceRange: {
@@ -87,7 +87,7 @@ type ShopifyProductNode = {
       id: string;
       title: string;
       availableForSale: boolean;
-      quantityAvailable: number | null;
+      quantityAvailable?: number | null;
       selectedOptions: ShopifySelectedOption[];
       price: ShopifyMoney;
     }>;
@@ -142,7 +142,6 @@ const PRODUCT_FIELDS = `
   title
   description
   availableForSale
-  totalInventory
   tags
   featuredImage {
     url
@@ -171,7 +170,6 @@ const PRODUCT_FIELDS = `
       id
       title
       availableForSale
-      quantityAvailable
       selectedOptions {
         name
         value
@@ -205,7 +203,9 @@ function selectedOptionValue(
 }
 
 function fallbackSize(options: ShopifySelectedOption[]) {
-  const values = options.map((option) => option.value).filter(Boolean);
+  const values = options
+    .map((option) => option.value)
+    .filter((value) => value && normalizeText(value) !== "default title");
   const knownSize = values.find((value) =>
     ["xs", "s", "m", "l", "xl", "xxl", "xxxl"].includes(normalizeText(value)),
   );
@@ -217,7 +217,9 @@ function fallbackColor(options: ShopifySelectedOption[]) {
   const explicitColor = selectedOptionValue(options, ["color", "colour", "culoare"]);
   if (explicitColor) return explicitColor;
 
-  const values = options.map((option) => option.value).filter(Boolean);
+  const values = options
+    .map((option) => option.value)
+    .filter((value) => value && normalizeText(value) !== "default title");
   const nonSizeValue = values.find(
     (value) => !["xs", "s", "m", "l", "xl", "xxl", "xxxl"].includes(normalizeText(value)),
   );
