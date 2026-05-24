@@ -68,13 +68,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content:
           "Trei Linii creează tricouri oversized și streetwear curat, cu logo mic pe față și print mai puternic pe spate.",
       },
-      { property: "og:title", content: "Trei Linii" },
+      { property: "og:title", content: "Trei Linii — Tricouri oversized și streetwear curat" },
       {
         property: "og:description",
         content: "Tricouri oversized, bumbac dens și grafică simplă pentru purtare zilnică.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Trei Linii — Tricouri oversized și streetwear curat" },
+      { name: "description", content: "3Linii is a React + TypeScript frontend demo for a minimal fashion brand, showcasing products and collections." },
+      { property: "og:description", content: "3Linii is a React + TypeScript frontend demo for a minimal fashion brand, showcasing products and collections." },
+      { name: "twitter:description", content: "3Linii is a React + TypeScript frontend demo for a minimal fashion brand, showcasing products and collections." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49bdac7b-d7cb-4816-b609-491e2ad3ec36/id-preview-8009d740--e18bc022-dcaa-4623-816c-c9581808d4a1.lovable.app-1779578875799.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/49bdac7b-d7cb-4816-b609-491e2ad3ec36/id-preview-8009d740--e18bc022-dcaa-4623-816c-c9581808d4a1.lovable.app-1779578875799.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
