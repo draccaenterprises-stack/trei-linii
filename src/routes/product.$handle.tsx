@@ -1,16 +1,21 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import { products, reviews } from "@/lib/mock-data";
+import { reviews } from "@/lib/mock-data";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { RotateCcw, Shield, Truck } from "lucide-react";
+import { fetchProductByHandle, fetchProducts } from "@/lib/shopify";
 
 export const Route = createFileRoute("/product/$handle")({
-  loader: ({ params }) => {
-    const product = products.find((p) => p.handle === params.handle);
+  loader: async ({ params }) => {
+    const [product, products] = await Promise.all([
+      fetchProductByHandle(params.handle),
+      fetchProducts(),
+    ]);
     if (!product) throw notFound();
-    return { product };
+    const related = products.filter((p) => p.id !== product.id).slice(0, 3);
+    return { product, related };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
@@ -35,7 +40,7 @@ export const Route = createFileRoute("/product/$handle")({
 });
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product, related } = Route.useLoaderData();
   const { addItem } = useCart();
   const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
   const [color, setColor] = useState<string>(product.colors[0].name);
@@ -47,8 +52,6 @@ function ProductPage() {
     }
     addItem(product, size, color);
   };
-
-  const related = products.filter((p) => p.id !== product.id).slice(0, 3);
 
   return (
     <div className="px-5 md:px-10 py-8 md:py-12 pb-28 md:pb-12">

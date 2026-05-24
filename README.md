@@ -1,15 +1,15 @@
 # Trei Linii storefront
 
-Frontend ecommerce custom generat în Lovable pentru brandul Trei Linii.
+Frontend ecommerce custom generat in Lovable pentru brandul Trei Linii.
 
-## Dezvoltare locală
+## Dezvoltare locala
 
 ```bash
 npm install
 npm run dev
 ```
 
-Verificări:
+Verificari:
 
 ```bash
 npm run build
@@ -18,35 +18,35 @@ npm run lint
 
 ## Date demo
 
-Proiectul folosește momentan produse, categorii, FAQ, recenzii și setări homepage mock din:
+Proiectul poate afisa produse, categorii, FAQ, recenzii si setari homepage mock din:
 
 ```text
 src/lib/mock-data.ts
 src/lib/site-context.tsx
 ```
 
-Aceste date sunt temporare până conectăm Shopify.
+Aceste date raman fallback pana exista produse publicate in Shopify pe canalul Headless.
 
-## Cum se adaugă produse
+## Cum se adauga produse
 
-Da: în producție produsele se adaugă direct din Shopify Admin.
+Produsele reale se adauga direct din Shopify Admin.
 
-Shopify trebuie să gestioneze:
+Shopify gestioneaza:
 
 - produse
-- titluri și descrieri
-- prețuri
+- titluri si descrieri
+- preturi
 - imagini
-- variante precum mărime și culoare
+- variante precum marime si culoare
 - stoc
 - reduceri
 - checkout
-- plăți
+- plati
 - comenzi
 - taxe
-- livrare și integrări cu firme de curierat
+- livrare si integrari cu firme de curierat
 
-Frontend-ul custom citește catalogul din Shopify și trimite clientul la Shopify Checkout.
+Frontend-ul custom citeste catalogul din Shopify si trimite clientul la Shopify Checkout.
 
 ## Integrare Shopify
 
@@ -56,20 +56,23 @@ Layer-ul de integrare este aici:
 src/lib/shopify.ts
 ```
 
-Variabile necesare:
+Variabile recomandate:
 
 ```text
-VITE_SHOPIFY_STORE_DOMAIN=magazinul-tau.myshopify.com
+VITE_SHOPIFY_STORE_DOMAIN=aa01qm-mq.myshopify.com
 VITE_SHOPIFY_STOREFRONT_TOKEN=token_public_storefront
-VITE_SHOPIFY_API_VERSION=2024-10
+VITE_SHOPIFY_API_VERSION=2026-01
 ```
 
-Pașii următori:
+Status integrare:
 
-1. Înlocuim citirea produselor mock cu query-uri Shopify Storefront API.
-2. Mapăm handle-urile Shopify la ruta `/product/$handle`.
-3. Folosim ID-urile variantelor Shopify pentru coș.
-4. Folosim `cartCreate` și `cartLinesAdd`.
-5. Redirecționăm către `checkoutUrl` primit de la Shopify.
+1. Produsele si colectiile sunt citite prin Shopify Storefront API.
+2. Ruta `/product/$handle` cauta produsul dupa handle-ul Shopify.
+3. Cosul foloseste ID-urile variantelor Shopify cand produsul vine din Shopify.
+4. Checkout-ul foloseste `cartCreate` si `cartLinesAdd`.
+5. Clientul este redirectionat catre `checkoutUrl` primit de la Shopify.
 
 Nu construim checkout custom.
+
+Pentru Trei Linii, domeniul Shopify curent este `aa01qm-mq.myshopify.com`.
+Tokenul Storefront este public si poate fi folosit din browser, dar variabilele de mediu raman metoda recomandata pentru Lovable/deploy. Daca Shopify nu are inca produse publicate pe canalul Headless, frontend-ul pastreaza produsele demo ca site-ul sa nu para gol.

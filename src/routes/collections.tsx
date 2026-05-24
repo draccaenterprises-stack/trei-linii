@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CollectionCard } from "@/components/CollectionCard";
-import { collections } from "@/lib/mock-data";
+import { fetchCollections } from "@/lib/shopify";
 
 export const Route = createFileRoute("/collections")({
+  loader: () => fetchCollections(),
   component: CollectionsPage,
   head: () => ({
     meta: [
@@ -16,6 +17,8 @@ export const Route = createFileRoute("/collections")({
 });
 
 function CollectionsPage() {
+  const collections = Route.useLoaderData();
+
   return (
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1600px]">

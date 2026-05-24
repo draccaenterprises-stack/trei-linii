@@ -10,21 +10,31 @@ import {
   SocialProofGrid,
   TrustStrip,
 } from "@/components/Sections";
-import { collections, faqs, lookbookImages, products } from "@/lib/mock-data";
+import { faqs, lookbookImages } from "@/lib/mock-data";
 import { sectionEnabled, useSite } from "@/lib/site-context";
+import { fetchCollections, fetchProducts } from "@/lib/shopify";
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
+    return { products, collections };
+  },
   component: Index,
 });
 
 function Index() {
+  const { products, collections } = Route.useLoaderData();
   const { sections, featuredProductIds, featuredCollectionHandles } = useSite();
-  const featured = featuredProductIds
+  const configuredFeatured = featuredProductIds
     .map((id) => products.find((p) => p.id === id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
-  const featuredCols = featuredCollectionHandles
+  const featured = configuredFeatured.length ? configuredFeatured : products.slice(0, 4);
+  const configuredFeaturedCols = featuredCollectionHandles
     .map((h) => collections.find((c) => c.handle === h))
     .filter((c): c is NonNullable<typeof c> => Boolean(c));
+  const featuredCols = configuredFeaturedCols.length
+    ? configuredFeaturedCols
+    : collections.slice(0, 3);
 
   return (
     <>

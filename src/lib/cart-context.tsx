@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { Product, Size } from "./mock-data";
+import { getSelectedVariantId } from "./shopify";
 
 export interface CartLine {
   lineId: string;
   productId: string;
+  merchandiseId?: string;
   handle: string;
   title: string;
   image: string;
@@ -60,7 +62,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       open: () => setIsOpen(true),
       close: () => setIsOpen(false),
       addItem: (product, size, color, quantity = 1) => {
-        const lineId = `${product.id}-${size}-${color}`;
+        const merchandiseId = getSelectedVariantId(product, size, color);
+        const lineId = `${merchandiseId ?? product.id}-${size}-${color}`;
         setLines((prev) => {
           const existing = prev.find((l) => l.lineId === lineId);
           if (existing) {
@@ -73,6 +76,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             {
               lineId,
               productId: product.id,
+              merchandiseId,
               handle: product.handle,
               title: product.title,
               image: product.images[0],

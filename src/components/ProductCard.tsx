@@ -53,7 +53,10 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="text-sm tabular-nums">{formatRON(product.price)}</div>
       </div>
 
-      <div className="mt-4 grid grid-cols-4 border border-border">
+      <div
+        className="mt-4 grid border border-border"
+        style={{ gridTemplateColumns: `repeat(${product.sizes.length}, minmax(0, 1fr))` }}
+      >
         {product.sizes.map((size) => {
           const disabled = product.stock[size] === 0;
           return (

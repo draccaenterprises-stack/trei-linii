@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { useCart, type CartLine } from "@/lib/cart-context";
-import { X, Plus, Minus } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import { Minus, Plus, X } from "lucide-react";
 import { formatRON } from "@/lib/format";
+import { useCart, type CartLine } from "@/lib/cart-context";
 import {
   addCartLines,
   createCart,
   isShopifyConfigured,
+  isShopifyProductVariantId,
   redirectToShopifyCheckout,
 } from "@/lib/shopify";
 
@@ -19,24 +20,29 @@ export function CartDrawer() {
       <div className="absolute inset-0 bg-charcoal/40" onClick={close} />
       <aside className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-background flex flex-col">
         <div className="h-16 px-5 flex items-center justify-between border-b border-border">
-          <span className="font-mono-xs">Coș ({lines.length})</span>
-          <button onClick={close} aria-label="Închide coșul">
+          <span className="font-mono-xs">Cos ({lines.length})</span>
+          <button onClick={close} aria-label="Inchide cosul">
             <X className="h-5 w-5" strokeWidth={1.25} />
           </button>
         </div>
 
         {lines.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center px-8 gap-4">
-            <p className="font-display text-2xl">Coșul este gol.</p>
+            <p className="font-display text-2xl">Cosul este gol.</p>
             <Link to="/shop" onClick={close} className="font-mono-xs underline underline-offset-4">
-              Continuă cumpărăturile
+              Continua cumparaturile
             </Link>
           </div>
         ) : (
           <>
             <div className="flex-1 overflow-y-auto px-5 py-4 divide-y divide-border">
-              {lines.map((l) => (
-                <CartRow key={l.lineId} line={l} onRemove={removeItem} onQty={updateQuantity} />
+              {lines.map((line) => (
+                <CartRow
+                  key={line.lineId}
+                  line={line}
+                  onRemove={removeItem}
+                  onQty={updateQuantity}
+                />
               ))}
             </div>
             <CheckoutFooter subtotal={subtotal} />
@@ -74,11 +80,11 @@ function CartRow({
               onClick={() => onRemove(line.lineId)}
               className="font-mono-xs opacity-60 hover:opacity-100"
             >
-              Elimină
+              Elimina
             </button>
           </div>
           <p className="font-mono-xs opacity-50 mt-1">
-            {line.color} · {line.size}
+            {line.color} / {line.size}
           </p>
         </div>
         <div className="flex items-center justify-between">
@@ -112,11 +118,11 @@ export function CheckoutFooter({ subtotal }: { subtotal: number }) {
         <span className="tabular-nums text-base">{formatRON(subtotal)}</span>
       </div>
       <p className="font-mono-xs opacity-50">
-        Livrarea și taxele se calculează la finalizarea comenzii.
+        Livrarea si taxele se calculeaza la finalizarea comenzii.
       </p>
       <ShopifyCheckoutButton />
       <Link to="/cart" className="block text-center font-mono-xs underline underline-offset-4">
-        Vezi coșul complet
+        Vezi cosul complet
       </Link>
     </div>
   );
@@ -125,35 +131,53 @@ export function CheckoutFooter({ subtotal }: { subtotal: number }) {
 export function ShopifyCheckoutButton({ className = "" }: { className?: string }) {
   const { lines } = useCart();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const shopifyReady = isShopifyConfigured();
+  const hasRealShopifyVariants = lines.every((line) =>
+    isShopifyProductVariantId(line.merchandiseId),
+  );
+  const canCheckout = shopifyReady && lines.length > 0 && hasRealShopifyVariants;
 
   const handleCheckout = async () => {
-    if (!shopifyReady) return;
+    if (!canCheckout) return;
+
     setLoading(true);
+    setError(null);
+
     try {
-      // Placeholder: în producție se folosesc ID-urile variantelor Shopify, nu ID-urile mock.
       const cart = await createCart();
       const updatedCart = await addCartLines(
         cart.id,
-        lines.map((l) => ({ merchandiseId: l.productId, quantity: l.quantity })),
+        lines.map((line) => ({
+          merchandiseId: line.merchandiseId as string,
+          quantity: line.quantity,
+        })),
       );
+
       redirectToShopifyCheckout(updatedCart.checkoutUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Nu am putut porni checkout-ul Shopify.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <button
-      onClick={handleCheckout}
-      disabled={loading || lines.length === 0 || !shopifyReady}
-      className={`w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors disabled:opacity-50 ${className}`}
-    >
-      {!shopifyReady
-        ? "Finalizare Shopify neconfigurată"
-        : loading
-          ? "Se redirecționează…"
-          : "Continuă spre finalizarea Shopify →"}
-    </button>
+    <div className="space-y-2">
+      <button
+        onClick={handleCheckout}
+        disabled={loading || !canCheckout}
+        className={`w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors disabled:opacity-50 ${className}`}
+      >
+        {!shopifyReady
+          ? "Finalizare Shopify neconfigurata"
+          : !hasRealShopifyVariants
+            ? "Adauga produse publicate in Shopify"
+            : loading
+              ? "Se redirectioneaza..."
+              : "Continua spre checkout Shopify ->"}
+      </button>
+      {error && <p className="font-mono-xs text-red-700">{error}</p>}
+    </div>
   );
 }

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProductGrid } from "@/components/ProductCard";
-import { collections, products } from "@/lib/mock-data";
+import { fetchCollections, fetchProducts } from "@/lib/shopify";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -10,6 +10,10 @@ const searchSchema = z.object({
 
 export const Route = createFileRoute("/shop")({
   validateSearch: searchSchema,
+  loader: async () => {
+    const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
+    return { products, collections };
+  },
   component: Shop,
   head: () => ({
     meta: [
@@ -24,6 +28,7 @@ export const Route = createFileRoute("/shop")({
 });
 
 function Shop() {
+  const { products, collections } = Route.useLoaderData();
   const { collection } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");

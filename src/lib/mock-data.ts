@@ -13,11 +13,19 @@ import lb2 from "@/assets/lookbook-2.jpg";
 import lb3 from "@/assets/lookbook-3.jpg";
 
 export type Badge = "noutate" | "limitat" | "stoc limitat";
-export type Size = "S" | "M" | "L" | "XL";
+export type Size = string;
 
 export interface ColorVariant {
   name: string;
   hex: string;
+}
+
+export interface ProductVariant {
+  id: string;
+  size: Size;
+  color: string;
+  availableForSale: boolean;
+  quantityAvailable: number | null;
 }
 
 export interface Product {
@@ -33,6 +41,7 @@ export interface Product {
   sizes: Size[];
   colors: ColorVariant[];
   stock: Record<Size, number>;
+  variants?: ProductVariant[];
 }
 
 export const products: Product[] = [
