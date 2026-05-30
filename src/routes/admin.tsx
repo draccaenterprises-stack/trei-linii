@@ -1,16 +1,59 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { collections, products } from "@/lib/mock-data";
-import { useSite } from "@/lib/site-context";
+import { useState, type ReactNode } from "react";
+import { useSite, type SiteMode } from "@/lib/site-context";
+
+const ADMIN_PIN = "treilinii";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
   head: () => ({
-    meta: [{ title: "Admin — Trei Linii" }, { name: "robots", content: "noindex" }],
+    meta: [{ title: "Admin - Trei Linii" }, { name: "robots", content: "noindex,nofollow" }],
   }),
 });
 
 function Admin() {
   const site = useSite();
+  const [pin, setPin] = useState("");
+  const [unlocked, setUnlocked] = useState(
+    () => typeof window !== "undefined" && sessionStorage.getItem("trei-linii-admin") === "1",
+  );
+  const missingLegal = !site.legalBusinessName || !site.legalBusinessDetails;
+
+  if (!unlocked) {
+    return (
+      <div className="min-h-screen bg-cream px-5 py-20 grid place-items-center">
+        <form
+          className="w-full max-w-sm border border-border bg-background p-6 space-y-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (pin === ADMIN_PIN) {
+              sessionStorage.setItem("trei-linii-admin", "1");
+              setUnlocked(true);
+            }
+          }}
+        >
+          <div>
+            <p className="font-mono-xs opacity-60">Admin privat</p>
+            <h1 className="font-display text-4xl mt-2">Control site</h1>
+          </div>
+          <input
+            type="password"
+            className="input"
+            value={pin}
+            onChange={(event) => setPin(event.target.value)}
+            placeholder="Cod acces"
+          />
+          <button className="w-full bg-charcoal text-cream py-3 font-mono-xs">
+            Intra in admin
+          </button>
+          <p className="text-xs text-muted-foreground">
+            Acces rezervat pentru administrarea continutului Trei Linii.
+          </p>
+        </form>
+        <AdminStyles />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-cream min-h-screen">
@@ -18,19 +61,64 @@ function Admin() {
         <div className="mx-auto max-w-[1400px]">
           <div className="flex flex-wrap items-end justify-between gap-4 mb-12 pb-6 border-b border-border">
             <div>
-              <p className="font-mono-xs opacity-60">Admin · Demo fără autentificare</p>
+              <p className="font-mono-xs opacity-60">Admin · Trei Linii</p>
               <h1 className="font-display text-5xl md:text-7xl mt-2">Control site.</h1>
             </div>
-            <button
-              onClick={site.reset}
-              className="font-mono-xs border border-border px-4 py-2 hover:border-charcoal"
-            >
-              Resetează setările
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  sessionStorage.removeItem("trei-linii-admin");
+                  setUnlocked(false);
+                }}
+                className="font-mono-xs border border-border px-4 py-2 hover:border-charcoal"
+              >
+                Blocheaza
+              </button>
+              <button
+                onClick={site.reset}
+                className="font-mono-xs border border-border px-4 py-2 hover:border-charcoal"
+              >
+                Reseteaza setarile
+              </button>
+            </div>
           </div>
 
+          {missingLegal && (
+            <div className="mb-6 border border-washed-red bg-background p-4 text-sm">
+              Datele firmei lipsesc in admin. Publicul nu vede un placeholder, dar trebuie
+              completate inainte de lansarea comerciala.
+            </div>
+          )}
+
           <div className="grid lg:grid-cols-2 gap-6">
-            <Panel title="Brand">
+            <Panel title="Mod site">
+              <Row label="Status comercial">
+                <select
+                  className="input"
+                  value={site.siteMode}
+                  onChange={(e) => site.update({ siteMode: e.target.value as SiteMode })}
+                >
+                  <option value="pre-launch">Pre-launch</option>
+                  <option value="live-shop">Live shop</option>
+                </select>
+              </Row>
+              <Row label="Bara anunt activa">
+                <input
+                  type="checkbox"
+                  checked={site.announcementVisible}
+                  onChange={(e) => site.update({ announcementVisible: e.target.checked })}
+                />
+              </Row>
+              <Row label="Text bara anunt">
+                <input
+                  className="input"
+                  value={site.announcement}
+                  onChange={(e) => site.update({ announcement: e.target.value })}
+                />
+              </Row>
+            </Panel>
+
+            <Panel title="Brand & SEO">
               <Row label="Text logo">
                 <input
                   className="input"
@@ -38,43 +126,43 @@ function Admin() {
                   onChange={(e) => site.update({ logoText: e.target.value })}
                 />
               </Row>
-              <Row label="URL favicon">
+              <Row label="SEO title">
                 <input
                   className="input"
-                  value={site.favicon}
-                  onChange={(e) => site.update({ favicon: e.target.value })}
+                  value={site.seoTitle}
+                  onChange={(e) => site.update({ seoTitle: e.target.value })}
                 />
               </Row>
-              <Row label="Culoare principală">
-                <input
-                  type="color"
-                  className="h-10 w-20 cursor-pointer"
-                  value={site.primaryColor}
-                  onChange={(e) => site.update({ primaryColor: e.target.value })}
+              <Row label="SEO description">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.seoDescription}
+                  onChange={(e) => site.update({ seoDescription: e.target.value })}
                 />
               </Row>
-              <Row label="Culoare accent">
-                <input
-                  type="color"
-                  className="h-10 w-20 cursor-pointer"
-                  value={site.accentColor}
-                  onChange={(e) => site.update({ accentColor: e.target.value })}
-                />
-              </Row>
-              <Row label="Sistem font">
-                <select
-                  className="input"
-                  value={site.font}
-                  onChange={(e) => site.update({ font: e.target.value as typeof site.font })}
-                >
-                  <option>Serif Editorial</option>
-                  <option>Sans Modern</option>
-                </select>
-              </Row>
+              <div className="grid grid-cols-2 gap-3">
+                <Row label="Culoare principala">
+                  <input
+                    type="color"
+                    className="h-10 w-20 cursor-pointer"
+                    value={site.primaryColor}
+                    onChange={(e) => site.update({ primaryColor: e.target.value })}
+                  />
+                </Row>
+                <Row label="Culoare accent">
+                  <input
+                    type="color"
+                    className="h-10 w-20 cursor-pointer"
+                    value={site.accentColor}
+                    onChange={(e) => site.update({ accentColor: e.target.value })}
+                  />
+                </Row>
+              </div>
             </Panel>
 
             <Panel title="Hero">
-              <Row label="Text mic de sus">
+              <Row label="Text mic">
                 <input
                   className="input"
                   value={site.heroEyebrow}
@@ -97,154 +185,131 @@ function Admin() {
                   onChange={(e) => site.update({ heroSubcopy: e.target.value })}
                 />
               </Row>
-              <Row label="Imagine hero">
-                <button className="font-mono-xs border border-border px-3 py-2 hover:border-charcoal">
-                  Înlocuiește imaginea (placeholder)
-                </button>
-              </Row>
-            </Panel>
-
-            <Panel title="Bară anunț">
-              <Row label="Mesaj">
+              <div className="grid md:grid-cols-2 gap-3">
+                <Row label="CTA principal text">
+                  <input
+                    className="input"
+                    value={site.heroPrimaryCtaText}
+                    onChange={(e) => site.update({ heroPrimaryCtaText: e.target.value })}
+                  />
+                </Row>
+                <Row label="CTA principal link">
+                  <input
+                    className="input"
+                    value={site.heroPrimaryCtaLink}
+                    onChange={(e) => site.update({ heroPrimaryCtaLink: e.target.value })}
+                  />
+                </Row>
+                <Row label="CTA secundar text">
+                  <input
+                    className="input"
+                    value={site.heroSecondaryCtaText}
+                    onChange={(e) => site.update({ heroSecondaryCtaText: e.target.value })}
+                  />
+                </Row>
+                <Row label="CTA secundar link">
+                  <input
+                    className="input"
+                    value={site.heroSecondaryCtaLink}
+                    onChange={(e) => site.update({ heroSecondaryCtaLink: e.target.value })}
+                  />
+                </Row>
+              </div>
+              <Row label="Badge-uri sub hero">
                 <input
                   className="input"
-                  value={site.announcement}
-                  onChange={(e) => site.update({ announcement: e.target.value })}
+                  value={site.heroBadges}
+                  onChange={(e) => site.update({ heroBadges: e.target.value })}
                 />
               </Row>
             </Panel>
 
-            <Panel title="Secțiuni homepage">
+            <Panel title="Sectiuni homepage">
               <ul className="divide-y divide-border">
                 {site.sections.map((s) => (
                   <li key={s.id} className="flex items-center justify-between py-3">
                     <span className="text-sm">{s.label}</span>
                     <button
                       onClick={() => site.toggleSection(s.id)}
-                      className={`w-12 h-6 rounded-full transition-colors relative ${s.enabled ? "bg-charcoal" : "bg-border"}`}
+                      className={`w-12 h-6 rounded-full transition-colors relative ${
+                        s.enabled ? "bg-charcoal" : "bg-border"
+                      }`}
                     >
                       <span
-                        className={`absolute top-0.5 h-5 w-5 bg-cream rounded-full transition-all ${s.enabled ? "left-6" : "left-0.5"}`}
+                        className={`absolute top-0.5 h-5 w-5 bg-cream rounded-full transition-all ${
+                          s.enabled ? "left-6" : "left-0.5"
+                        }`}
                       />
                     </button>
                   </li>
                 ))}
               </ul>
+              <Row label="Recenzii active">
+                <input
+                  type="checkbox"
+                  checked={site.reviewsEnabled}
+                  onChange={(e) => site.update({ reviewsEnabled: e.target.checked })}
+                />
+              </Row>
             </Panel>
 
-            <Panel title="Produse recomandate">
-              <p className="font-mono-xs opacity-60 mb-3">Alege ce produse apar pe homepage.</p>
-              <ul className="space-y-2">
-                {products.map((p) => {
-                  const on = site.featuredProductIds.includes(p.id);
-                  return (
-                    <li
-                      key={p.id}
-                      className="flex items-center justify-between border border-border px-3 py-2"
-                    >
-                      <span className="text-sm">{p.title}</span>
-                      <button
-                        onClick={() =>
-                          site.update({
-                            featuredProductIds: on
-                              ? site.featuredProductIds.filter((id) => id !== p.id)
-                              : [...site.featuredProductIds, p.id],
-                          })
-                        }
-                        className="font-mono-xs"
-                      >
-                        {on ? "● Recomandat" : "○ Ascuns"}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
+            <Panel title="Contact & social">
+              <Row label="Email contact">
+                <input
+                  className="input"
+                  value={site.contactEmail}
+                  onChange={(e) => site.update({ contactEmail: e.target.value })}
+                />
+              </Row>
+              <Row label="WhatsApp link">
+                <input
+                  className="input"
+                  value={site.whatsapp}
+                  onChange={(e) => site.update({ whatsapp: e.target.value })}
+                />
+              </Row>
+              <Row label="Instagram">
+                <input
+                  className="input"
+                  value={site.instagram}
+                  onChange={(e) => site.update({ instagram: e.target.value })}
+                />
+              </Row>
+              <Row label="TikTok">
+                <input
+                  className="input"
+                  value={site.tiktok}
+                  onChange={(e) => site.update({ tiktok: e.target.value })}
+                />
+              </Row>
             </Panel>
 
-            <Panel title="Categorii recomandate">
-              <ul className="space-y-2">
-                {collections.map((c) => {
-                  const on = site.featuredCollectionHandles.includes(c.handle);
-                  return (
-                    <li
-                      key={c.handle}
-                      className="flex items-center justify-between border border-border px-3 py-2"
-                    >
-                      <span className="text-sm">{c.title}</span>
-                      <button
-                        onClick={() =>
-                          site.update({
-                            featuredCollectionHandles: on
-                              ? site.featuredCollectionHandles.filter((h) => h !== c.handle)
-                              : [...site.featuredCollectionHandles, c.handle],
-                          })
-                        }
-                        className="font-mono-xs"
-                      >
-                        {on ? "● Recomandată" : "○ Ascunsă"}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </Panel>
-
-            <Panel title="Badge-uri produse">
-              <p className="font-mono-xs opacity-60 mb-3">
-                Preview momentan. În producție se pot administra prin Shopify metafields.
-              </p>
-              <ul className="space-y-2">
-                {products.map((p) => (
-                  <li
-                    key={p.id}
-                    className="flex items-center justify-between border border-border px-3 py-2"
-                  >
-                    <span className="text-sm">{p.title}</span>
-                    <span className="font-mono-xs opacity-70">{p.badge ?? "— fără badge —"}</span>
-                  </li>
-                ))}
-              </ul>
-            </Panel>
-
-            <Panel title="Conținut static">
-              <p className="font-mono-xs opacity-60 mb-3">
-                Bannere · Editorial · FAQ · Footer · Despre
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  "Editează bannere",
-                  "Editează editorial",
-                  "Editează FAQ",
-                  "Editează recenzii",
-                  "Editează footer",
-                  "Editează pagini statice",
-                ].map((t) => (
-                  <button
-                    key={t}
-                    className="font-mono-xs border border-border px-3 py-3 text-left hover:border-charcoal"
-                  >
-                    {t} →
-                  </button>
-                ))}
-              </div>
+            <Panel title="Date legale">
+              <Row label="Nume firma">
+                <input
+                  className="input"
+                  value={site.legalBusinessName}
+                  onChange={(e) => site.update({ legalBusinessName: e.target.value })}
+                />
+              </Row>
+              <Row label="CUI / Reg. Com. / adresa">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.legalBusinessDetails}
+                  onChange={(e) => site.update({ legalBusinessDetails: e.target.value })}
+                />
+              </Row>
             </Panel>
           </div>
         </div>
       </div>
-
-      <style>{`
-        .input {
-          width: 100%; background: transparent; outline: none;
-          border: 1px solid var(--color-border); padding: 8px 10px;
-          font-family: var(--font-sans); font-size: 0.875rem;
-        }
-        .input:focus { border-color: var(--color-charcoal); }
-      `}</style>
+      <AdminStyles />
     </div>
   );
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="bg-background border border-border p-6 md:p-8">
       <h2 className="font-display text-2xl mb-6">{title}</h2>
@@ -253,11 +318,24 @@ function Panel({ title, children }: { title: string; children: React.ReactNode }
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
       <label className="font-mono-xs opacity-60 block mb-2">{label}</label>
       {children}
     </div>
+  );
+}
+
+function AdminStyles() {
+  return (
+    <style>{`
+      .input {
+        width: 100%; background: transparent; outline: none;
+        border: 1px solid var(--color-border); padding: 8px 10px;
+        font-family: var(--font-sans); font-size: 0.875rem;
+      }
+      .input:focus { border-color: var(--color-charcoal); }
+    `}</style>
   );
 }

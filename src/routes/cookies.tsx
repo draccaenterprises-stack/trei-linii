@@ -4,11 +4,8 @@ export const Route = createFileRoute("/cookies")({
   component: Cookies,
   head: () => ({
     meta: [
-      { title: "Politica de cookies — Trei Linii" },
-      {
-        name: "description",
-        content: "Politica de cookies pentru Trei Linii.",
-      },
+      { title: "Cookies - Trei Linii" },
+      { name: "description", content: "Informatii despre cookies pe site-ul Trei Linii." },
     ],
   }),
 });
@@ -21,11 +18,12 @@ function Cookies() {
         <h1 className="font-display text-5xl md:text-7xl mt-3">Cookies</h1>
         <div className="mt-10 space-y-6 text-muted-foreground leading-relaxed">
           <p>
-            Această pagină trebuie completată cu instrumentele reale folosite pentru analiză,
-            marketing, consimțământ și funcționarea coșului.
+            Site-ul poate folosi cookies necesare pentru functionarea navigarii, cosului si
+            formularelor. Unele servicii externe pot seta cookies pentru analiza sau masurare.
           </p>
           <p>
-            În producție, recomandarea este folosirea unui banner de consimțământ compatibil GDPR.
+            Poti controla cookies din setarile browserului. Blocarea unor cookies poate afecta
+            experienta de navigare sau functionalitatea cosului.
           </p>
         </div>
       </article>

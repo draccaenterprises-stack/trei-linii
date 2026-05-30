@@ -1,19 +1,48 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ShoppingBag, Menu } from "lucide-react";
+import { Menu, ShoppingBag } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
 
-const nav = [
-  { to: "/shop", label: "Magazin" },
-  { to: "/collections", label: "Lansări" },
-  { to: "/lookbook", label: "Pe stradă" },
-  { to: "/about", label: "Despre" },
+const preLaunchNav = [
+  { to: "/about", label: "Concept" },
+  { to: "/shop", label: "Modele" },
+  { to: "/size-guide", label: "Marimi" },
+  { to: "/#newsletter", label: "Inscriere" },
+] as const;
+
+const liveShopNav = [
+  { to: "/shop", label: "Shop" },
+  { to: "/collections", label: "Modele" },
+  { to: "/size-guide", label: "Ghid marimi" },
+  { to: "/lookbook", label: "Lookbook" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
+function NavLink({ to, label }: { to: string; label: string }) {
+  if (to.includes("#")) {
+    return (
+      <a href={to} className="font-mono-xs hover:opacity-60 transition-opacity">
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <Link
+      to={to}
+      className="font-mono-xs hover:opacity-60 transition-opacity"
+      activeProps={{ className: "font-mono-xs underline underline-offset-4" }}
+    >
+      {label}
+    </Link>
+  );
+}
+
 export function Announcement() {
-  const { announcement } = useSite();
+  const { announcement, announcementVisible } = useSite();
+  if (!announcementVisible || !announcement.trim()) return null;
+
   return (
     <div className="bg-charcoal text-cream overflow-hidden border-b border-charcoal">
       <div className="marquee-track py-2 font-mono-xs">
@@ -29,8 +58,9 @@ export function Announcement() {
 
 export function Header() {
   const { count, open } = useCart();
-  const { logoText } = useSite();
+  const { logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
+  const nav = siteMode === "pre-launch" ? preLaunchNav : liveShopNav;
 
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-border">
@@ -41,26 +71,25 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-8">
           {nav.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              className="font-mono-xs hover:opacity-60 transition-opacity"
-              activeProps={{ className: "font-mono-xs underline underline-offset-4" }}
-            >
-              {n.label}
-            </Link>
+            <NavLink key={n.to} to={n.to} label={n.label} />
           ))}
         </nav>
 
         <div className="flex items-center gap-4">
-          <button
-            onClick={open}
-            className="font-mono-xs flex items-center gap-1.5 hover:opacity-60 transition-opacity"
-            aria-label="Deschide coșul"
-          >
-            <ShoppingBag className="h-4 w-4" strokeWidth={1.25} />
-            <span>Coș ({count})</span>
-          </button>
+          {siteMode === "live-shop" ? (
+            <button
+              onClick={open}
+              className="font-mono-xs flex items-center gap-1.5 hover:opacity-60 transition-opacity"
+              aria-label="Deschide cosul"
+            >
+              <ShoppingBag className="h-4 w-4" strokeWidth={1.25} />
+              <span>Cos ({count})</span>
+            </button>
+          ) : (
+            <a href="/#newsletter" className="font-mono-xs hover:opacity-60 transition-opacity">
+              Lista lansare
+            </a>
+          )}
           <details className="md:hidden">
             <summary
               className="list-none cursor-pointer [&::-webkit-details-marker]:hidden"
@@ -70,17 +99,22 @@ export function Header() {
             </summary>
             <div className="fixed left-0 right-0 top-[96px] z-50 bg-background border-b border-border shadow-sm">
               <nav className="flex flex-col px-5 py-6 gap-5">
-                {nav.map((n) => (
-                  <Link key={n.to} to={n.to} className="font-display text-3xl">
-                    {n.label}
-                  </Link>
-                ))}
+                {nav.map((n) =>
+                  n.to.includes("#") ? (
+                    <a key={n.to} href={n.to} className="font-display text-3xl">
+                      {n.label}
+                    </a>
+                  ) : (
+                    <Link key={n.to} to={n.to} className="font-display text-3xl">
+                      {n.label}
+                    </Link>
+                  ),
+                )}
               </nav>
             </div>
           </details>
         </div>
       </div>
-      {/* hide highlight warning */}
       <span className="sr-only">{pathname}</span>
     </header>
   );

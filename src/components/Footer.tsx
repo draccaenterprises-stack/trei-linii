@@ -2,49 +2,63 @@ import { Link } from "@tanstack/react-router";
 import { useSite } from "@/lib/site-context";
 
 export function Footer() {
-  const { logoText } = useSite();
+  const {
+    logoText,
+    contactEmail,
+    whatsapp,
+    instagram,
+    tiktok,
+    legalBusinessName,
+    legalBusinessDetails,
+    siteMode,
+  } = useSite();
+  const businessLine =
+    legalBusinessName && legalBusinessDetails
+      ? `${legalBusinessName} · ${legalBusinessDetails}`
+      : logoText;
+
   return (
     <footer className="bg-charcoal text-cream mt-32">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-16 md:py-24">
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
             <div className="font-display text-3xl md:text-5xl leading-[0.95]">
-              Simplu în față,
+              Simplu in fata,
               <br />
-              puternic pe spate.
+              design pe spate.
             </div>
-            <p className="font-mono-xs mt-6 opacity-60">{logoText} · EST. 2026 · BUCUREȘTI</p>
+            <p className="font-mono-xs mt-6 opacity-60">{logoText} · Bucuresti</p>
           </div>
 
           <div className="md:col-span-2">
-            <h4 className="font-mono-xs opacity-50 mb-4">Magazin</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">Navigatie</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/shop" className="hover:opacity-60">
-                  Toate produsele
+                  Modele
                 </Link>
               </li>
               <li>
-                <Link to="/collections" className="hover:opacity-60">
-                  Lansări
+                <Link to="/size-guide" className="hover:opacity-60">
+                  Ghid marimi
                 </Link>
               </li>
               <li>
                 <Link to="/lookbook" className="hover:opacity-60">
-                  Pe stradă
+                  Lookbook
+                </Link>
+              </li>
+              <li>
+                <Link to="/about" className="hover:opacity-60">
+                  Concept
                 </Link>
               </li>
             </ul>
           </div>
 
           <div className="md:col-span-2">
-            <h4 className="font-mono-xs opacity-50 mb-4">Brand</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">Suport</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/about" className="hover:opacity-60">
-                  Despre
-                </Link>
-              </li>
               <li>
                 <Link to="/contact" className="hover:opacity-60">
                   Contact
@@ -55,25 +69,37 @@ export function Footer() {
                   FAQ
                 </Link>
               </li>
+              <li>
+                <Link to="/delivery" className="hover:opacity-60">
+                  Livrare
+                </Link>
+              </li>
+              <li>
+                <Link to="/returns" className="hover:opacity-60">
+                  Retur
+                </Link>
+              </li>
+              <li>
+                <Link to="/exchange" className="hover:opacity-60">
+                  Schimb marime
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">Newsletter</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">
+              {siteMode === "pre-launch" ? "Lista de lansare" : "Newsletter"}
+            </h4>
             <p className="text-sm opacity-70 mb-3">
-              -10% la prima comandă și acces cu 24h înainte la următoarea lansare.
+              Afla cand apar primele modele si cand devine disponibil checkout-ul.
             </p>
-            <form
-              className="flex border-b border-cream/30 pb-1"
-              onSubmit={(e) => e.preventDefault()}
+            <a
+              href="/#newsletter"
+              className="font-mono-xs underline underline-offset-4 hover:opacity-60"
             >
-              <input
-                type="email"
-                placeholder="email@exemplu.ro"
-                className="flex-1 bg-transparent outline-none text-sm placeholder:opacity-40"
-              />
-              <button className="font-mono-xs hover:opacity-60">→</button>
-            </form>
+              Inscrie-te
+            </a>
           </div>
         </div>
 
@@ -83,17 +109,12 @@ export function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/terms" className="hover:opacity-60">
-                  Termeni și condiții
-                </Link>
-              </li>
-              <li>
-                <Link to="/returns" className="hover:opacity-60">
-                  Politica de retur
+                  Termeni si conditii
                 </Link>
               </li>
               <li>
                 <Link to="/privacy" className="hover:opacity-60">
-                  Confidențialitate
+                  Confidentialitate
                 </Link>
               </li>
               <li>
@@ -108,7 +129,7 @@ export function Footer() {
               </li>
               <li>
                 <a href="https://ec.europa.eu/consumers/odr" className="hover:opacity-60">
-                  ANPC-SAL
+                  SOL
                 </a>
               </li>
             </ul>
@@ -118,37 +139,42 @@ export function Footer() {
             <h4 className="font-mono-xs opacity-50 mb-4">Social</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="https://instagram.com" className="hover:opacity-60">
+                <a href={instagram} className="hover:opacity-60">
                   Instagram
                 </a>
               </li>
               <li>
-                <a href="https://tiktok.com" className="hover:opacity-60">
+                <a href={tiktok} className="hover:opacity-60">
                   TikTok
                 </a>
               </li>
-              <li>
-                <a href="https://wa.me/" className="hover:opacity-60">
-                  WhatsApp
-                </a>
-              </li>
+              {whatsapp && (
+                <li>
+                  <a href={whatsapp} className="hover:opacity-60">
+                    WhatsApp
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">Încredere</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">Incredere</h4>
             <ul className="space-y-2 text-sm opacity-80">
               <li>Retur 14 zile</li>
-              <li>Plată securizată Shopify</li>
-              <li>Visa · Mastercard · Apple Pay</li>
+              <li>Schimb marime</li>
+              <li>Plata securizata la checkout</li>
             </ul>
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">Date firmă</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">Contact</h4>
             <p className="text-sm opacity-70 leading-relaxed">
-              Se completează înainte de lansarea comercială: nume firmă, CUI, Nr. Reg. Comerțului și
-              adresă sediu.
+              <a href={`mailto:${contactEmail}`} className="hover:opacity-60">
+                {contactEmail}
+              </a>
+              <br />
+              {businessLine}
             </p>
           </div>
         </div>
@@ -157,7 +183,7 @@ export function Footer() {
           <span>
             © {new Date().getFullYear()} {logoText}. Toate drepturile rezervate.
           </span>
-          <span>Demo — finalizarea Shopify se conectează după configurare.</span>
+          <span>{siteMode === "pre-launch" ? "Pre-lansare" : "Magazin activ"}</span>
         </div>
       </div>
     </footer>

@@ -10,11 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SizeGuideRouteImport } from './routes/size-guide'
 import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LookbookRouteImport } from './routes/lookbook'
 import { Route as FaqRouteImport } from './routes/faq'
+import { Route as ExchangeRouteImport } from './routes/exchange'
+import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CollectionsRouteImport } from './routes/collections'
@@ -27,6 +30,11 @@ import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SizeGuideRoute = SizeGuideRouteImport.update({
+  id: '/size-guide',
+  path: '/size-guide',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopRoute = ShopRouteImport.update({
@@ -52,6 +60,16 @@ const LookbookRoute = LookbookRouteImport.update({
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExchangeRoute = ExchangeRouteImport.update({
+  id: '/exchange',
+  path: '/exchange',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeliveryRoute = DeliveryRouteImport.update({
+  id: '/delivery',
+  path: '/delivery',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CookiesRoute = CookiesRouteImport.update({
@@ -103,11 +121,14 @@ export interface FileRoutesByFullPath {
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/delivery': typeof DeliveryRoute
+  '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
   '/returns': typeof ReturnsRoute
   '/shop': typeof ShopRoute
+  '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
@@ -119,11 +140,14 @@ export interface FileRoutesByTo {
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/delivery': typeof DeliveryRoute
+  '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
   '/returns': typeof ReturnsRoute
   '/shop': typeof ShopRoute
+  '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
@@ -136,11 +160,14 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
+  '/delivery': typeof DeliveryRoute
+  '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
   '/returns': typeof ReturnsRoute
   '/shop': typeof ShopRoute
+  '/size-guide': typeof SizeGuideRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
@@ -154,11 +181,14 @@ export interface FileRouteTypes {
     | '/collections'
     | '/contact'
     | '/cookies'
+    | '/delivery'
+    | '/exchange'
     | '/faq'
     | '/lookbook'
     | '/privacy'
     | '/returns'
     | '/shop'
+    | '/size-guide'
     | '/terms'
     | '/product/$handle'
   fileRoutesByTo: FileRoutesByTo
@@ -170,11 +200,14 @@ export interface FileRouteTypes {
     | '/collections'
     | '/contact'
     | '/cookies'
+    | '/delivery'
+    | '/exchange'
     | '/faq'
     | '/lookbook'
     | '/privacy'
     | '/returns'
     | '/shop'
+    | '/size-guide'
     | '/terms'
     | '/product/$handle'
   id:
@@ -186,11 +219,14 @@ export interface FileRouteTypes {
     | '/collections'
     | '/contact'
     | '/cookies'
+    | '/delivery'
+    | '/exchange'
     | '/faq'
     | '/lookbook'
     | '/privacy'
     | '/returns'
     | '/shop'
+    | '/size-guide'
     | '/terms'
     | '/product/$handle'
   fileRoutesById: FileRoutesById
@@ -203,11 +239,14 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRoute
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
+  DeliveryRoute: typeof DeliveryRoute
+  ExchangeRoute: typeof ExchangeRoute
   FaqRoute: typeof FaqRoute
   LookbookRoute: typeof LookbookRoute
   PrivacyRoute: typeof PrivacyRoute
   ReturnsRoute: typeof ReturnsRoute
   ShopRoute: typeof ShopRoute
+  SizeGuideRoute: typeof SizeGuideRoute
   TermsRoute: typeof TermsRoute
   ProductHandleRoute: typeof ProductHandleRoute
 }
@@ -219,6 +258,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/size-guide': {
+      id: '/size-guide'
+      path: '/size-guide'
+      fullPath: '/size-guide'
+      preLoaderRoute: typeof SizeGuideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/shop': {
@@ -254,6 +300,20 @@ declare module '@tanstack/react-router' {
       path: '/faq'
       fullPath: '/faq'
       preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exchange': {
+      id: '/exchange'
+      path: '/exchange'
+      fullPath: '/exchange'
+      preLoaderRoute: typeof ExchangeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delivery': {
+      id: '/delivery'
+      path: '/delivery'
+      fullPath: '/delivery'
+      preLoaderRoute: typeof DeliveryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/cookies': {
@@ -323,14 +383,27 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRoute,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
+  DeliveryRoute: DeliveryRoute,
+  ExchangeRoute: ExchangeRoute,
   FaqRoute: FaqRoute,
   LookbookRoute: LookbookRoute,
   PrivacyRoute: PrivacyRoute,
   ReturnsRoute: ReturnsRoute,
   ShopRoute: ShopRoute,
+  SizeGuideRoute: SizeGuideRoute,
   TermsRoute: TermsRoute,
   ProductHandleRoute: ProductHandleRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

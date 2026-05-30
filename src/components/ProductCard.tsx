@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { Product } from "@/lib/mock-data";
 import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
+import { useSite } from "@/lib/site-context";
 
 const badgeStyles: Record<string, string> = {
   noutate: "bg-charcoal text-cream",
@@ -11,31 +12,40 @@ const badgeStyles: Record<string, string> = {
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
+  const { siteMode } = useSite();
   const availableSizes = product.sizes.filter((size) => product.stock[size] > 0);
+  const showPrice = siteMode === "live-shop";
+  const primaryImage = product.images[1] ?? product.images[0];
+  const hoverImage = product.images[0];
 
   return (
     <article className="group">
       <Link to="/product/$handle" params={{ handle: product.handle }} className="block">
-        <div className="relative img-zoom aspect-[4/5] bg-warm-grey">
+        <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
           <img
-            src={product.images[0]}
-            alt={product.title}
+            src={primaryImage}
+            alt={`${product.title} - vedere spate`}
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover"
           />
-          {product.images[1] && (
+          {hoverImage && hoverImage !== primaryImage && (
             <img
-              src={product.images[1]}
+              src={hoverImage}
               alt=""
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
             />
           )}
-          {product.badge && (
+          {siteMode === "live-shop" && product.badge && (
             <span
               className={`absolute top-3 left-3 px-2 py-1 font-mono-xs ${badgeStyles[product.badge]}`}
             >
               {product.badge}
+            </span>
+          )}
+          {siteMode === "pre-launch" && (
+            <span className="absolute top-3 left-3 px-2 py-1 font-mono-xs bg-charcoal text-cream">
+              preview
             </span>
           )}
         </div>
@@ -47,44 +57,56 @@ export function ProductCard({ product }: { product: Product }) {
             <h3 className="text-sm md:text-base font-display tracking-tight">{product.title}</h3>
           </Link>
           <p className="font-mono-xs opacity-50 mt-1">
-            {product.colors.length} culori · {product.sizes.length} mărimi
+            Design pe spate · {product.sizes.length} marimi
           </p>
         </div>
-        <div className="text-sm tabular-nums">{formatRON(product.price)}</div>
+        {showPrice && <div className="text-sm tabular-nums">{formatRON(product.price)}</div>}
       </div>
 
-      <div
-        className="mt-4 grid border border-border"
-        style={{ gridTemplateColumns: `repeat(${product.sizes.length}, minmax(0, 1fr))` }}
-      >
-        {product.sizes.map((size) => {
-          const disabled = product.stock[size] === 0;
-          return (
-            <button
-              type="button"
-              key={size}
-              disabled={disabled}
-              onPointerUp={(event) => {
-                event.preventDefault();
-                addItem(product, size, product.colors[0].name);
-              }}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  addItem(product, size, product.colors[0].name);
-                }
-              }}
-              className="h-10 font-mono-xs border-r border-border last:border-r-0 hover:bg-charcoal hover:text-cream transition-colors disabled:opacity-30 disabled:line-through disabled:hover:bg-transparent disabled:hover:text-charcoal"
-              aria-label={`Adaugă ${product.title}, mărimea ${size}, în coș`}
-            >
-              {size}
-            </button>
-          );
-        })}
-      </div>
-      <p className="mt-2 font-mono-xs opacity-45">
-        Adaugă rapid: {availableSizes.length ? availableSizes.join(" / ") : "stoc epuizat"}
-      </p>
+      {siteMode === "live-shop" ? (
+        <>
+          <div
+            className="mt-4 grid border border-border"
+            style={{ gridTemplateColumns: `repeat(${product.sizes.length}, minmax(0, 1fr))` }}
+          >
+            {product.sizes.map((size) => {
+              const disabled = product.stock[size] === 0;
+              return (
+                <button
+                  type="button"
+                  key={size}
+                  disabled={disabled}
+                  onPointerUp={(event) => {
+                    event.preventDefault();
+                    addItem(product, size, product.colors[0].name);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      addItem(product, size, product.colors[0].name);
+                    }
+                  }}
+                  className="h-10 font-mono-xs border-r border-border last:border-r-0 hover:bg-charcoal hover:text-cream transition-colors disabled:opacity-30 disabled:line-through disabled:hover:bg-transparent disabled:hover:text-charcoal"
+                  aria-label={`Adauga ${product.title}, marimea ${size}, in cos`}
+                >
+                  {size}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 font-mono-xs opacity-45">
+            Adauga rapid: {availableSizes.length ? availableSizes.join(" / ") : "stoc epuizat"}
+          </p>
+        </>
+      ) : (
+        <Link
+          to="/product/$handle"
+          params={{ handle: product.handle }}
+          className="mt-4 inline-flex border border-charcoal px-4 py-2 font-mono-xs hover:bg-charcoal hover:text-cream transition-colors"
+        >
+          Vezi preview
+        </Link>
+      )}
     </article>
   );
 }

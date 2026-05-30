@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
-import { reviews } from "@/lib/mock-data";
+import { useState, type ReactNode } from "react";
+import { RotateCcw, Shield, Truck } from "lucide-react";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
-import { RotateCcw, Shield, Truck } from "lucide-react";
 import { fetchProductByHandle, fetchProducts } from "@/lib/shopify";
+import { useSite } from "@/lib/site-context";
 
 export const Route = createFileRoute("/product/$handle")({
   loader: async ({ params }) => {
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/product/$handle")({
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: `${loaderData.product.title} — Trei Linii` },
+          { title: `${loaderData.product.title} - Trei Linii` },
           { name: "description", content: loaderData.product.description },
           { property: "og:title", content: loaderData.product.title },
           { property: "og:description", content: loaderData.product.description },
@@ -31,9 +31,9 @@ export const Route = createFileRoute("/product/$handle")({
   component: ProductPage,
   notFoundComponent: () => (
     <div className="px-5 py-32 text-center">
-      <h1 className="font-display text-5xl">Produsul nu a fost găsit</h1>
+      <h1 className="font-display text-5xl">Produsul nu a fost gasit</h1>
       <Link to="/shop" className="font-mono-xs underline mt-6 inline-block">
-        Înapoi la magazin
+        Inapoi la modele
       </Link>
     </div>
   ),
@@ -41,13 +41,15 @@ export const Route = createFileRoute("/product/$handle")({
 
 function ProductPage() {
   const { product, related } = Route.useLoaderData();
+  const { siteMode, reviewsEnabled } = useSite();
   const { addItem } = useCart();
   const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
   const [color, setColor] = useState<string>(product.colors[0].name);
 
   const handleAdd = () => {
+    if (siteMode === "pre-launch") return;
     if (!size) {
-      alert("Alege o mărime înainte de a adăuga produsul în coș.");
+      alert("Alege o marime inainte de a adauga produsul in cos.");
       return;
     }
     addItem(product, size, color);
@@ -58,7 +60,7 @@ function ProductPage() {
       <div className="mx-auto max-w-[1600px]">
         <nav className="font-mono-xs opacity-60 mb-8">
           <Link to="/shop" className="hover:opacity-100">
-            Magazin
+            Modele
           </Link>
           <span className="mx-2">/</span>
           <span>{product.title}</span>
@@ -67,10 +69,10 @@ function ProductPage() {
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
           <div className="lg:col-span-7 grid md:grid-cols-2 gap-3 md:gap-4">
             {product.images.map((img: string, i: number) => (
-              <div key={i} className="aspect-[4/5] bg-warm-grey img-zoom">
+              <div key={i} className="aspect-[3/4] bg-warm-grey img-zoom">
                 <img
                   src={img}
-                  alt={product.title}
+                  alt={`${product.title} ${i === 0 ? "spate" : "detaliu"}`}
                   loading={i === 0 ? "eager" : "lazy"}
                   className="w-full h-full object-cover"
                 />
@@ -80,26 +82,26 @@ function ProductPage() {
 
           <aside className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
             <div className="flex items-center gap-3 mb-3">
-              {product.badge && (
-                <span className="font-mono-xs bg-charcoal text-cream px-2 py-1">
-                  {product.badge}
-                </span>
-              )}
-              <span className="font-mono-xs opacity-60">{product.collection}</span>
+              <span className="font-mono-xs bg-charcoal text-cream px-2 py-1">
+                {siteMode === "pre-launch" ? "preview" : (product.badge ?? "disponibil")}
+              </span>
+              <span className="font-mono-xs opacity-60">design pe spate</span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl leading-tight">{product.title}</h1>
-            <div className="mt-3 text-xl tabular-nums">{formatRON(product.price)}</div>
+            {siteMode === "live-shop" && (
+              <div className="mt-3 text-xl tabular-nums">{formatRON(product.price)}</div>
+            )}
 
             <p className="mt-8 text-muted-foreground leading-relaxed">{product.description}</p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 font-mono-xs">
               <div className="border border-border p-3">
                 <span className="opacity-50 block mb-1">Material</span>
-                Bumbac dens 240 gsm
+                Bumbac dens
               </div>
               <div className="border border-border p-3">
-                <span className="opacity-50 block mb-1">Model</span>
-                1.82m · poartă L
+                <span className="opacity-50 block mb-1">Fit</span>
+                Oversized relaxat
               </div>
             </div>
 
@@ -113,10 +115,13 @@ function ProductPage() {
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono-xs">Mărime</span>
-                  <button className="font-mono-xs underline underline-offset-4 opacity-60">
-                    Ghid mărimi
-                  </button>
+                  <span className="font-mono-xs">Marime</span>
+                  <Link
+                    to="/size-guide"
+                    className="font-mono-xs underline underline-offset-4 opacity-60"
+                  >
+                    Ghid marimi
+                  </Link>
                 </div>
                 <SizeSelector
                   sizes={product.sizes}
@@ -124,31 +129,31 @@ function ProductPage() {
                   value={size}
                   onChange={setSize}
                 />
-                {size && (
-                  <p className="font-mono-xs mt-3 opacity-60">
-                    {product.stock[size] > 0
-                      ? product.stock[size] < 5
-                        ? `Doar ${product.stock[size]} rămase`
-                        : "În stoc"
-                      : "Stoc epuizat"}
-                  </p>
-                )}
               </div>
 
-              <button
-                onClick={handleAdd}
-                className="w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors"
-              >
-                Adaugă în coș — {formatRON(product.price)}
-              </button>
+              {siteMode === "live-shop" ? (
+                <button
+                  onClick={handleAdd}
+                  className="w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors"
+                >
+                  Adauga in cos - {formatRON(product.price)}
+                </button>
+              ) : (
+                <a
+                  href="/#newsletter"
+                  className="block text-center w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors"
+                >
+                  Anunta-ma la lansare
+                </a>
+              )}
 
-              <p className="font-mono-xs opacity-60">Croială: {product.fitNote}</p>
+              <p className="font-mono-xs opacity-60">Croiala: {product.fitNote}</p>
             </div>
 
             <ul className="mt-10 grid grid-cols-3 gap-4 pt-6 border-t border-border">
               <li className="flex flex-col items-start gap-2">
                 <Truck className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">Livrare RO/EU</span>
+                <span className="font-mono-xs">Livrare</span>
               </li>
               <li className="flex flex-col items-start gap-2">
                 <RotateCcw className="h-4 w-4" strokeWidth={1.25} />
@@ -156,28 +161,28 @@ function ProductPage() {
               </li>
               <li className="flex flex-col items-start gap-2">
                 <Shield className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">Plată securizată</span>
+                <span className="font-mono-xs">Plata securizata</span>
               </li>
             </ul>
 
             <div className="mt-10 space-y-8 border-t border-border pt-8">
-              <InfoBlock title="De ce costă atât">
+              <InfoBlock title="Ce il diferentiaza">
                 <ul className="space-y-2">
-                  <li>Bumbac greu, 240 gsm, cu senzație premium.</li>
-                  <li>Croială oversized boxy, construită pentru purtare zilnică.</li>
-                  <li>Față curată, print mai puternic pe spate și serie limitată.</li>
+                  <li>Fata ramane curata, fara logo mare pe piept.</li>
+                  <li>Designul principal este plasat pe spate.</li>
+                  <li>Croiala oversized este gandita pentru o cadere relaxata.</li>
                 </ul>
               </InfoBlock>
 
-              <InfoBlock title="Tabel mărimi">
+              <InfoBlock title="Tabel marimi">
                 <div className="overflow-x-auto">
                   <table className="w-full text-left font-mono-xs border border-border">
                     <thead className="bg-cream">
                       <tr>
-                        <th className="p-3 border-r border-border">Mărime</th>
+                        <th className="p-3 border-r border-border">Marime</th>
                         <th className="p-3 border-r border-border">Piept</th>
                         <th className="p-3 border-r border-border">Lungime</th>
-                        <th className="p-3">Umăr</th>
+                        <th className="p-3">Umar</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -199,46 +204,32 @@ function ProductPage() {
                   </table>
                 </div>
                 <p className="mt-3 text-muted-foreground">
-                  Măsurătorile sunt orientative pentru demo. În producție se vor înlocui cu
-                  măsurătorile exacte ale produsului.
+                  Daca esti intre doua marimi, alege marimea mai mare pentru un fit oversized mai
+                  vizibil.
                 </p>
               </InfoBlock>
 
-              <InfoBlock title="Îngrijire">
-                Spală pe dos la 30°C, nu folosi înălbitor și evită uscarea automată. Calcă pe dos,
-                fără contact direct cu printul.
+              <InfoBlock title="Ingrijire">
+                Spala pe dos la 30°C, nu folosi inalbitor si evita uscarea automata. Calca pe dos,
+                fara contact direct cu printul.
               </InfoBlock>
             </div>
           </aside>
         </div>
 
-        <section className="mt-20 md:mt-32 border-t border-border pt-12">
-          <div className="grid md:grid-cols-12 gap-10">
-            <div className="md:col-span-4">
-              <p className="font-mono-xs opacity-60">Recenzii</p>
-              <h2 className="font-display text-4xl md:text-6xl mt-3">Ce spun clienții.</h2>
-            </div>
-            <div className="md:col-span-8 grid md:grid-cols-3 gap-6">
-              {reviews.map((review) => (
-                <figure key={review.name} className="border-t border-border pt-5">
-                  <div className="font-mono-xs">{"★".repeat(review.rating)}</div>
-                  <blockquote className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                    “{review.text}”
-                  </blockquote>
-                  <figcaption className="font-mono-xs opacity-60 mt-4">
-                    {review.name} · {review.location}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </div>
-        </section>
+        {reviewsEnabled && (
+          <section className="mt-20 md:mt-32 border-t border-border pt-12">
+            <h2 className="font-display text-4xl md:text-6xl">Feedback clienti.</h2>
+          </section>
+        )}
 
         <section className="mt-20 md:mt-32 border-t border-border pt-12">
           <div className="flex items-end justify-between gap-6 mb-8">
             <div>
-              <p className="font-mono-xs opacity-60">Completează coșul</p>
-              <h2 className="font-display text-4xl md:text-6xl mt-3">Merge bine cu.</h2>
+              <p className="font-mono-xs opacity-60">
+                {siteMode === "pre-launch" ? "Alte preview-uri" : "Completeaza cosul"}
+              </p>
+              <h2 className="font-display text-4xl md:text-6xl mt-3">Mai multe modele.</h2>
             </div>
             <Link to="/shop" className="font-mono-xs underline underline-offset-4">
               Vezi tot
@@ -250,12 +241,14 @@ function ProductPage() {
                 <img
                   src={item.images[0]}
                   alt={item.title}
-                  className="aspect-[4/5] w-full object-cover bg-warm-grey"
+                  className="aspect-[3/4] w-full object-cover bg-warm-grey"
                   loading="lazy"
                 />
                 <div className="mt-3 flex justify-between gap-3">
                   <span className="font-display">{item.title}</span>
-                  <span className="text-sm tabular-nums">{formatRON(item.price)}</span>
+                  {siteMode === "live-shop" && (
+                    <span className="text-sm tabular-nums">{formatRON(item.price)}</span>
+                  )}
                 </div>
               </Link>
             ))}
@@ -263,16 +256,18 @@ function ProductPage() {
         </section>
       </div>
 
-      <div className="fixed md:hidden left-0 right-0 bottom-0 z-40 bg-background border-t border-border p-4">
-        <button onClick={handleAdd} className="w-full bg-charcoal text-cream py-4 font-mono-xs">
-          Adaugă în coș — {formatRON(product.price)}
-        </button>
-      </div>
+      {siteMode === "live-shop" && (
+        <div className="fixed md:hidden left-0 right-0 bottom-0 z-40 bg-background border-t border-border p-4">
+          <button onClick={handleAdd} className="w-full bg-charcoal text-cream py-4 font-mono-xs">
+            Adauga in cos - {formatRON(product.price)}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-function InfoBlock({ title, children }: { title: string; children: React.ReactNode }) {
+function InfoBlock({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section>
       <h2 className="font-mono-xs mb-3">{title}</h2>

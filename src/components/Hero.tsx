@@ -2,8 +2,47 @@ import { Link } from "@tanstack/react-router";
 import heroImg from "@/assets/hero.jpg";
 import { useSite } from "@/lib/site-context";
 
+function CtaLink({
+  href,
+  children,
+  variant,
+}: {
+  href: string;
+  children: React.ReactNode;
+  variant: "primary" | "secondary";
+}) {
+  const className =
+    variant === "primary"
+      ? "inline-flex items-center gap-2 bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90 transition-colors"
+      : "font-mono-xs hover:opacity-60 underline underline-offset-4";
+
+  if (href.startsWith("#")) {
+    return (
+      <a href={href} className={className}>
+        {children}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={href} className={className}>
+      {children}
+    </Link>
+  );
+}
+
 export function Hero() {
-  const { heroEyebrow, heroHeadline, heroSubcopy } = useSite();
+  const {
+    heroEyebrow,
+    heroHeadline,
+    heroSubcopy,
+    heroPrimaryCtaText,
+    heroPrimaryCtaLink,
+    heroSecondaryCtaText,
+    heroSecondaryCtaLink,
+    heroBadges,
+  } = useSite();
+
   return (
     <section className="relative">
       <div className="grid md:grid-cols-12 min-h-[80vh] md:min-h-[88vh]">
@@ -16,36 +55,28 @@ export function Hero() {
             <p className="mt-8 max-w-md text-base md:text-lg leading-relaxed text-muted-foreground">
               {heroSubcopy}
             </p>
-            <div className="mt-10 flex items-center gap-4">
-              <Link
-                to="/shop"
-                className="inline-flex items-center gap-2 bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90 transition-colors"
-              >
-                Comandă Lansarea 01 →
-              </Link>
-              <Link
-                to="/lookbook"
-                className="font-mono-xs hover:opacity-60 underline underline-offset-4"
-              >
-                Vezi pe stradă
-              </Link>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <CtaLink href={heroPrimaryCtaLink} variant="primary">
+                {heroPrimaryCtaText}
+              </CtaLink>
+              <CtaLink href={heroSecondaryCtaLink} variant="secondary">
+                {heroSecondaryCtaText}
+              </CtaLink>
             </div>
           </div>
-          <div className="font-mono-xs opacity-50 hidden md:block">
-            01 — Bumbac 240gsm · Croială oversized
-          </div>
+          <div className="font-mono-xs opacity-50 hidden md:block">{heroBadges}</div>
         </div>
 
         <div className="md:col-span-7 relative img-zoom min-h-[70vh] md:min-h-full">
           <img
             src={heroImg}
-            alt="Model purtând un tricou oversized Trei Linii pe o stradă urbană"
+            alt="Model purtand un tricou oversized Trei Linii intr-un cadru urban"
             width={1600}
             height={1200}
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute bottom-5 right-5 font-mono-xs text-cream bg-charcoal/70 backdrop-blur px-3 py-1.5">
-            TL/01 · CREM
+            Design pe spate · Croiala oversized
           </div>
         </div>
       </div>

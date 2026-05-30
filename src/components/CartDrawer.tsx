@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import { Minus, Plus, X } from "lucide-react";
 import { formatRON } from "@/lib/format";
 import { useCart, type CartLine } from "@/lib/cart-context";
+import { useSite } from "@/lib/site-context";
 import {
   addCartLines,
   createCart,
@@ -130,13 +131,15 @@ export function CheckoutFooter({ subtotal }: { subtotal: number }) {
 
 export function ShopifyCheckoutButton({ className = "" }: { className?: string }) {
   const { lines } = useCart();
+  const { siteMode } = useSite();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const shopifyReady = isShopifyConfigured();
   const hasRealShopifyVariants = lines.every((line) =>
     isShopifyProductVariantId(line.merchandiseId),
   );
-  const canCheckout = shopifyReady && lines.length > 0 && hasRealShopifyVariants;
+  const canCheckout =
+    siteMode === "live-shop" && shopifyReady && lines.length > 0 && hasRealShopifyVariants;
 
   const handleCheckout = async () => {
     if (!canCheckout) return;
@@ -169,13 +172,15 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
         disabled={loading || !canCheckout}
         className={`w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors disabled:opacity-50 ${className}`}
       >
-        {!shopifyReady
-          ? "Finalizare Shopify neconfigurata"
-          : !hasRealShopifyVariants
-            ? "Adauga produse publicate in Shopify"
-            : loading
-              ? "Se redirectioneaza..."
-              : "Continua spre checkout Shopify ->"}
+        {siteMode === "pre-launch"
+          ? "Checkout disponibil la lansare"
+          : !shopifyReady
+            ? "Finalizarea comenzii este indisponibila momentan"
+            : !hasRealShopifyVariants
+              ? "Adauga produse publicate in Shopify"
+              : loading
+                ? "Se redirectioneaza..."
+                : "Continua spre checkout Shopify ->"}
       </button>
       {error && <p className="font-mono-xs text-red-700">{error}</p>}
     </div>

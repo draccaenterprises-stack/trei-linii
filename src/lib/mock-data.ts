@@ -31,6 +31,7 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   handle: string;
+  shopifyHandle?: string;
   title: string;
   price: number;
   collection: string;
@@ -47,69 +48,65 @@ export interface Product {
 export const products: Product[] = [
   {
     id: "p1",
-    handle: "tricou-oversized-linia-01",
-    title: "Tricou Oversized Linia 01",
+    handle: "preview-oversized-01",
+    title: "Preview oversized 01",
     price: 189,
-    collection: "tricouri",
-    badge: "noutate",
+    collection: "fit",
     images: [p1a],
     description:
-      "Primul model Trei Linii. Tricou din bumbac dens, 240 gsm, cu croială boxy oversized, umeri căzuți și semn discret pe față. Creat pentru purtare zilnică.",
-    fitNote:
-      "Croială oversized. Alege mărimea normală pentru oversized sau o mărime mai mică pentru o croială relaxată.",
+      "Preview pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.",
+    fitNote: "Croiala oversized. Alege marimea normala pentru o cadere relaxata.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
       { name: "Crem", hex: "#f1ead9" },
-      { name: "Cărbune", hex: "#2b2a28" },
+      { name: "Carbune", hex: "#2b2a28" },
     ],
     stock: { S: 12, M: 8, L: 4, XL: 0 },
   },
   {
     id: "p2",
-    handle: "tricou-spalat-urban",
-    title: "Tricou Spălat Urban",
+    handle: "preview-spate-02",
+    title: "Preview design spate 02",
     price: 219,
-    collection: "spalate",
-    badge: "stoc limitat",
+    collection: "spate",
     images: [p2b, p2a],
     description:
-      "Tricou garment-dyed, spălat pentru o textură moale și un aspect purtat natural. Print pe spate cu grafică urbană estompată.",
-    fitNote: "Oversized relaxat. Bumbacul devine mai moale după fiecare spălare.",
+      "Preview pentru grafica de spate: compozitie simpla, purtabila, fara logo mare pe piept.",
+    fitNote: "Oversized relaxat, cu umeri usor cazuti.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Albastru spălat", hex: "#8aa9c8" },
+      { name: "Albastru spalat", hex: "#8aa9c8" },
       { name: "Os", hex: "#e8e3d6" },
     ],
     stock: { S: 6, M: 10, L: 12, XL: 3 },
   },
   {
     id: "p3",
-    handle: "tricou-backprint-semnal",
-    title: "Tricou Backprint Semnal",
+    handle: "preview-grafica-03",
+    title: "Preview grafica 03",
     price: 239,
-    collection: "printuri",
-    badge: "limitat",
+    collection: "grafica",
     images: [p3b, p3a],
     description:
-      "Print mare pe spate în roșu spălat, aplicat pe bumbac charcoal. Semn mic pe piept, grafică puternică pe spate. Serie limitată.",
-    fitNote: "Boxy oversized. Cade ușor sub șold.",
+      "Preview pentru o directie mai puternica de print pe spate, pastrand fata tricoului curata.",
+    fitNote: "Boxy oversized. Cade usor sub sold.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
-      { name: "Cărbune", hex: "#2b2a28" },
-      { name: "Negru spălat", hex: "#1a1a1a" },
+      { name: "Carbune", hex: "#2b2a28" },
+      { name: "Negru spalat", hex: "#1a1a1a" },
     ],
     stock: { S: 2, M: 5, L: 6, XL: 1 },
   },
   {
     id: "p4",
-    handle: "tricou-studio-olive",
-    title: "Tricou Studio Olive",
+    handle: "preview-olive-04",
+    title: "Preview olive 04",
     price: 199,
-    collection: "tricouri",
+    collection: "fit",
     images: [p4b, p4a],
     description:
-      "Uniformă de studio în olive prăfuit. Bumbac greu, guler întărit și marcaj Trei Linii aproape invizibil.",
-    fitNote: "Oversized pe mărimea normală. Umăr ușor căzut.",
+      "Preview pentru o baza de culoare olive, gandita pentru un tricou simplu si usor de purtat.",
+    fitNote: "Oversized pe marimea normala.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
       { name: "Olive", hex: "#6b7a3a" },
@@ -129,87 +126,67 @@ export interface Collection {
 
 export const collections: Collection[] = [
   {
-    handle: "tricouri",
-    title: "Tricouri",
-    description: "Modelele de bază Trei Linii: bumbac greu, croială curată, purtare zilnică.",
+    handle: "fit",
+    title: "Fit oversized",
+    description: "Croiala relaxata, umeri cazuti si proportii curate.",
     image: colEss,
     count: 2,
   },
   {
-    handle: "spalate",
-    title: "Spălate",
-    description: "Culori spălate, textură moale și aspect natural purtat.",
+    handle: "material",
+    title: "Material dens",
+    description: "Textura stabila si senzatie premium la purtare.",
     image: colWashed,
     count: 1,
   },
   {
-    handle: "printuri",
-    title: "Printuri",
-    description: "Față curată, printuri mai puternice pe spate și serii limitate.",
+    handle: "spate",
+    title: "Design pe spate",
+    description: "Fata curata, grafica minimalista plasata pe spate.",
     image: colGraphics,
     count: 1,
   },
 ];
 
 export const lookbookImages = [
-  { src: lb1, caption: "Lansarea 01 — Ore de beton" },
-  { src: lb2, caption: "Lansarea 01 — Note de teren" },
-  { src: lb3, caption: "Lansarea 01 — Traversări" },
+  { src: lb1, caption: "Fit oversized - vedere spate" },
+  { src: lb2, caption: "Material dens - cadere relaxata" },
+  { src: lb3, caption: "Design minimalist - purtare zilnica" },
 ];
 
-export const reviews = [
-  {
-    name: "Alex M.",
-    location: "București",
-    rating: 5,
-    text: "Bumbacul chiar se simte gros. Croiala cade foarte bine și arată premium.",
-  },
-  {
-    name: "Iulia D.",
-    location: "Cluj-Napoca",
-    rating: 5,
-    text: "Am luat două: crem și olive. Ambalarea și materialul fac diferența.",
-  },
-  {
-    name: "Vlad P.",
-    location: "Timișoara",
-    rating: 5,
-    text: "Printul de pe spate e exact cât trebuie: față simplă, spate cu personalitate.",
-  },
-];
+export const reviews: Array<{ name: string; location: string; rating: number; text: string }> = [];
 
 export const faqs = [
   {
-    q: "Cum aleg mărimea?",
-    a: "Toate tricourile sunt gândite oversized. Pentru o croială relaxată, alege o mărime mai mică. Pentru oversized complet, alege mărimea normală.",
+    q: "Cum aleg marimea?",
+    a: "Tricourile sunt gandite oversized. Alege marimea normala pentru un fit relaxat sau o marime mai mica pentru o cadere mai apropiata de corp.",
   },
   {
     q: "Din ce material sunt tricourile?",
-    a: "Bumbac greu, 240 gsm, pre-shrunk. Modelele spălate sunt vopsite și finisate pentru textură mai moale.",
+    a: "Directia brandului este bumbac dens, cu guler stabil si croiala relaxata. Specificatiile exacte apar pe fiecare pagina de produs.",
   },
   {
-    q: "Unde livrați?",
-    a: "În demo livrarea este doar simulată. În producție, livrarea și taxele vor fi calculate la finalizarea comenzii în Shopify.",
+    q: "Unde este plasat designul?",
+    a: "Designul principal este pe spatele tricoului. Fata ramane curata, fara logo mare pe piept.",
   },
   {
     q: "Pot returna produsul?",
-    a: "Da, politica finală de retur va fi administrată prin Shopify. Recomandarea este retur în 14 zile pentru produse nepurtate.",
+    a: "Returul este disponibil in 14 zile pentru produse nepurtate, nespalate si cu etichetele intacte.",
   },
   {
-    q: "Când apar modele noi?",
-    a: "Lansările vor fi organizate în serii limitate. Abonarea la newsletter va anunța data și produsele noi.",
+    q: "Cand apar modele noi?",
+    a: "Modelele noi sunt anuntate prin lista de lansare si pe canalele sociale ale brandului.",
   },
 ];
 
-export const announcement =
-  "Transport gratuit în România peste 350 RON · Lansarea 01 disponibilă în curând";
+export const announcement = "Lansare in pregatire · Tricouri oversized cu design pe spate";
 
 export const homepageSections = [
   { id: "hero", label: "Hero", enabled: true },
   { id: "featured-products", label: "Produse recomandate", enabled: true },
-  { id: "collections", label: "Categorii", enabled: true },
-  { id: "lookbook", label: "Editorial", enabled: true },
-  { id: "reviews", label: "Recenzii", enabled: true },
-  { id: "faq", label: "Întrebări frecvente", enabled: true },
+  { id: "collections", label: "Structura modele", enabled: true },
+  { id: "lookbook", label: "Lookbook", enabled: true },
+  { id: "reviews", label: "Recenzii", enabled: false },
+  { id: "faq", label: "Intrebari frecvente", enabled: true },
   { id: "newsletter", label: "Newsletter", enabled: true },
 ];

@@ -106,7 +106,7 @@ type ShopifyCollectionNode = {
 
 async function storefrontFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
   if (!shopifyConfig.domain || !shopifyConfig.token) {
-    throw new Error("Shopify nu este configurat.");
+    throw new Error("Magazinul nu este disponibil momentan.");
   }
 
   const response = await fetch(
@@ -190,8 +190,46 @@ function normalizeText(value: string) {
     .trim();
 }
 
+function isInternalTestLabel(value: string) {
+  const normalized = normalizeText(value);
+  return (
+    /^model\s*\d+/.test(normalized) ||
+    /^colectie\s*\d+/.test(normalized) ||
+    /^collection\s*\d+/.test(normalized) ||
+    normalized.includes(" test") ||
+    normalized.endsWith(" test") ||
+    normalized === "home page" ||
+    normalized === "homepage"
+  );
+}
+
+function publicProductTitle(title: string, index = 0) {
+  if (isInternalTestLabel(title))
+    return `Preview design spate ${String(index + 1).padStart(2, "0")}`;
+  return title;
+}
+
 function unique<T>(items: T[]) {
   return [...new Set(items)];
+}
+
+function publicProductHandle(product: ShopifyProductNode, index = 0) {
+  if (isInternalTestLabel(product.title) || isInternalTestLabel(product.handle)) {
+    return `preview-design-spate-${String(index + 1).padStart(2, "0")}`;
+  }
+
+  return product.handle;
+}
+
+function publicProductDescription(product: ShopifyProductNode) {
+  if (isInternalTestLabel(product.title) || isInternalTestLabel(product.description)) {
+    return "Preview pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.";
+  }
+
+  return (
+    product.description?.trim() ??
+    "Tricou Trei Linii cu croiala oversized si finisaj curat, conectat din Shopify."
+  );
 }
 
 function selectedOptionValue(
@@ -274,7 +312,7 @@ function badgeFromProduct(
   return undefined;
 }
 
-function mapShopifyProduct(product: ShopifyProductNode): Product {
+function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
   const variants = product.variants.nodes.map<ProductVariant>((variant) => {
     const size =
       selectedOptionValue(variant.selectedOptions, ["size", "marime", "mărime"]) ??
@@ -309,19 +347,23 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
   if (!images.length && product.featuredImage?.url) images.push(product.featuredImage.url);
 
   const firstCollection = product.collections.nodes[0];
+  const publicCollection = firstCollection
+    ? isInternalTestLabel(firstCollection.title) || isInternalTestLabel(firstCollection.handle)
+      ? "spate"
+      : firstCollection.handle
+    : "tricouri";
   const firstMockImage = mockProducts[0]?.images[0] ?? "";
 
   return {
     id: product.id,
-    handle: product.handle,
-    title: product.title,
+    handle: publicProductHandle(product, index),
+    shopifyHandle: product.handle,
+    title: publicProductTitle(product.title, index),
     price: Number(product.priceRange.minVariantPrice.amount),
-    collection: firstCollection?.handle ?? "tricouri",
+    collection: publicCollection,
     badge: badgeFromProduct(product, variants),
     images: images.length ? images : [firstMockImage],
-    description:
-      product.description?.trim() ??
-      "Tricou Trei Linii cu croiala oversized si finisaj curat, conectat din Shopify.",
+    description: publicProductDescription(product),
     fitNote:
       "Croiala oversized. Verifica tabelul de marimi inainte de comanda pentru potrivirea corecta.",
     sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
@@ -333,11 +375,15 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
 
 function mapShopifyCollection(collection: ShopifyCollectionNode, index: number): Collection {
   const fallback = mockCollections[index % mockCollections.length];
+  const looksInternal =
+    isInternalTestLabel(collection.title) || isInternalTestLabel(collection.handle);
 
   return {
-    handle: collection.handle,
-    title: collection.title,
-    description: collection.description?.trim() || fallback.description,
+    handle: looksInternal ? fallback.handle : collection.handle,
+    title: looksInternal ? fallback.title : collection.title,
+    description: looksInternal
+      ? fallback.description
+      : collection.description?.trim() || fallback.description,
     image: collection.image?.url ?? fallback.image,
     count: collection.products.nodes.length,
   };
@@ -406,12 +452,20 @@ export async function fetchProductByHandle(handle: string): Promise<Product | un
       { handle },
     );
 
-    return data.product
-      ? mapShopifyProduct(data.product)
-      : mockProducts.find((p) => p.handle === handle);
+    if (data.product) return mapShopifyProduct(data.product);
+
+    const products = await fetchProducts();
+    return (
+      products.find((p) => p.handle === handle || p.shopifyHandle === handle) ??
+      mockProducts.find((p) => p.handle === handle)
+    );
   } catch (error) {
     console.error(`Nu am putut citi produsul ${handle} din Shopify.`, error);
-    return mockProducts.find((p) => p.handle === handle);
+    const products = await fetchProducts();
+    return (
+      products.find((p) => p.handle === handle || p.shopifyHandle === handle) ??
+      mockProducts.find((p) => p.handle === handle)
+    );
   }
 }
 
