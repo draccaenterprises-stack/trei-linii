@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSite } from "@/lib/site-context";
 
 export const Route = createFileRoute("/terms")({
   component: Terms,
@@ -11,16 +12,15 @@ export const Route = createFileRoute("/terms")({
 });
 
 function Terms() {
+  const { legalIntro } = useSite();
+
   return (
     <main className="px-5 md:px-10 py-16 md:py-24">
       <article className="mx-auto max-w-3xl">
         <p className="font-mono-xs opacity-60">Legal</p>
         <h1 className="font-display text-5xl md:text-7xl mt-3">Termeni si conditii</h1>
         <div className="mt-10 space-y-6 text-muted-foreground leading-relaxed">
-          <p>
-            Prin folosirea site-ului Trei Linii accepti termenii de navigare, informare si, atunci
-            cand magazinul este activ, plasare a comenzilor prin checkout securizat.
-          </p>
+          <p>{legalIntro}</p>
           <p>
             Produsele, preturile, disponibilitatea, livrarea si metodele de plata pot fi actualizate
             in functie de stoc, furnizori si setarile magazinului.

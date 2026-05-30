@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSite } from "@/lib/site-context";
 
 export const Route = createFileRoute("/delivery")({
   component: Delivery,
@@ -11,16 +12,15 @@ export const Route = createFileRoute("/delivery")({
 });
 
 function Delivery() {
+  const { deliveryTitle, deliveryBody } = useSite();
+
   return (
     <main className="px-5 md:px-10 py-16 md:py-24">
       <article className="mx-auto max-w-3xl">
         <p className="font-mono-xs opacity-60">Suport</p>
-        <h1 className="font-display text-5xl md:text-7xl mt-3">Livrare</h1>
+        <h1 className="font-display text-5xl md:text-7xl mt-3">{deliveryTitle}</h1>
         <div className="mt-10 space-y-6 text-muted-foreground leading-relaxed">
-          <p>
-            Comenzile sunt pregatite dupa confirmarea platii. Estimarea de livrare este afisata la
-            checkout, in functie de adresa si metoda disponibila.
-          </p>
+          <p>{deliveryBody}</p>
           <p>
             Dupa expediere, primesti detaliile de urmarire pe email. Verifica adresa inainte de
             finalizarea comenzii pentru a evita intarzierile.

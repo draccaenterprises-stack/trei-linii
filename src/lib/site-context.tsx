@@ -84,6 +84,15 @@ export interface SiteSettings {
   whatsapp: string;
   instagram: string;
   tiktok: string;
+  deliveryTitle: string;
+  deliveryBody: string;
+  returnsTitle: string;
+  returnsBody: string;
+  exchangeTitle: string;
+  exchangeBody: string;
+  legalIntro: string;
+  privacyIntro: string;
+  cookiesIntro: string;
   seoTitle: string;
   seoDescription: string;
   sections: Array<{ id: string; label: string; enabled: boolean }>;
@@ -99,8 +108,8 @@ const defaults: SiteSettings = {
   primaryColor: "#2b2a28",
   accentColor: "#ff006f",
   font: "Serif Editorial",
-  announcement: "Lansare in pregatire · Tricouri oversized cu design pe spate",
-  heroEyebrow: "Pre-lansare · Trei Linii",
+  announcement: "Lansare in pregatire - Tricouri oversized cu design pe spate",
+  heroEyebrow: "Pre-lansare - Trei Linii",
   heroHeadline: "Fata curata.\nSpate care vorbeste.",
   heroSubcopy:
     "Tricouri oversized cu design minimalist pe spate. Croiala relaxata, material dens si grafica simpla, fara logo-uri mari pe piept.",
@@ -108,19 +117,19 @@ const defaults: SiteSettings = {
   heroPrimaryCtaLink: "#newsletter",
   heroSecondaryCtaText: "Vezi conceptul",
   heroSecondaryCtaLink: "/about",
-  heroBadges: "Croiala oversized · Design pe spate · Lansare in pregatire",
+  heroBadges: "Croiala oversized - Design pe spate - Lansare in pregatire",
   conceptEyebrow: "Concept",
   conceptTitle: "Tricouri simple in fata, gandite sa arate bine din spate.",
   conceptBody:
     "Trei Linii porneste de la o idee clara: fit oversized, material dens si design minimalist plasat pe spate. Fara logo mare pe piept, fara zgomot vizual inutil.",
-  featuredEyebrowPreLaunch: "01 · Preview modele",
-  featuredEyebrowLiveShop: "01 · Modele disponibile",
+  featuredEyebrowPreLaunch: "01 - Preview modele",
+  featuredEyebrowLiveShop: "01 - Modele disponibile",
   featuredTitlePreLaunch: "Primele directii.",
   featuredTitleLiveShop: "Alege modelul.",
   featuredLinkText: "Vezi modelele",
-  collectionsEyebrow: "02 · Structura",
+  collectionsEyebrow: "02 - Structura",
   collectionsTitle: "Fit, material si design pe spate.",
-  lookbookEyebrow: "03 · Lookbook",
+  lookbookEyebrow: "03 - Lookbook",
   lookbookTitle: "Cum cade tricoul.",
   lookbookLinkText: "Deschide lookbook",
   socialProofEyebrow: "Lookbook",
@@ -128,7 +137,7 @@ const defaults: SiteSettings = {
   socialProofCardTitle: "Designul sta pe spate.",
   socialProofCardText:
     "Fata ramane simpla. Grafica este plasata pe spate, gandita pentru un tricou purtabil zi de zi.",
-  faqEyebrow: "04 · FAQ",
+  faqEyebrow: "04 - FAQ",
   faqTitle: "Intrebari utile.",
   faqLinkText: "Vezi toate intrebarile",
   newsletterEyebrowPreLaunch: "Lista de lansare",
@@ -238,6 +247,21 @@ const defaults: SiteSettings = {
   whatsapp: "",
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
+  deliveryTitle: "Livrare",
+  deliveryBody:
+    "Comenzile sunt pregatite dupa confirmarea platii. Estimarea de livrare este afisata la finalizare, in functie de adresa si metoda disponibila.",
+  returnsTitle: "Retur",
+  returnsBody:
+    "Returul este acceptat in 14 zile pentru produse nepurtate, nespalate, fara urme de folosire si cu etichetele intacte.",
+  exchangeTitle: "Schimb marime",
+  exchangeBody:
+    "Daca marimea nu se potriveste, poti cere schimb cu o alta marime disponibila. Produsul trebuie sa fie nepurtat, nespalat si cu etichetele intacte.",
+  legalIntro:
+    "Termenii de utilizare si conditiile comerciale vor guverna comenzile plasate pe site dupa activarea magazinului.",
+  privacyIntro:
+    "Datele personale sunt folosite pentru procesarea comenzilor, comunicari de suport si mesaje trimise prin lista de lansare.",
+  cookiesIntro:
+    "Site-ul poate folosi cookies necesare pentru navigare, cos, formulare si masurarea performantei.",
   seoTitle: "Trei Linii - Tricouri oversized cu design pe spate",
   seoDescription:
     "Tricouri oversized cu fata curata si design minimalist pe spate. Croiala relaxata, material dens si modele simple.",
@@ -261,7 +285,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v5";
+const STORAGE_KEY = "trei-linii-site-v6";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

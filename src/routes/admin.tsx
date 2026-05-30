@@ -18,6 +18,14 @@ function Admin() {
     () => typeof window !== "undefined" && sessionStorage.getItem("trei-linii-admin") === "1",
   );
   const missingLegal = !site.legalBusinessName || !site.legalBusinessDetails;
+  const updateCsv = (key: "featuredProductIds" | "featuredCollectionHandles", value: string) => {
+    site.update({
+      [key]: value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    });
+  };
 
   if (!unlocked) {
     return (
@@ -346,6 +354,29 @@ function Admin() {
               </Row>
             </Panel>
 
+            <Panel title="Featured content">
+              <p className="text-sm text-muted-foreground">
+                Pentru produse poti folosi ID-ul local, handle-ul public sau ID-ul venit din
+                catalog. Pentru colectii foloseste handle-urile separate prin virgula.
+              </p>
+              <Row label="Produse featured">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.featuredProductIds.join(", ")}
+                  onChange={(e) => updateCsv("featuredProductIds", e.target.value)}
+                />
+              </Row>
+              <Row label="Colectii featured">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.featuredCollectionHandles.join(", ")}
+                  onChange={(e) => updateCsv("featuredCollectionHandles", e.target.value)}
+                />
+              </Row>
+            </Panel>
+
             <Panel title="Card produs">
               <Row label="Imagine spate prima">
                 <input
@@ -590,6 +621,78 @@ function Admin() {
                   className="input resize-none"
                   value={site.legalBusinessDetails}
                   onChange={(e) => site.update({ legalBusinessDetails: e.target.value })}
+                />
+              </Row>
+            </Panel>
+
+            <Panel title="Pagini suport & legal">
+              <Row label="Titlu livrare">
+                <input
+                  className="input"
+                  value={site.deliveryTitle}
+                  onChange={(e) => site.update({ deliveryTitle: e.target.value })}
+                />
+              </Row>
+              <Row label="Text livrare">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.deliveryBody}
+                  onChange={(e) => site.update({ deliveryBody: e.target.value })}
+                />
+              </Row>
+              <Row label="Titlu retur">
+                <input
+                  className="input"
+                  value={site.returnsTitle}
+                  onChange={(e) => site.update({ returnsTitle: e.target.value })}
+                />
+              </Row>
+              <Row label="Text retur">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.returnsBody}
+                  onChange={(e) => site.update({ returnsBody: e.target.value })}
+                />
+              </Row>
+              <Row label="Titlu schimb marime">
+                <input
+                  className="input"
+                  value={site.exchangeTitle}
+                  onChange={(e) => site.update({ exchangeTitle: e.target.value })}
+                />
+              </Row>
+              <Row label="Text schimb marime">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.exchangeBody}
+                  onChange={(e) => site.update({ exchangeBody: e.target.value })}
+                />
+              </Row>
+              <Row label="Intro termeni">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.legalIntro}
+                  onChange={(e) => site.update({ legalIntro: e.target.value })}
+                />
+              </Row>
+              <Row label="Intro confidentialitate">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.privacyIntro}
+                  onChange={(e) => site.update({ privacyIntro: e.target.value })}
+                />
+              </Row>
+              <Row label="Intro cookies">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.cookiesIntro}
+                  onChange={(e) => site.update({ cookiesIntro: e.target.value })}
                 />
               </Row>
             </Panel>
