@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { Minus, Plus } from "lucide-react";
+import { ShopifyCheckoutButton } from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
-import { ShopifyCheckoutButton } from "@/components/CartDrawer";
-import { Minus, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
-  head: () => ({ meta: [{ title: "Coș — Trei Linii" }] }),
+  head: () => ({ meta: [{ title: "Cos - Trei Linii" }] }),
 });
 
 function CartPage() {
@@ -15,13 +15,13 @@ function CartPage() {
   if (lines.length === 0) {
     return (
       <div className="px-5 py-32 text-center">
-        <p className="font-mono-xs opacity-60">Coș</p>
-        <h1 className="font-display text-5xl md:text-7xl mt-2">Coșul este gol.</h1>
+        <p className="font-mono-xs opacity-60">Cos</p>
+        <h1 className="font-display text-5xl md:text-7xl mt-2">Cosul este gol.</h1>
         <Link
           to="/shop"
           className="inline-block mt-8 bg-charcoal text-cream px-6 py-3 font-mono-xs"
         >
-          Continuă cumpărăturile →
+          Continua cumparaturile
         </Link>
       </div>
     );
@@ -30,7 +30,7 @@ function CartPage() {
   return (
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1400px]">
-        <p className="font-mono-xs opacity-60">Coș</p>
+        <p className="font-mono-xs opacity-60">Cos</p>
         <h1 className="font-display text-5xl md:text-7xl mt-2">Produse · {lines.length}</h1>
 
         <div className="mt-12 grid lg:grid-cols-12 gap-12">
@@ -59,11 +59,11 @@ function CartPage() {
                         onClick={() => removeItem(l.lineId)}
                         className="font-mono-xs opacity-60 hover:opacity-100"
                       >
-                        Elimină
+                        Elimina
                       </button>
                     </div>
                     <p className="font-mono-xs opacity-60 mt-2">
-                      {l.color} · Mărime {l.size}
+                      {l.color} · Marime {l.size}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">
@@ -91,14 +91,14 @@ function CartPage() {
 
           <aside className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
             <div className="bg-cream p-6 border border-border space-y-5">
-              <h2 className="font-display text-2xl">Sumar comandă</h2>
+              <h2 className="font-display text-2xl">Sumar comanda</h2>
               <div className="flex justify-between font-mono-xs">
                 <span>Subtotal</span>
                 <span className="tabular-nums text-base">{formatRON(subtotal)}</span>
               </div>
               <div className="flex justify-between font-mono-xs">
                 <span>Livrare</span>
-                <span>Calculată la finalizare</span>
+                <span>Calculata la finalizare</span>
               </div>
               <div className="border-t border-border pt-4 flex justify-between">
                 <span className="font-mono-xs">Total</span>
@@ -106,7 +106,7 @@ function CartPage() {
               </div>
               <ShopifyCheckoutButton />
               <p className="font-mono-xs opacity-50 text-center">
-                Vei fi redirecționat către finalizarea securizată Shopify.
+                Vei fi redirectionat catre finalizarea securizata a comenzii.
               </p>
             </div>
           </aside>

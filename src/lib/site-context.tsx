@@ -3,6 +3,20 @@ import { homepageSections as defaultSections } from "./mock-data";
 
 export type SiteMode = "pre-launch" | "live-shop";
 
+export interface FaqItem {
+  id: string;
+  q: string;
+  a: string;
+  enabled: boolean;
+}
+
+export interface TrustItem {
+  id: string;
+  title: string;
+  text: string;
+  enabled: boolean;
+}
+
 export interface SiteSettings {
   siteMode: SiteMode;
   logoText: string;
@@ -20,7 +34,50 @@ export interface SiteSettings {
   heroSecondaryCtaText: string;
   heroSecondaryCtaLink: string;
   heroBadges: string;
+  conceptEyebrow: string;
+  conceptTitle: string;
+  conceptBody: string;
+  featuredEyebrowPreLaunch: string;
+  featuredEyebrowLiveShop: string;
+  featuredTitlePreLaunch: string;
+  featuredTitleLiveShop: string;
+  featuredLinkText: string;
+  collectionsEyebrow: string;
+  collectionsTitle: string;
+  lookbookEyebrow: string;
+  lookbookTitle: string;
+  lookbookLinkText: string;
+  socialProofEyebrow: string;
+  socialProofTitle: string;
+  socialProofCardTitle: string;
+  socialProofCardText: string;
+  faqEyebrow: string;
+  faqTitle: string;
+  faqLinkText: string;
+  newsletterEyebrowPreLaunch: string;
+  newsletterEyebrowLiveShop: string;
+  newsletterTitlePreLaunch: string;
+  newsletterTitleLiveShop: string;
+  newsletterBody: string;
+  newsletterButtonText: string;
+  newsletterSuccessText: string;
+  launchBannerEyebrow: string;
+  launchBannerTitle: string;
+  launchBannerCtaText: string;
+  launchBannerCtaLink: string;
+  liveBannerEyebrow: string;
+  liveBannerTitle: string;
+  liveBannerCtaText: string;
+  liveBannerCtaLink: string;
+  productCardBackImageFirst: boolean;
+  productCardShowPreviewBadge: boolean;
+  productCardShowLiveBadges: boolean;
+  productCardQuickAdd: boolean;
+  productCardMetaText: string;
   reviewsEnabled: boolean;
+  trustItemsPreLaunch: TrustItem[];
+  trustItemsLiveShop: TrustItem[];
+  faqItems: FaqItem[];
   legalBusinessName: string;
   legalBusinessDetails: string;
   contactEmail: string;
@@ -52,7 +109,129 @@ const defaults: SiteSettings = {
   heroSecondaryCtaText: "Vezi conceptul",
   heroSecondaryCtaLink: "/about",
   heroBadges: "Croiala oversized · Design pe spate · Lansare in pregatire",
+  conceptEyebrow: "Concept",
+  conceptTitle: "Tricouri simple in fata, gandite sa arate bine din spate.",
+  conceptBody:
+    "Trei Linii porneste de la o idee clara: fit oversized, material dens si design minimalist plasat pe spate. Fara logo mare pe piept, fara zgomot vizual inutil.",
+  featuredEyebrowPreLaunch: "01 · Preview modele",
+  featuredEyebrowLiveShop: "01 · Modele disponibile",
+  featuredTitlePreLaunch: "Primele directii.",
+  featuredTitleLiveShop: "Alege modelul.",
+  featuredLinkText: "Vezi modelele",
+  collectionsEyebrow: "02 · Structura",
+  collectionsTitle: "Fit, material si design pe spate.",
+  lookbookEyebrow: "03 · Lookbook",
+  lookbookTitle: "Cum cade tricoul.",
+  lookbookLinkText: "Deschide lookbook",
+  socialProofEyebrow: "Lookbook",
+  socialProofTitle: "Fit-ul din spate.",
+  socialProofCardTitle: "Designul sta pe spate.",
+  socialProofCardText:
+    "Fata ramane simpla. Grafica este plasata pe spate, gandita pentru un tricou purtabil zi de zi.",
+  faqEyebrow: "04 · FAQ",
+  faqTitle: "Intrebari utile.",
+  faqLinkText: "Vezi toate intrebarile",
+  newsletterEyebrowPreLaunch: "Lista de lansare",
+  newsletterEyebrowLiveShop: "Newsletter",
+  newsletterTitlePreLaunch: "Afla primul cand se lanseaza.",
+  newsletterTitleLiveShop: "Ramai aproape de urmatorul drop.",
+  newsletterBody:
+    "Trimitem doar noutati despre lansari, marimi disponibile si update-uri relevante pentru primele modele.",
+  newsletterButtonText: "Inscrie-te",
+  newsletterSuccessText: "Email salvat. Te anuntam la lansare.",
+  launchBannerEyebrow: "Lista de lansare",
+  launchBannerTitle:
+    "Vezi primele modele inainte de lansare si primesti anuntul cand drop-ul este gata.",
+  launchBannerCtaText: "Intra pe lista",
+  launchBannerCtaLink: "/#newsletter",
+  liveBannerEyebrow: "Oferta de lansare",
+  liveBannerTitle: "Doua tricouri in cos pot debloca beneficii de livrare la checkout.",
+  liveBannerCtaText: "Vezi modelele",
+  liveBannerCtaLink: "/shop",
+  productCardBackImageFirst: true,
+  productCardShowPreviewBadge: true,
+  productCardShowLiveBadges: true,
+  productCardQuickAdd: true,
+  productCardMetaText: "Design pe spate",
   reviewsEnabled: false,
+  trustItemsPreLaunch: [
+    {
+      id: "fit",
+      title: "Croiala oversized",
+      text: "Fit relaxat, gandit pentru purtare zilnica.",
+      enabled: true,
+    },
+    {
+      id: "back-design",
+      title: "Design pe spate",
+      text: "Fata ramane curata, grafica sta pe spate.",
+      enabled: true,
+    },
+    {
+      id: "size-exchange",
+      title: "Schimb marime",
+      text: "Politica finala va fi afisata inainte de lansare.",
+      enabled: true,
+    },
+    {
+      id: "launch-list",
+      title: "Lista de lansare",
+      text: "Anuntam disponibilitatea inainte de drop.",
+      enabled: true,
+    },
+  ],
+  trustItemsLiveShop: [
+    {
+      id: "delivery",
+      title: "Livrare 2-3 zile",
+      text: "Costul final se afiseaza la checkout.",
+      enabled: true,
+    },
+    {
+      id: "returns",
+      title: "Retur 14 zile",
+      text: "Pentru produse nepurtate si curate.",
+      enabled: true,
+    },
+    {
+      id: "size-exchange",
+      title: "Schimb marime",
+      text: "Te ajutam sa alegi fit-ul potrivit.",
+      enabled: true,
+    },
+    {
+      id: "secure-payment",
+      title: "Plata securizata",
+      text: "Comanda se finalizeaza prin checkout securizat.",
+      enabled: true,
+    },
+  ],
+  faqItems: [
+    {
+      id: "size",
+      q: "Cum aleg marimea?",
+      a: "Tricourile sunt gandite oversized. Alege marimea normala pentru un fit relaxat sau o marime mai mica pentru o cadere mai apropiata de corp.",
+      enabled: true,
+    },
+    {
+      id: "material",
+      q: "Din ce material sunt tricourile?",
+      a: "Directia este bumbac dens, cu textura stabila si cadere curata. Detaliile exacte vor fi afisate pe fiecare pagina de produs.",
+      enabled: true,
+    },
+    {
+      id: "launch",
+      q: "Cand se lanseaza primele modele?",
+      a: "Lansarea este in pregatire. Inscrie-te pe lista si primesti anuntul cand modelele devin disponibile.",
+      enabled: true,
+    },
+    {
+      id: "checkout",
+      q: "Cum va functiona comanda?",
+      a: "Cand magazinul este live, alegi marimea, adaugi produsul in cos si finalizezi comanda prin checkout securizat.",
+      enabled: true,
+    },
+  ],
   legalBusinessName: "",
   legalBusinessDetails: "",
   contactEmail: "contact@treilinii.ro",
@@ -72,11 +251,17 @@ const defaults: SiteSettings = {
 interface Ctx extends SiteSettings {
   update: (patch: Partial<SiteSettings>) => void;
   toggleSection: (id: string) => void;
+  updateFaqItem: (id: string, patch: Partial<FaqItem>) => void;
+  updateTrustItem: (
+    mode: "pre-launch" | "live-shop",
+    id: string,
+    patch: Partial<TrustItem>,
+  ) => void;
   reset: () => void;
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v4";
+const STORAGE_KEY = "trei-linii-site-v5";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);
@@ -109,6 +294,19 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             sec.id === id ? { ...sec, enabled: !sec.enabled } : sec,
           ),
         })),
+      updateFaqItem: (id, patch) =>
+        setSettings((s) => ({
+          ...s,
+          faqItems: s.faqItems.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+        })),
+      updateTrustItem: (mode, id, patch) =>
+        setSettings((s) => {
+          const key = mode === "pre-launch" ? "trustItemsPreLaunch" : "trustItemsLiveShop";
+          return {
+            ...s,
+            [key]: s[key].map((item) => (item.id === id ? { ...item, ...patch } : item)),
+          };
+        }),
       reset: () => setSettings(defaults),
     }),
     [settings],

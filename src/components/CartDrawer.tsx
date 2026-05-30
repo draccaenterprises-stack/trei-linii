@@ -159,7 +159,7 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
 
       redirectToShopifyCheckout(updatedCart.checkoutUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nu am putut porni checkout-ul Shopify.");
+      setError(err instanceof Error ? err.message : "Nu am putut porni checkout-ul securizat.");
     } finally {
       setLoading(false);
     }
@@ -177,10 +177,10 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
           : !shopifyReady
             ? "Finalizarea comenzii este indisponibila momentan"
             : !hasRealShopifyVariants
-              ? "Adauga produse publicate in Shopify"
+              ? "Adauga produse disponibile"
               : loading
                 ? "Se redirectioneaza..."
-                : "Continua spre checkout Shopify ->"}
+                : "Continua spre plata securizata ->"}
       </button>
       {error && <p className="font-mono-xs text-red-700">{error}</p>}
     </div>

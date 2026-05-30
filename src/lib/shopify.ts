@@ -228,7 +228,7 @@ function publicProductDescription(product: ShopifyProductNode) {
 
   return (
     product.description?.trim() ??
-    "Tricou Trei Linii cu croiala oversized si finisaj curat, conectat din Shopify."
+    "Tricou Trei Linii cu croiala oversized, material dens si finisaj curat."
   );
 }
 

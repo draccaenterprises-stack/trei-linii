@@ -1,8 +1,11 @@
 import { useState } from "react";
 import { faqs } from "@/lib/mock-data";
 import { Plus, Minus } from "lucide-react";
+import type { FaqItem } from "@/lib/site-context";
 
-export function FAQAccordion({ items = faqs }: { items?: typeof faqs }) {
+type FaqLike = Pick<FaqItem, "q" | "a">;
+
+export function FAQAccordion({ items = faqs }: { items?: FaqLike[] }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <div className="border-t border-border">

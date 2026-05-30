@@ -12,11 +12,20 @@ const badgeStyles: Record<string, string> = {
 
 export function ProductCard({ product }: { product: Product }) {
   const { addItem } = useCart();
-  const { siteMode } = useSite();
+  const {
+    siteMode,
+    productCardBackImageFirst,
+    productCardShowPreviewBadge,
+    productCardShowLiveBadges,
+    productCardQuickAdd,
+    productCardMetaText,
+  } = useSite();
   const availableSizes = product.sizes.filter((size) => product.stock[size] > 0);
   const showPrice = siteMode === "live-shop";
-  const primaryImage = product.images[1] ?? product.images[0];
-  const hoverImage = product.images[0];
+  const primaryImage = productCardBackImageFirst
+    ? (product.images[1] ?? product.images[0])
+    : product.images[0];
+  const hoverImage = primaryImage === product.images[0] ? product.images[1] : product.images[0];
 
   return (
     <article className="group">
@@ -24,7 +33,7 @@ export function ProductCard({ product }: { product: Product }) {
         <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
           <img
             src={primaryImage}
-            alt={`${product.title} - vedere spate`}
+            alt={`${product.title} - vedere produs`}
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -36,14 +45,14 @@ export function ProductCard({ product }: { product: Product }) {
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
             />
           )}
-          {siteMode === "live-shop" && product.badge && (
+          {siteMode === "live-shop" && productCardShowLiveBadges && product.badge && (
             <span
               className={`absolute top-3 left-3 px-2 py-1 font-mono-xs ${badgeStyles[product.badge]}`}
             >
               {product.badge}
             </span>
           )}
-          {siteMode === "pre-launch" && (
+          {siteMode === "pre-launch" && productCardShowPreviewBadge && (
             <span className="absolute top-3 left-3 px-2 py-1 font-mono-xs bg-charcoal text-cream">
               preview
             </span>
@@ -57,13 +66,13 @@ export function ProductCard({ product }: { product: Product }) {
             <h3 className="text-sm md:text-base font-display tracking-tight">{product.title}</h3>
           </Link>
           <p className="font-mono-xs opacity-50 mt-1">
-            Design pe spate · {product.sizes.length} marimi
+            {productCardMetaText} · {product.sizes.length} marimi
           </p>
         </div>
         {showPrice && <div className="text-sm tabular-nums">{formatRON(product.price)}</div>}
       </div>
 
-      {siteMode === "live-shop" ? (
+      {siteMode === "live-shop" && productCardQuickAdd ? (
         <>
           <div
             className="mt-4 grid border border-border"
@@ -104,7 +113,7 @@ export function ProductCard({ product }: { product: Product }) {
           params={{ handle: product.handle }}
           className="mt-4 inline-flex border border-charcoal px-4 py-2 font-mono-xs hover:bg-charcoal hover:text-cream transition-colors"
         >
-          Vezi preview
+          {siteMode === "pre-launch" ? "Vezi preview" : "Vezi produsul"}
         </Link>
       )}
     </article>

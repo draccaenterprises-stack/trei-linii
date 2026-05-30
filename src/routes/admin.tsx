@@ -85,7 +85,7 @@ function Admin() {
 
           {missingLegal && (
             <div className="mb-6 border border-washed-red bg-background p-4 text-sm">
-              Datele firmei lipsesc in admin. Publicul nu vede un placeholder, dar trebuie
+              Datele firmei lipsesc in admin. Publicul nu vede texte temporare, dar trebuie
               completate inainte de lansarea comerciala.
             </div>
           )}
@@ -224,6 +224,99 @@ function Admin() {
               </Row>
             </Panel>
 
+            <Panel title="Homepage copy">
+              <Row label="Concept - text mic">
+                <input
+                  className="input"
+                  value={site.conceptEyebrow}
+                  onChange={(e) => site.update({ conceptEyebrow: e.target.value })}
+                />
+              </Row>
+              <Row label="Concept - titlu">
+                <textarea
+                  rows={2}
+                  className="input resize-none"
+                  value={site.conceptTitle}
+                  onChange={(e) => site.update({ conceptTitle: e.target.value })}
+                />
+              </Row>
+              <Row label="Concept - descriere">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.conceptBody}
+                  onChange={(e) => site.update({ conceptBody: e.target.value })}
+                />
+              </Row>
+              <div className="grid md:grid-cols-2 gap-3">
+                <Row label="Produse - eyebrow pre-launch">
+                  <input
+                    className="input"
+                    value={site.featuredEyebrowPreLaunch}
+                    onChange={(e) => site.update({ featuredEyebrowPreLaunch: e.target.value })}
+                  />
+                </Row>
+                <Row label="Produse - eyebrow live">
+                  <input
+                    className="input"
+                    value={site.featuredEyebrowLiveShop}
+                    onChange={(e) => site.update({ featuredEyebrowLiveShop: e.target.value })}
+                  />
+                </Row>
+                <Row label="Produse - titlu pre-launch">
+                  <input
+                    className="input"
+                    value={site.featuredTitlePreLaunch}
+                    onChange={(e) => site.update({ featuredTitlePreLaunch: e.target.value })}
+                  />
+                </Row>
+                <Row label="Produse - titlu live">
+                  <input
+                    className="input"
+                    value={site.featuredTitleLiveShop}
+                    onChange={(e) => site.update({ featuredTitleLiveShop: e.target.value })}
+                  />
+                </Row>
+              </div>
+              <Row label="Text link produse">
+                <input
+                  className="input"
+                  value={site.featuredLinkText}
+                  onChange={(e) => site.update({ featuredLinkText: e.target.value })}
+                />
+              </Row>
+              <div className="grid md:grid-cols-2 gap-3">
+                <Row label="Structura - text mic">
+                  <input
+                    className="input"
+                    value={site.collectionsEyebrow}
+                    onChange={(e) => site.update({ collectionsEyebrow: e.target.value })}
+                  />
+                </Row>
+                <Row label="Structura - titlu">
+                  <input
+                    className="input"
+                    value={site.collectionsTitle}
+                    onChange={(e) => site.update({ collectionsTitle: e.target.value })}
+                  />
+                </Row>
+                <Row label="Lookbook - text mic">
+                  <input
+                    className="input"
+                    value={site.lookbookEyebrow}
+                    onChange={(e) => site.update({ lookbookEyebrow: e.target.value })}
+                  />
+                </Row>
+                <Row label="Lookbook - titlu">
+                  <input
+                    className="input"
+                    value={site.lookbookTitle}
+                    onChange={(e) => site.update({ lookbookTitle: e.target.value })}
+                  />
+                </Row>
+              </div>
+            </Panel>
+
             <Panel title="Sectiuni homepage">
               <ul className="divide-y divide-border">
                 {site.sections.map((s) => (
@@ -249,6 +342,205 @@ function Admin() {
                   type="checkbox"
                   checked={site.reviewsEnabled}
                   onChange={(e) => site.update({ reviewsEnabled: e.target.checked })}
+                />
+              </Row>
+            </Panel>
+
+            <Panel title="Card produs">
+              <Row label="Imagine spate prima">
+                <input
+                  type="checkbox"
+                  checked={site.productCardBackImageFirst}
+                  onChange={(e) => site.update({ productCardBackImageFirst: e.target.checked })}
+                />
+              </Row>
+              <Row label="Badge preview activ">
+                <input
+                  type="checkbox"
+                  checked={site.productCardShowPreviewBadge}
+                  onChange={(e) => site.update({ productCardShowPreviewBadge: e.target.checked })}
+                />
+              </Row>
+              <Row label="Badge produs live activ">
+                <input
+                  type="checkbox"
+                  checked={site.productCardShowLiveBadges}
+                  onChange={(e) => site.update({ productCardShowLiveBadges: e.target.checked })}
+                />
+              </Row>
+              <Row label="Quick add marimi in live-shop">
+                <input
+                  type="checkbox"
+                  checked={site.productCardQuickAdd}
+                  onChange={(e) => site.update({ productCardQuickAdd: e.target.checked })}
+                />
+              </Row>
+              <Row label="Meta card produs">
+                <input
+                  className="input"
+                  value={site.productCardMetaText}
+                  onChange={(e) => site.update({ productCardMetaText: e.target.value })}
+                />
+              </Row>
+            </Panel>
+
+            <Panel title="Trust badges">
+              <p className="text-sm text-muted-foreground">
+                Se editeaza local pentru modul curent. Dezactiveaza un badge daca nu vrei sa apara
+                public.
+              </p>
+              {(site.siteMode === "pre-launch"
+                ? site.trustItemsPreLaunch
+                : site.trustItemsLiveShop
+              ).map((item) => (
+                <div key={item.id} className="border border-border p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono-xs">{item.id}</span>
+                    <input
+                      type="checkbox"
+                      checked={item.enabled}
+                      onChange={(e) =>
+                        site.updateTrustItem(site.siteMode, item.id, { enabled: e.target.checked })
+                      }
+                    />
+                  </div>
+                  <input
+                    className="input"
+                    value={item.title}
+                    onChange={(e) =>
+                      site.updateTrustItem(site.siteMode, item.id, { title: e.target.value })
+                    }
+                  />
+                  <textarea
+                    rows={2}
+                    className="input resize-none"
+                    value={item.text}
+                    onChange={(e) =>
+                      site.updateTrustItem(site.siteMode, item.id, { text: e.target.value })
+                    }
+                  />
+                </div>
+              ))}
+            </Panel>
+
+            <Panel title="FAQ">
+              <div className="grid md:grid-cols-3 gap-3">
+                <Row label="Text mic FAQ">
+                  <input
+                    className="input"
+                    value={site.faqEyebrow}
+                    onChange={(e) => site.update({ faqEyebrow: e.target.value })}
+                  />
+                </Row>
+                <Row label="Titlu FAQ">
+                  <input
+                    className="input"
+                    value={site.faqTitle}
+                    onChange={(e) => site.update({ faqTitle: e.target.value })}
+                  />
+                </Row>
+                <Row label="Link FAQ">
+                  <input
+                    className="input"
+                    value={site.faqLinkText}
+                    onChange={(e) => site.update({ faqLinkText: e.target.value })}
+                  />
+                </Row>
+              </div>
+              {site.faqItems.map((item) => (
+                <div key={item.id} className="border border-border p-4 space-y-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-mono-xs">{item.id}</span>
+                    <input
+                      type="checkbox"
+                      checked={item.enabled}
+                      onChange={(e) => site.updateFaqItem(item.id, { enabled: e.target.checked })}
+                    />
+                  </div>
+                  <input
+                    className="input"
+                    value={item.q}
+                    onChange={(e) => site.updateFaqItem(item.id, { q: e.target.value })}
+                  />
+                  <textarea
+                    rows={3}
+                    className="input resize-none"
+                    value={item.a}
+                    onChange={(e) => site.updateFaqItem(item.id, { a: e.target.value })}
+                  />
+                </div>
+              ))}
+            </Panel>
+
+            <Panel title="Newsletter & bannere">
+              <div className="grid md:grid-cols-2 gap-3">
+                <Row label="Newsletter eyebrow pre-launch">
+                  <input
+                    className="input"
+                    value={site.newsletterEyebrowPreLaunch}
+                    onChange={(e) => site.update({ newsletterEyebrowPreLaunch: e.target.value })}
+                  />
+                </Row>
+                <Row label="Newsletter eyebrow live">
+                  <input
+                    className="input"
+                    value={site.newsletterEyebrowLiveShop}
+                    onChange={(e) => site.update({ newsletterEyebrowLiveShop: e.target.value })}
+                  />
+                </Row>
+                <Row label="Newsletter titlu pre-launch">
+                  <input
+                    className="input"
+                    value={site.newsletterTitlePreLaunch}
+                    onChange={(e) => site.update({ newsletterTitlePreLaunch: e.target.value })}
+                  />
+                </Row>
+                <Row label="Newsletter titlu live">
+                  <input
+                    className="input"
+                    value={site.newsletterTitleLiveShop}
+                    onChange={(e) => site.update({ newsletterTitleLiveShop: e.target.value })}
+                  />
+                </Row>
+              </div>
+              <Row label="Newsletter descriere">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.newsletterBody}
+                  onChange={(e) => site.update({ newsletterBody: e.target.value })}
+                />
+              </Row>
+              <div className="grid md:grid-cols-2 gap-3">
+                <Row label="Buton newsletter">
+                  <input
+                    className="input"
+                    value={site.newsletterButtonText}
+                    onChange={(e) => site.update({ newsletterButtonText: e.target.value })}
+                  />
+                </Row>
+                <Row label="Mesaj succes">
+                  <input
+                    className="input"
+                    value={site.newsletterSuccessText}
+                    onChange={(e) => site.update({ newsletterSuccessText: e.target.value })}
+                  />
+                </Row>
+              </div>
+              <Row label="Banner pre-launch">
+                <textarea
+                  rows={2}
+                  className="input resize-none"
+                  value={site.launchBannerTitle}
+                  onChange={(e) => site.update({ launchBannerTitle: e.target.value })}
+                />
+              </Row>
+              <Row label="Banner live-shop">
+                <textarea
+                  rows={2}
+                  className="input resize-none"
+                  value={site.liveBannerTitle}
+                  onChange={(e) => site.update({ liveBannerTitle: e.target.value })}
                 />
               </Row>
             </Panel>
