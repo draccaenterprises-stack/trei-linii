@@ -22,8 +22,8 @@ function Privacy() {
         <div className="mt-10 space-y-6 text-muted-foreground leading-relaxed">
           <p>{privacyIntro}</p>
           <p>
-            Datele de plata sunt procesate prin furnizorii securizati folositi la checkout. Nu
-            stocam local date complete de card.
+            Datele de plata sunt procesate prin furnizorii securizati folositi la finalizarea
+            comenzii. Nu stocam local date complete de card.
           </p>
           <p>
             Poti cere modificarea sau stergerea datelor de contact trimitand un mesaj prin pagina de

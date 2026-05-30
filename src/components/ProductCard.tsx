@@ -54,7 +54,7 @@ export function ProductCard({ product }: { product: Product }) {
           )}
           {siteMode === "pre-launch" && productCardShowPreviewBadge && (
             <span className="absolute top-3 left-3 px-2 py-1 font-mono-xs bg-charcoal text-cream">
-              preview
+              previzualizare
             </span>
           )}
         </div>
@@ -113,7 +113,7 @@ export function ProductCard({ product }: { product: Product }) {
           params={{ handle: product.handle }}
           className="mt-4 inline-flex border border-charcoal px-4 py-2 font-mono-xs hover:bg-charcoal hover:text-cream transition-colors"
         >
-          {siteMode === "pre-launch" ? "Vezi preview" : "Vezi produsul"}
+          {siteMode === "pre-launch" ? "Vezi previzualizarea" : "Vezi produsul"}
         </Link>
       )}
     </article>

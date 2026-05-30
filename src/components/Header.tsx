@@ -12,7 +12,7 @@ const preLaunchNav = [
 ] as const;
 
 const liveShopNav = [
-  { to: "/shop", label: "Shop" },
+  { to: "/shop", label: "Magazin" },
   { to: "/collections", label: "Modele" },
   { to: "/size-guide", label: "Ghid marimi" },
   { to: "/lookbook", label: "Lookbook" },

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { useSite, type SiteMode } from "@/lib/site-context";
+import { isShopifyConfigured, shopifyConfig } from "@/lib/shopify";
+import { useSite, type SiteMode, type SiteSettings } from "@/lib/site-context";
 
 const ADMIN_PIN = "treilinii";
 
@@ -17,7 +18,10 @@ function Admin() {
   const [unlocked, setUnlocked] = useState(
     () => typeof window !== "undefined" && sessionStorage.getItem("trei-linii-admin") === "1",
   );
+  const [settingsBackup, setSettingsBackup] = useState("");
+  const [settingsMessage, setSettingsMessage] = useState("");
   const missingLegal = !site.legalBusinessName || !site.legalBusinessDetails;
+  const shopifyReady = isShopifyConfigured();
   const updateCsv = (key: "featuredProductIds" | "featuredCollectionHandles", value: string) => {
     site.update({
       [key]: value
@@ -25,6 +29,30 @@ function Admin() {
         .map((item) => item.trim())
         .filter(Boolean),
     });
+  };
+  const updateFooterTrustItems = (value: string) => {
+    site.update({
+      footerTrustItems: value
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    });
+  };
+  const exportSettings = () => {
+    const settingsOnly = Object.fromEntries(
+      Object.entries(site).filter(([, value]) => typeof value !== "function"),
+    );
+    setSettingsBackup(JSON.stringify(settingsOnly, null, 2));
+    setSettingsMessage("Backup generat local.");
+  };
+  const importSettings = () => {
+    try {
+      const parsed = JSON.parse(settingsBackup) as Partial<SiteSettings>;
+      site.update(parsed);
+      setSettingsMessage("Setarile au fost importate local.");
+    } catch {
+      setSettingsMessage("JSON invalid. Verifica backup-ul si incearca din nou.");
+    }
   };
 
   if (!unlocked) {
@@ -106,8 +134,8 @@ function Admin() {
                   value={site.siteMode}
                   onChange={(e) => site.update({ siteMode: e.target.value as SiteMode })}
                 >
-                  <option value="pre-launch">Pre-launch</option>
-                  <option value="live-shop">Live shop</option>
+                  <option value="pre-launch">Pre-lansare</option>
+                  <option value="live-shop">Magazin activ</option>
                 </select>
               </Row>
               <Row label="Bara anunt activa">
@@ -257,7 +285,7 @@ function Admin() {
                 />
               </Row>
               <div className="grid md:grid-cols-2 gap-3">
-                <Row label="Produse - eyebrow pre-launch">
+                <Row label="Produse - text mic pre-lansare">
                   <input
                     className="input"
                     value={site.featuredEyebrowPreLaunch}
@@ -385,7 +413,7 @@ function Admin() {
                   onChange={(e) => site.update({ productCardBackImageFirst: e.target.checked })}
                 />
               </Row>
-              <Row label="Badge preview activ">
+              <Row label="Badge previzualizare activ">
                 <input
                   type="checkbox"
                   checked={site.productCardShowPreviewBadge}
@@ -399,7 +427,7 @@ function Admin() {
                   onChange={(e) => site.update({ productCardShowLiveBadges: e.target.checked })}
                 />
               </Row>
-              <Row label="Quick add marimi in live-shop">
+              <Row label="Adaugare rapida marimi in magazin activ">
                 <input
                   type="checkbox"
                   checked={site.productCardQuickAdd}
@@ -503,30 +531,30 @@ function Admin() {
               ))}
             </Panel>
 
-            <Panel title="Newsletter & bannere">
+            <Panel title="Noutati & bannere">
               <div className="grid md:grid-cols-2 gap-3">
-                <Row label="Newsletter eyebrow pre-launch">
+                <Row label="Noutati - text mic pre-lansare">
                   <input
                     className="input"
                     value={site.newsletterEyebrowPreLaunch}
                     onChange={(e) => site.update({ newsletterEyebrowPreLaunch: e.target.value })}
                   />
                 </Row>
-                <Row label="Newsletter eyebrow live">
+                <Row label="Noutati - text mic live">
                   <input
                     className="input"
                     value={site.newsletterEyebrowLiveShop}
                     onChange={(e) => site.update({ newsletterEyebrowLiveShop: e.target.value })}
                   />
                 </Row>
-                <Row label="Newsletter titlu pre-launch">
+                <Row label="Noutati - titlu pre-lansare">
                   <input
                     className="input"
                     value={site.newsletterTitlePreLaunch}
                     onChange={(e) => site.update({ newsletterTitlePreLaunch: e.target.value })}
                   />
                 </Row>
-                <Row label="Newsletter titlu live">
+                <Row label="Noutati - titlu live">
                   <input
                     className="input"
                     value={site.newsletterTitleLiveShop}
@@ -534,7 +562,7 @@ function Admin() {
                   />
                 </Row>
               </div>
-              <Row label="Newsletter descriere">
+              <Row label="Noutati descriere">
                 <textarea
                   rows={3}
                   className="input resize-none"
@@ -558,7 +586,7 @@ function Admin() {
                   />
                 </Row>
               </div>
-              <Row label="Banner pre-launch">
+              <Row label="Banner pre-lansare">
                 <textarea
                   rows={2}
                   className="input resize-none"
@@ -566,12 +594,46 @@ function Admin() {
                   onChange={(e) => site.update({ launchBannerTitle: e.target.value })}
                 />
               </Row>
-              <Row label="Banner live-shop">
+              <Row label="Banner magazin activ">
                 <textarea
                   rows={2}
                   className="input resize-none"
                   value={site.liveBannerTitle}
                   onChange={(e) => site.update({ liveBannerTitle: e.target.value })}
+                />
+              </Row>
+            </Panel>
+
+            <Panel title="Footer">
+              <Row label="Slogan footer">
+                <textarea
+                  rows={2}
+                  className="input resize-none"
+                  value={site.footerTagline}
+                  onChange={(e) => site.update({ footerTagline: e.target.value })}
+                />
+              </Row>
+              <Row label="Locatie footer">
+                <input
+                  className="input"
+                  value={site.footerLocation}
+                  onChange={(e) => site.update({ footerLocation: e.target.value })}
+                />
+              </Row>
+              <Row label="Text lista/noutati footer">
+                <textarea
+                  rows={3}
+                  className="input resize-none"
+                  value={site.footerNewsletterText}
+                  onChange={(e) => site.update({ footerNewsletterText: e.target.value })}
+                />
+              </Row>
+              <Row label="Elemente incredere footer">
+                <textarea
+                  rows={4}
+                  className="input resize-none"
+                  value={site.footerTrustItems.join("\n")}
+                  onChange={(e) => updateFooterTrustItems(e.target.value)}
                 />
               </Row>
             </Panel>
@@ -623,6 +685,54 @@ function Admin() {
                   onChange={(e) => site.update({ legalBusinessDetails: e.target.value })}
                 />
               </Row>
+            </Panel>
+
+            <Panel title="Shopify & publicare">
+              <div className="grid md:grid-cols-2 gap-3 text-sm">
+                <div className="border border-border p-4">
+                  <p className="font-mono-xs opacity-60">Status Storefront API</p>
+                  <p className="mt-2">{shopifyReady ? "Configurat" : "Neconfigurat"}</p>
+                </div>
+                <div className="border border-border p-4">
+                  <p className="font-mono-xs opacity-60">Domeniu Shopify</p>
+                  <p className="mt-2 break-all">{shopifyConfig.domain ?? "Lipsa"}</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Produsele, preturile, variantele si stocul vin din Shopify cand sunt publicate pe
+                canalul Headless. Checkout-ul se activeaza doar in modul Magazin activ si doar
+                pentru variante Shopify reale.
+              </p>
+            </Panel>
+
+            <Panel title="Backup setari locale">
+              <p className="text-sm text-muted-foreground">
+                Adminul este temporar si salveaza in browser. Genereaza backup inainte de schimbari
+                mari sau inainte sa publici din alt browser.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={exportSettings}
+                  className="font-mono-xs bg-charcoal text-cream px-4 py-2"
+                >
+                  Genereaza backup
+                </button>
+                <button
+                  onClick={importSettings}
+                  className="font-mono-xs border border-border px-4 py-2"
+                >
+                  Importa backup
+                </button>
+              </div>
+              <textarea
+                rows={8}
+                className="input resize-none font-mono text-xs"
+                value={settingsBackup}
+                onChange={(e) => setSettingsBackup(e.target.value)}
+              />
+              {settingsMessage && (
+                <p className="text-sm text-muted-foreground">{settingsMessage}</p>
+              )}
             </Panel>
 
             <Panel title="Pagini suport & legal">

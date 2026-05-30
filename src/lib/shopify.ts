@@ -1,7 +1,7 @@
 /**
  * Shopify Storefront API integration.
  *
- * Products are still allowed to fall back to demo data while Shopify has no
+ * Products can fall back to local pre-launch data while Shopify has no
  * products published to the Headless storefront. Checkout only runs for real
  * Shopify ProductVariant IDs.
  */
@@ -205,7 +205,7 @@ function isInternalTestLabel(value: string) {
 
 function publicProductTitle(title: string, index = 0) {
   if (isInternalTestLabel(title))
-    return `Preview design spate ${String(index + 1).padStart(2, "0")}`;
+    return `Previzualizare design spate ${String(index + 1).padStart(2, "0")}`;
   return title;
 }
 
@@ -215,7 +215,7 @@ function unique<T>(items: T[]) {
 
 function publicProductHandle(product: ShopifyProductNode, index = 0) {
   if (isInternalTestLabel(product.title) || isInternalTestLabel(product.handle)) {
-    return `preview-design-spate-${String(index + 1).padStart(2, "0")}`;
+    return `previzualizare-design-spate-${String(index + 1).padStart(2, "0")}`;
   }
 
   return product.handle;
@@ -223,7 +223,7 @@ function publicProductHandle(product: ShopifyProductNode, index = 0) {
 
 function publicProductDescription(product: ShopifyProductNode) {
   if (isInternalTestLabel(product.title) || isInternalTestLabel(product.description)) {
-    return "Preview pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.";
+    return "Previzualizare pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.";
   }
 
   return (
@@ -315,7 +315,7 @@ function badgeFromProduct(
 function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
   const variants = product.variants.nodes.map<ProductVariant>((variant) => {
     const size =
-      selectedOptionValue(variant.selectedOptions, ["size", "marime", "mărime"]) ??
+      selectedOptionValue(variant.selectedOptions, ["size", "marime"]) ??
       fallbackSize(variant.selectedOptions);
     const color = fallbackColor(variant.selectedOptions);
 

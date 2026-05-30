@@ -25,7 +25,7 @@ function Contact() {
           <div className="mt-12 space-y-8 font-mono-xs">
             <div>
               <h3 className="opacity-50 mb-2">Studio</h3>
-              <p>București, România</p>
+              <p>Bucuresti, Romania</p>
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Email</h3>
@@ -63,7 +63,7 @@ function Contact() {
               <textarea rows={6} required className="input resize-none" />
             </Field>
             <button className="bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90">
-              {sent ? "Trimis ✓" : "Trimite mesajul →"}
+              {sent ? "Trimis" : "Trimite mesajul"}
             </button>
           </form>
         </div>

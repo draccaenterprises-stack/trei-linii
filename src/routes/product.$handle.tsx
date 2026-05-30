@@ -83,7 +83,7 @@ function ProductPage() {
           <aside className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
             <div className="flex items-center gap-3 mb-3">
               <span className="font-mono-xs bg-charcoal text-cream px-2 py-1">
-                {siteMode === "pre-launch" ? "preview" : (product.badge ?? "disponibil")}
+                {siteMode === "pre-launch" ? "previzualizare" : (product.badge ?? "disponibil")}
               </span>
               <span className="font-mono-xs opacity-60">design pe spate</span>
             </div>
@@ -210,8 +210,8 @@ function ProductPage() {
               </InfoBlock>
 
               <InfoBlock title="Ingrijire">
-                Spala pe dos la 30°C, nu folosi inalbitor si evita uscarea automata. Calca pe dos,
-                fara contact direct cu printul.
+                Spala pe dos la 30 grade C, nu folosi inalbitor si evita uscarea automata. Calca pe
+                dos, fara contact direct cu printul.
               </InfoBlock>
             </div>
           </aside>
@@ -227,7 +227,7 @@ function ProductPage() {
           <div className="flex items-end justify-between gap-6 mb-8">
             <div>
               <p className="font-mono-xs opacity-60">
-                {siteMode === "pre-launch" ? "Alte preview-uri" : "Completeaza cosul"}
+                {siteMode === "pre-launch" ? "Alte previzualizari" : "Completeaza cosul"}
               </p>
               <h2 className="font-display text-4xl md:text-6xl mt-3">Mai multe modele.</h2>
             </div>

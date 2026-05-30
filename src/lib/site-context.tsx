@@ -84,6 +84,10 @@ export interface SiteSettings {
   whatsapp: string;
   instagram: string;
   tiktok: string;
+  footerTagline: string;
+  footerLocation: string;
+  footerNewsletterText: string;
+  footerTrustItems: string[];
   deliveryTitle: string;
   deliveryBody: string;
   returnsTitle: string;
@@ -122,7 +126,7 @@ const defaults: SiteSettings = {
   conceptTitle: "Tricouri simple in fata, gandite sa arate bine din spate.",
   conceptBody:
     "Trei Linii porneste de la o idee clara: fit oversized, material dens si design minimalist plasat pe spate. Fara logo mare pe piept, fara zgomot vizual inutil.",
-  featuredEyebrowPreLaunch: "01 - Preview modele",
+  featuredEyebrowPreLaunch: "01 - Previzualizare modele",
   featuredEyebrowLiveShop: "01 - Modele disponibile",
   featuredTitlePreLaunch: "Primele directii.",
   featuredTitleLiveShop: "Alege modelul.",
@@ -141,20 +145,20 @@ const defaults: SiteSettings = {
   faqTitle: "Intrebari utile.",
   faqLinkText: "Vezi toate intrebarile",
   newsletterEyebrowPreLaunch: "Lista de lansare",
-  newsletterEyebrowLiveShop: "Newsletter",
+  newsletterEyebrowLiveShop: "Noutati",
   newsletterTitlePreLaunch: "Afla primul cand se lanseaza.",
-  newsletterTitleLiveShop: "Ramai aproape de urmatorul drop.",
+  newsletterTitleLiveShop: "Ramai aproape de urmatoarea lansare.",
   newsletterBody:
     "Trimitem doar noutati despre lansari, marimi disponibile si update-uri relevante pentru primele modele.",
   newsletterButtonText: "Inscrie-te",
   newsletterSuccessText: "Email salvat. Te anuntam la lansare.",
   launchBannerEyebrow: "Lista de lansare",
   launchBannerTitle:
-    "Vezi primele modele inainte de lansare si primesti anuntul cand drop-ul este gata.",
+    "Vezi primele modele inainte de lansare si primesti anuntul cand colectia este gata.",
   launchBannerCtaText: "Intra pe lista",
   launchBannerCtaLink: "/#newsletter",
   liveBannerEyebrow: "Oferta de lansare",
-  liveBannerTitle: "Doua tricouri in cos pot debloca beneficii de livrare la checkout.",
+  liveBannerTitle: "Doua tricouri in cos pot debloca beneficii de livrare la finalizare.",
   liveBannerCtaText: "Vezi modelele",
   liveBannerCtaLink: "/shop",
   productCardBackImageFirst: true,
@@ -185,7 +189,7 @@ const defaults: SiteSettings = {
     {
       id: "launch-list",
       title: "Lista de lansare",
-      text: "Anuntam disponibilitatea inainte de drop.",
+      text: "Anuntam disponibilitatea inainte de lansare.",
       enabled: true,
     },
   ],
@@ -193,7 +197,7 @@ const defaults: SiteSettings = {
     {
       id: "delivery",
       title: "Livrare 2-3 zile",
-      text: "Costul final se afiseaza la checkout.",
+      text: "Costul final se afiseaza la finalizare.",
       enabled: true,
     },
     {
@@ -211,7 +215,7 @@ const defaults: SiteSettings = {
     {
       id: "secure-payment",
       title: "Plata securizata",
-      text: "Comanda se finalizeaza prin checkout securizat.",
+      text: "Comanda se finalizeaza prin plata securizata.",
       enabled: true,
     },
   ],
@@ -237,7 +241,7 @@ const defaults: SiteSettings = {
     {
       id: "checkout",
       q: "Cum va functiona comanda?",
-      a: "Cand magazinul este live, alegi marimea, adaugi produsul in cos si finalizezi comanda prin checkout securizat.",
+      a: "Cand magazinul este activ, alegi marimea, adaugi produsul in cos si finalizezi comanda prin plata securizata.",
       enabled: true,
     },
   ],
@@ -247,6 +251,11 @@ const defaults: SiteSettings = {
   whatsapp: "",
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
+  footerTagline: "Simplu in fata,\ndesign pe spate.",
+  footerLocation: "Bucuresti",
+  footerNewsletterText:
+    "Afla cand apar primele modele si cand devine disponibila finalizarea comenzii.",
+  footerTrustItems: ["Retur 14 zile", "Schimb marime", "Plata securizata la finalizare"],
   deliveryTitle: "Livrare",
   deliveryBody:
     "Comenzile sunt pregatite dupa confirmarea platii. Estimarea de livrare este afisata la finalizare, in functie de adresa si metoda disponibila.",
@@ -285,7 +294,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v6";
+const STORAGE_KEY = "trei-linii-site-v8";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

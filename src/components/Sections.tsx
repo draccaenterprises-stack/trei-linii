@@ -102,7 +102,7 @@ export function Reviews() {
         <div className="grid md:grid-cols-3 gap-8 md:gap-12">
           {reviews.map((r) => (
             <figure key={r.name} className="border-t border-border pt-6">
-              <div className="font-mono-xs mb-4">{"★".repeat(r.rating)}</div>
+              <div className="font-mono-xs mb-4">{"*".repeat(r.rating)}</div>
               <blockquote className="font-display text-xl md:text-2xl leading-snug">
                 "{r.text}"
               </blockquote>

@@ -11,11 +11,16 @@ export function Footer() {
     legalBusinessName,
     legalBusinessDetails,
     siteMode,
+    footerTagline,
+    footerLocation,
+    footerNewsletterText,
+    footerTrustItems,
   } = useSite();
   const businessLine =
     legalBusinessName && legalBusinessDetails
       ? `${legalBusinessName} · ${legalBusinessDetails}`
       : logoText;
+  const taglineLines = footerTagline.split("\n").filter(Boolean);
 
   return (
     <footer className="bg-charcoal text-cream mt-32">
@@ -23,11 +28,16 @@ export function Footer() {
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
             <div className="font-display text-3xl md:text-5xl leading-[0.95]">
-              Simplu in fata,
-              <br />
-              design pe spate.
+              {taglineLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
             </div>
-            <p className="font-mono-xs mt-6 opacity-60">{logoText} · Bucuresti</p>
+            <p className="font-mono-xs mt-6 opacity-60">
+              {logoText}
+              {footerLocation ? ` · ${footerLocation}` : ""}
+            </p>
           </div>
 
           <div className="md:col-span-2">
@@ -89,11 +99,9 @@ export function Footer() {
 
           <div className="md:col-span-3">
             <h4 className="font-mono-xs opacity-50 mb-4">
-              {siteMode === "pre-launch" ? "Lista de lansare" : "Newsletter"}
+              {siteMode === "pre-launch" ? "Lista de lansare" : "Noutati"}
             </h4>
-            <p className="text-sm opacity-70 mb-3">
-              Afla cand apar primele modele si cand devine disponibil checkout-ul.
-            </p>
+            <p className="text-sm opacity-70 mb-3">{footerNewsletterText}</p>
             <a
               href="/#newsletter"
               className="font-mono-xs underline underline-offset-4 hover:opacity-60"
@@ -161,9 +169,9 @@ export function Footer() {
           <div className="md:col-span-3">
             <h4 className="font-mono-xs opacity-50 mb-4">Incredere</h4>
             <ul className="space-y-2 text-sm opacity-80">
-              <li>Retur 14 zile</li>
-              <li>Schimb marime</li>
-              <li>Plata securizata la checkout</li>
+              {footerTrustItems.filter(Boolean).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
           </div>
 

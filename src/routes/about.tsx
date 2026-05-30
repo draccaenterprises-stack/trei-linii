@@ -39,7 +39,7 @@ function About() {
             </p>
             <p>
               Produsele finale, stocul, cosul si comenzile vor fi operate printr-un flux securizat,
-              fara checkout custom.
+              fara finalizare custom.
             </p>
           </div>
 

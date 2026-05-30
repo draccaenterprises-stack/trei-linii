@@ -48,13 +48,13 @@ export interface Product {
 export const products: Product[] = [
   {
     id: "p1",
-    handle: "preview-oversized-01",
-    title: "Preview oversized 01",
+    handle: "previzualizare-oversized-01",
+    title: "Previzualizare oversized 01",
     price: 189,
     collection: "fit",
     images: [p1a],
     description:
-      "Preview pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.",
+      "Previzualizare pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.",
     fitNote: "Croiala oversized. Alege marimea normala pentru o cadere relaxata.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -65,13 +65,13 @@ export const products: Product[] = [
   },
   {
     id: "p2",
-    handle: "preview-spate-02",
-    title: "Preview design spate 02",
+    handle: "previzualizare-spate-02",
+    title: "Previzualizare design spate 02",
     price: 219,
     collection: "spate",
     images: [p2b, p2a],
     description:
-      "Preview pentru grafica de spate: compozitie simpla, purtabila, fara logo mare pe piept.",
+      "Previzualizare pentru grafica de spate: compozitie simpla, purtabila, fara logo mare pe piept.",
     fitNote: "Oversized relaxat, cu umeri usor cazuti.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -82,13 +82,13 @@ export const products: Product[] = [
   },
   {
     id: "p3",
-    handle: "preview-grafica-03",
-    title: "Preview grafica 03",
+    handle: "previzualizare-grafica-03",
+    title: "Previzualizare grafica 03",
     price: 239,
     collection: "grafica",
     images: [p3b, p3a],
     description:
-      "Preview pentru o directie mai puternica de print pe spate, pastrand fata tricoului curata.",
+      "Previzualizare pentru o directie mai puternica de print pe spate, pastrand fata tricoului curata.",
     fitNote: "Boxy oversized. Cade usor sub sold.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -99,13 +99,13 @@ export const products: Product[] = [
   },
   {
     id: "p4",
-    handle: "preview-olive-04",
-    title: "Preview olive 04",
+    handle: "previzualizare-olive-04",
+    title: "Previzualizare olive 04",
     price: 199,
     collection: "fit",
     images: [p4b, p4a],
     description:
-      "Preview pentru o baza de culoare olive, gandita pentru un tricou simplu si usor de purtat.",
+      "Previzualizare pentru o baza de culoare olive, gandita pentru un tricou simplu si usor de purtat.",
     fitNote: "Oversized pe marimea normala.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -179,7 +179,7 @@ export const faqs = [
   },
 ];
 
-export const announcement = "Lansare in pregatire · Tricouri oversized cu design pe spate";
+export const announcement = "Lansare in pregatire - Tricouri oversized cu design pe spate";
 
 export const homepageSections = [
   { id: "hero", label: "Hero", enabled: true },
@@ -188,5 +188,5 @@ export const homepageSections = [
   { id: "lookbook", label: "Lookbook", enabled: true },
   { id: "reviews", label: "Recenzii", enabled: false },
   { id: "faq", label: "Intrebari frecvente", enabled: true },
-  { id: "newsletter", label: "Newsletter", enabled: true },
+  { id: "newsletter", label: "Noutati", enabled: true },
 ];

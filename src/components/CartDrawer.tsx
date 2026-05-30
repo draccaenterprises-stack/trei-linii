@@ -159,7 +159,9 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
 
       redirectToShopifyCheckout(updatedCart.checkoutUrl);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Nu am putut porni checkout-ul securizat.");
+      setError(
+        err instanceof Error ? err.message : "Nu am putut porni finalizarea securizata a comenzii.",
+      );
     } finally {
       setLoading(false);
     }
@@ -180,7 +182,7 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
               ? "Adauga produse disponibile"
               : loading
                 ? "Se redirectioneaza..."
-                : "Continua spre plata securizata ->"}
+                : "Continua spre plata securizata"}
       </button>
       {error && <p className="font-mono-xs text-red-700">{error}</p>}
     </div>

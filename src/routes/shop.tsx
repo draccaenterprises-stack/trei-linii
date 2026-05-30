@@ -22,7 +22,7 @@ export const Route = createFileRoute("/shop")({
       {
         name: "description",
         content:
-          "Tricouri oversized cu fata curata si design minimalist pe spate. Preview de modele Trei Linii.",
+          "Tricouri oversized cu fata curata si design minimalist pe spate. Previzualizare de modele Trei Linii.",
       },
     ],
   }),
@@ -47,7 +47,7 @@ function Shop() {
       <div className="mx-auto max-w-[1600px]">
         <header className="mb-12 md:mb-20 max-w-3xl">
           <p className="font-mono-xs opacity-60">
-            {siteMode === "pre-launch" ? "Preview modele" : "Shop"}
+            {siteMode === "pre-launch" ? "Previzualizare modele" : "Magazin"}
           </p>
           <h1 className="font-display text-5xl md:text-8xl mt-2">
             {collection
@@ -58,8 +58,8 @@ function Shop() {
           </h1>
           <p className="mt-6 text-muted-foreground text-lg">
             {siteMode === "pre-launch"
-              ? "Produsele afisate sunt preview-uri pentru directia brandului. Inscrie-te pe lista pentru anuntul de lansare."
-              : "Alege marimea, culoarea si continua catre checkout securizat."}
+              ? "Produsele afisate sunt previzualizari pentru directia brandului. Inscrie-te pe lista pentru anuntul de lansare."
+              : "Alege marimea, culoarea si continua catre plata securizata."}
           </p>
         </header>
 
