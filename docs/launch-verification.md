@@ -9,7 +9,7 @@ Ultima actualizare: 2026-05-31.
 - Daca Shopify nu intoarce catalog, site-ul foloseste date locale de pre-lansare ca sa nu arate gol.
 - Daca Shopify are mai putin de 8 produse publicate, catalogul vizual este completat cu produse mock de pre-lansare. Acestea sunt doar pentru prezentare pana sunt inlocuite cu produse reale in Shopify.
 - Checkout custom nu este construit. Cosul creeaza un cart Shopify si redirectioneaza catre `checkoutUrl`.
-- Adminul actual este temporar, local, protejat cu PIN si salveaza in browser.
+- Adminul actual este temporar, local, protejat cu PIN prin env si dezactivat implicit in build-ul public.
 - GitHub `main` contine ultima versiune verificata local.
 - Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` trebuie republicat dupa ultimul push GitHub ca sa preia catalogul vizual cu 8 produse.
 - Verificatorul automat `npm run verify:storefront -- <URL> --min-products=8` trebuie sa treaca pe URL-ul public inainte sa consideram deployment-ul gata.
@@ -23,7 +23,7 @@ Ultima actualizare: 2026-05-31.
 - Cart: sumar, cantitati, eliminare produse, buton pentru plata securizata.
 - Shopify: configurat pentru `aa01qm-mq.myshopify.com` cu token Storefront public.
 - Legal/static: livrare, retur, schimb marime, termeni, confidentialitate, cookies, FAQ, contact, despre, lookbook, ghid marimi.
-- Admin local: status site, copy homepage, sectiuni active/inactive, produse/colectii featured, card produs, trust badges, FAQ, noutati, footer, contact/social, date legale, pagini suport/legal, status Shopify, backup/import JSON.
+- Admin local: status site, copy homepage, sectiuni active/inactive, produse/colectii featured, card produs, trust badges, FAQ, noutati, footer, contact/social, date legale, pagini suport/legal, status Shopify, backup/import JSON. In public trebuie sa ramana dezactivat pana exista auth real pe server.
 
 ## Comenzi de verificare
 

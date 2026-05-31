@@ -3,7 +3,8 @@ import { useState, type ReactNode } from "react";
 import { isShopifyConfigured, shopifyConfig } from "@/lib/shopify";
 import { useSite, type SiteMode, type SiteSettings } from "@/lib/site-context";
 
-const ADMIN_PIN = "treilinii";
+const LOCAL_ADMIN_ENABLED = import.meta.env.VITE_ENABLE_LOCAL_ADMIN === "true";
+const LOCAL_ADMIN_PIN = import.meta.env.VITE_LOCAL_ADMIN_PIN as string | undefined;
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
@@ -22,6 +23,23 @@ function Admin() {
   const [settingsMessage, setSettingsMessage] = useState("");
   const missingLegal = !site.legalBusinessName || !site.legalBusinessDetails;
   const shopifyReady = isShopifyConfigured();
+
+  if (!LOCAL_ADMIN_ENABLED || !LOCAL_ADMIN_PIN) {
+    return (
+      <div className="min-h-screen bg-cream px-5 py-20 grid place-items-center">
+        <div className="w-full max-w-md border border-border bg-background p-6 space-y-4">
+          <p className="font-mono-xs opacity-60">Admin privat</p>
+          <h1 className="font-display text-4xl">Admin local dezactivat.</h1>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Dashboard-ul temporar se activeaza doar in mediul local, prin variabile de mediu.
+            Build-ul public nu expune cod de acces.
+          </p>
+        </div>
+        <AdminStyles />
+      </div>
+    );
+  }
+
   const updateCsv = (key: "featuredProductIds" | "featuredCollectionHandles", value: string) => {
     site.update({
       [key]: value
@@ -62,7 +80,7 @@ function Admin() {
           className="w-full max-w-sm border border-border bg-background p-6 space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
-            if (pin === ADMIN_PIN) {
+            if (pin === LOCAL_ADMIN_PIN) {
               sessionStorage.setItem("trei-linii-admin", "1");
               setUnlocked(true);
             }

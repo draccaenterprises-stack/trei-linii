@@ -70,6 +70,15 @@ VITE_SHOPIFY_STOREFRONT_TOKEN=token_public_storefront
 VITE_SHOPIFY_API_VERSION=2026-01
 ```
 
+Adminul temporar este dezactivat implicit in build-urile publice. Pentru test local:
+
+```text
+VITE_ENABLE_LOCAL_ADMIN=true
+VITE_LOCAL_ADMIN_PIN=schimba-acest-pin
+```
+
+Nu seta `VITE_ENABLE_LOCAL_ADMIN=true` in Lovable sau in deployment public.
+
 Status integrare:
 
 1. Produsele si colectiile sunt citite prin Shopify Storefront API.
