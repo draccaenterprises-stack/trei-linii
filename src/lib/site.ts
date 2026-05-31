@@ -11,3 +11,14 @@ export const SITE_NAME = "Trei Linii";
 export function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
+
+// Datele firmei pentru paginile legale (ANPC / GDPR).
+// *TREBUIE SCHIMBAT*: completeaza cu datele reale ale firmei inainte de lansare.
+export const LEGAL = {
+  company: "*TREBUIE SCHIMBAT* (denumire firma, ex. Trei Linii SRL / PFA)",
+  cui: "*TREBUIE SCHIMBAT* (CUI / CIF)",
+  regCom: "*TREBUIE SCHIMBAT* (Nr. Reg. Com., ex. J40/1234/2026)",
+  address: "*TREBUIE SCHIMBAT* (sediu social complet)",
+  phone: "*TREBUIE SCHIMBAT* (telefon)",
+  email: "contact@treilinii.ro",
+};
