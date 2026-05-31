@@ -181,7 +181,7 @@
     overflow: hidden;
   }
   .hero-media img {
-    animation: hero-kenburns 20s ease-in-out infinite alternate;
+    animation: hero-kenburns 16s linear infinite alternate;
     transform-origin: 60% 40%;
     will-change: transform;
   }
