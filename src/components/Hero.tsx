@@ -75,6 +75,8 @@ export function Hero() {
             alt="Model purtand un tricou oversized Trei Linii intr-un cadru urban"
             width={1600}
             height={1200}
+            fetchPriority="high"
+            loading="eager"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute bottom-5 right-5 font-mono-xs text-cream bg-charcoal/70 backdrop-blur px-3 py-1.5">
