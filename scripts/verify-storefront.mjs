@@ -1,7 +1,9 @@
-const baseUrl = (process.argv[2] ?? process.env.BASE_URL ?? "http://127.0.0.1:5175").replace(
-  /\/$/,
-  "",
-);
+const args = process.argv.slice(2);
+const targetArg = args.find((arg) => !arg.startsWith("--"));
+const minProductsArg = args.find((arg) => arg.startsWith("--min-products="));
+const minProducts = Number(minProductsArg?.split("=")[1] ?? process.env.MIN_PRODUCTS ?? 0);
+
+const baseUrl = (targetArg ?? process.env.BASE_URL ?? "http://127.0.0.1:5175").replace(/\/$/, "");
 
 const routes = [
   "/",
@@ -70,6 +72,16 @@ for (const route of routes) {
     for (const pattern of requiredByRoute[route] ?? []) {
       if (!pattern.test(html)) {
         errors.push(`${route}: text obligatoriu lipsa: ${pattern}`);
+      }
+    }
+
+    if (route === "/shop" && Number.isFinite(minProducts) && minProducts > 0) {
+      const productCards = html.match(/<article\b/gi)?.length ?? 0;
+
+      if (productCards < minProducts) {
+        errors.push(
+          `${route}: produse vizibile insuficiente (${productCards}/${minProducts}); probabil ruleaza o versiune Lovable nepublicata`,
+        );
       }
     }
   } catch (error) {

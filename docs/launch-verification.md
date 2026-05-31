@@ -11,8 +11,8 @@ Ultima actualizare: 2026-05-31.
 - Checkout custom nu este construit. Cosul creeaza un cart Shopify si redirectioneaza catre `checkoutUrl`.
 - Adminul actual este temporar, local, protejat cu PIN si salveaza in browser.
 - GitHub `main` contine ultima versiune verificata local.
-- Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` reflecta partial proiectul Trei Linii, dar nu ultima versiune GitHub la verificarea din 2026-05-31: inca afiseaza produse Shopify test de tip `model1/model2`, colectii test si texte intermediare. Este necesar `Publish` / update din Lovable dupa ultimul push.
-- Verificatorul automat `npm run verify:storefront -- <URL>` trebuie sa treaca pe URL-ul public inainte sa consideram deployment-ul gata.
+- Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` trebuie republicat dupa ultimul push GitHub ca sa preia catalogul vizual cu 8 produse.
+- Verificatorul automat `npm run verify:storefront -- <URL> --min-products=8` trebuie sa treaca pe URL-ul public inainte sa consideram deployment-ul gata.
 
 ## Cerinte verificate
 
@@ -30,8 +30,8 @@ Ultima actualizare: 2026-05-31.
 ```bash
 npm run build
 npm run lint
-npm run verify:storefront -- http://127.0.0.1:5175
-npm run verify:storefront -- https://blank-atelier-canvas.lovable.app
+npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8
+npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8
 ```
 
 ## QA browser obligatoriu
@@ -77,7 +77,7 @@ Pentru magazin activ:
 
 ## De reverificat inainte de lansare publica
 
-- Publicare Lovable dupa ultimul push GitHub si confirmare ca `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app` trece.
+- Publicare Lovable dupa ultimul push GitHub si confirmare ca `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8` trece.
 - Variabilele de mediu setate in Lovable: `VITE_SHOPIFY_STORE_DOMAIN`, `VITE_SHOPIFY_STOREFRONT_TOKEN`, `VITE_SHOPIFY_API_VERSION`.
 - Produsele Shopify publicate pe canalul Headless.
 - Shopify store fara password storefront sau cu domeniu custom public configurat.

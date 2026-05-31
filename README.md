@@ -14,7 +14,7 @@ Verificari:
 ```bash
 npm run build
 npm run lint
-npm run verify:storefront -- http://127.0.0.1:5175
+npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8
 ```
 
 ## Date locale de pre-lansare
@@ -103,7 +103,7 @@ VITE_SHOPIFY_API_VERSION=2026-01
 5. Verifica URL-ul public:
 
 ```bash
-npm run verify:storefront -- https://blank-atelier-canvas.lovable.app
+npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8
 ```
 
 Deployment-ul public nu este gata daca verificarea gaseste `model1`, `model2`, texte test,
