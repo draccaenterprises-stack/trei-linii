@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import { CartDrawer } from "@/components/CartDrawer";
+import { CookieConsent } from "@/components/CookieConsent";
 import { Footer } from "@/components/Footer";
 import { Announcement, Header } from "@/components/Header";
 import { CartProvider } from "@/lib/cart-context";
@@ -154,6 +155,7 @@ function RootComponent() {
           </main>
           <Footer />
           <CartDrawer />
+          <CookieConsent />
         </CartProvider>
       </SiteProvider>
     </QueryClientProvider>
