@@ -385,6 +385,25 @@ function mapShopifyCollection(collection: ShopifyCollectionNode, index: number):
   };
 }
 
+function fillVisualCatalog(products: Product[]) {
+  if (products.length >= mockProducts.length) return products.slice(0, mockProducts.length);
+
+  const usedHandles = new Set(products.map((product) => product.handle));
+  const supplemental = mockProducts.filter((product) => !usedHandles.has(product.handle));
+
+  return [...products, ...supplemental].slice(0, mockProducts.length);
+}
+
+function mergeCollections(collections: Collection[]) {
+  const byHandle = new Map(collections.map((collection) => [collection.handle, collection]));
+
+  for (const collection of mockCollections) {
+    if (!byHandle.has(collection.handle)) byHandle.set(collection.handle, collection);
+  }
+
+  return [...byHandle.values()];
+}
+
 export function findSelectedVariant(
   product: Product,
   size: Size,
@@ -424,7 +443,7 @@ export async function fetchProducts(): Promise<Product[]> {
     `);
 
     const products = data.products.nodes.map(mapShopifyProduct);
-    return products.length ? products : mockProducts;
+    return products.length ? fillVisualCatalog(products) : mockProducts;
   } catch (error) {
     console.error("Nu am putut citi produsele din Shopify.", error);
     return mockProducts;
@@ -493,7 +512,7 @@ export async function fetchCollections(): Promise<Collection[]> {
     `);
 
     const collections = data.collections.nodes.map(mapShopifyCollection);
-    return collections.length ? collections : mockCollections;
+    return collections.length ? mergeCollections(collections) : mockCollections;
   } catch (error) {
     console.error("Nu am putut citi colectiile din Shopify.", error);
     return mockCollections;

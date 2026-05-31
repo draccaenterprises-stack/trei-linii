@@ -7,6 +7,7 @@ Ultima actualizare: 2026-05-31.
 - Frontend custom Trei Linii este conectat la Shopify Storefront API.
 - Produsele, colectiile, variantele, preturile si imaginile se citesc din Shopify cand sunt publicate pe canalul Headless.
 - Daca Shopify nu intoarce catalog, site-ul foloseste date locale de pre-lansare ca sa nu arate gol.
+- Daca Shopify are mai putin de 8 produse publicate, catalogul vizual este completat cu produse mock de pre-lansare. Acestea sunt doar pentru prezentare pana sunt inlocuite cu produse reale in Shopify.
 - Checkout custom nu este construit. Cosul creeaza un cart Shopify si redirectioneaza catre `checkoutUrl`.
 - Adminul actual este temporar, local, protejat cu PIN si salveaza in browser.
 - GitHub `main` contine ultima versiune verificata local.
@@ -17,7 +18,7 @@ Ultima actualizare: 2026-05-31.
 
 - Brand: Trei Linii, texte publice in romana, fara link public catre admin.
 - Homepage: hero, trust strip, produse recomandate, structura/colectii, lookbook, FAQ si lista de lansare.
-- Shop: lista produse, filtre pe colectii, sortare in modul magazin activ.
+- Shop: pana la 8 produse vizuale, filtre pe colectii, sortare in modul magazin activ.
 - Product detail: imagini, variante, marimi, tabel marimi, ingrijire, CTA pre-lansare sau adaugare in cos.
 - Cart: sumar, cantitati, eliminare produse, buton pentru plata securizata.
 - Shopify: configurat pentru `aa01qm-mq.myshopify.com` cu token Storefront public.

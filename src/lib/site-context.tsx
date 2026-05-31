@@ -277,8 +277,8 @@ const defaults: SiteSettings = {
   sections: defaultSections.map((section) =>
     section.id === "reviews" ? { ...section, enabled: false } : section,
   ),
-  featuredProductIds: ["p1", "p3", "p2", "p4"],
-  featuredCollectionHandles: ["tricouri", "spalate", "printuri"],
+  featuredProductIds: ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
+  featuredCollectionHandles: ["fit", "material", "spate", "grafica"],
 };
 
 interface Ctx extends SiteSettings {

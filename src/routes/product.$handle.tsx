@@ -108,7 +108,7 @@ function ProductPage() {
             <div className="mt-10 space-y-6">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono-xs">Culoare · {color}</span>
+                  <span className="font-mono-xs">Culoare - {color}</span>
                 </div>
                 <VariantSelector colors={product.colors} value={color} onChange={setColor} />
               </div>

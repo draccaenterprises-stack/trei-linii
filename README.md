@@ -29,6 +29,10 @@ src/lib/site-context.tsx
 Aceste date raman fallback de pre-lansare pana exista produse publicate in Shopify pe canalul
 Headless.
 
+Catalogul vizual este limitat la 8 produse. Daca Shopify are mai putine produse publicate, site-ul
+completeaza lista cu produse locale de prezentare, ca layout-ul sa ramana plin pana incarci
+produsele finale in Shopify.
+
 ## Cum se adauga produse
 
 Produsele reale se adauga direct din Shopify Admin.
