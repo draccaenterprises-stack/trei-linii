@@ -46,16 +46,16 @@ export function Hero() {
   return (
     <section className="relative">
       <div className="grid md:grid-cols-12 min-h-[80vh] md:min-h-[88vh]">
-        <div className="md:col-span-5 px-5 md:px-10 py-12 md:py-20 flex flex-col justify-between fade-up">
-          <div className="font-mono-xs opacity-60">{heroEyebrow}</div>
+        <div className="md:col-span-5 px-5 md:px-10 py-12 md:py-20 flex flex-col justify-between">
+          <div className="fade-up reveal-delay-1 font-mono-xs opacity-60">{heroEyebrow}</div>
           <div>
-            <h1 className="font-display text-[12vw] md:text-[6.5vw] leading-[0.9] whitespace-pre-line">
+            <h1 className="fade-up reveal-delay-2 font-display text-[12vw] md:text-[6.5vw] leading-[0.9] whitespace-pre-line [text-wrap:balance]">
               {heroHeadline}
             </h1>
-            <p className="mt-8 max-w-md text-base md:text-lg leading-relaxed text-muted-foreground">
+            <p className="fade-up reveal-delay-3 mt-8 max-w-md text-base md:text-lg leading-relaxed text-muted-foreground">
               {heroSubcopy}
             </p>
-            <div className="mt-10 flex flex-wrap items-center gap-4">
+            <div className="fade-up reveal-delay-4 mt-10 flex flex-wrap items-center gap-4">
               <CtaLink href={heroPrimaryCtaLink} variant="primary">
                 {heroPrimaryCtaText}
               </CtaLink>
@@ -64,10 +64,12 @@ export function Hero() {
               </CtaLink>
             </div>
           </div>
-          <div className="font-mono-xs opacity-50 hidden md:block">{heroBadges}</div>
+          <div className="fade-up reveal-delay-4 font-mono-xs opacity-50 hidden md:block">
+            {heroBadges}
+          </div>
         </div>
 
-        <div className="md:col-span-7 relative img-zoom min-h-[70vh] md:min-h-full">
+        <div className="md:col-span-7 relative hero-media min-h-[70vh] md:min-h-full">
           <img
             src={heroImg}
             alt="Model purtand un tricou oversized Trei Linii intr-un cadru urban"

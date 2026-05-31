@@ -112,12 +112,12 @@ const defaults: SiteSettings = {
   primaryColor: "#2b2a28",
   accentColor: "#ff006f",
   font: "Serif Editorial",
-  announcement: "Lansare in pregatire - Tricouri oversized cu design pe spate",
+  announcement: "Acces early la prima colectie - intra pe lista, locuri limitate",
   heroEyebrow: "Pre-lansare - Trei Linii",
   heroHeadline: "Fata curata.\nSpate care vorbeste.",
   heroSubcopy:
     "Tricouri oversized cu design minimalist pe spate. Croiala relaxata, material dens si grafica simpla, fara logo-uri mari pe piept.",
-  heroPrimaryCtaText: "Intra pe lista de lansare",
+  heroPrimaryCtaText: "Vreau acces early",
   heroPrimaryCtaLink: "#newsletter",
   heroSecondaryCtaText: "Vezi conceptul",
   heroSecondaryCtaLink: "/about",
@@ -149,13 +149,13 @@ const defaults: SiteSettings = {
   newsletterTitlePreLaunch: "Afla primul cand se lanseaza.",
   newsletterTitleLiveShop: "Ramai aproape de urmatoarea lansare.",
   newsletterBody:
-    "Trimitem doar noutati despre lansari, marimi disponibile si update-uri relevante pentru primele modele.",
+    "Inscrie-te si prinzi acces early la prima colectie, plus o reducere de bun venit la prima comanda. Stoc limitat per model. Scriem rar, doar ce conteaza.",
   newsletterButtonText: "Inscrie-te",
   newsletterSuccessText: "Email salvat. Te anuntam la lansare.",
-  launchBannerEyebrow: "Lista de lansare",
+  launchBannerEyebrow: "Acces early - locuri limitate",
   launchBannerTitle:
-    "Vezi primele modele inainte de lansare si primesti anuntul cand colectia este gata.",
-  launchBannerCtaText: "Intra pe lista",
+    "Primii inscrisi vad colectia inainte de lansare si primesc o reducere de bun venit la prima comanda.",
+  launchBannerCtaText: "Prinde accesul early",
   launchBannerCtaLink: "/#newsletter",
   liveBannerEyebrow: "Oferta de lansare",
   liveBannerTitle: "Doua tricouri in cos pot debloca beneficii de livrare la finalizare.",
@@ -182,14 +182,14 @@ const defaults: SiteSettings = {
     },
     {
       id: "size-exchange",
-      title: "Schimb marime",
-      text: "Politica finala va fi afisata inainte de lansare.",
+      title: "Schimb marime 14 zile",
+      text: "Schimbi marimea daca nu se potriveste, simplu.",
       enabled: true,
     },
     {
       id: "launch-list",
-      title: "Lista de lansare",
-      text: "Anuntam disponibilitatea inainte de lansare.",
+      title: "Acces early",
+      text: "Primii inscrisi cumpara inaintea publicului.",
       enabled: true,
     },
   ],
@@ -235,7 +235,7 @@ const defaults: SiteSettings = {
     {
       id: "launch",
       q: "Cand se lanseaza primele modele?",
-      a: "Lansarea este in pregatire. Inscrie-te pe lista si primesti anuntul cand modelele devin disponibile.",
+      a: "Lansarea este aproape. Inscrie-te pe lista pentru acces early, reducere de bun venit si stoc limitat la primele modele.",
       enabled: true,
     },
     {
@@ -294,7 +294,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v8";
+const STORAGE_KEY = "trei-linii-site-v9";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

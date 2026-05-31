@@ -167,4 +167,49 @@
     display: inline-flex;
     white-space: nowrap;
   }
+
+  /* Hero ambient motion: slow, premium drift on the image */
+  @keyframes hero-kenburns {
+    from {
+      transform: scale(1.03);
+    }
+    to {
+      transform: scale(1.12);
+    }
+  }
+  .hero-media {
+    overflow: hidden;
+  }
+  .hero-media img {
+    animation: hero-kenburns 26s ease-in-out infinite alternate;
+    transform-origin: 60% 40%;
+    will-change: transform;
+  }
+
+  /* Staggered entrance for hero content (pairs with .fade-up) */
+  .reveal-delay-1 {
+    animation-delay: 90ms;
+  }
+  .reveal-delay-2 {
+    animation-delay: 220ms;
+  }
+  .reveal-delay-3 {
+    animation-delay: 360ms;
+  }
+  .reveal-delay-4 {
+    animation-delay: 500ms;
+  }
+}
+
+/* Accessibility: honor reduced-motion. Content stays fully visible. */
+@media (prefers-reduced-motion: reduce) {
+  .fade-up,
+  .hero-media img,
+  .marquee-track {
+    animation: none !important;
+  }
+  .fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
