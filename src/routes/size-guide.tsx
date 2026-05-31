@@ -29,6 +29,9 @@ function SizeGuide() {
         </p>
         <div className="mt-12 overflow-x-auto">
           <table className="w-full text-left font-mono-xs border border-border">
+            <caption className="sr-only">
+              Masuratori tricouri Trei Linii pe marime, in centimetri
+            </caption>
             <thead className="bg-cream">
               <tr>
                 <th className="p-3 border-r border-border">Marime</th>
@@ -50,6 +53,10 @@ function SizeGuide() {
             </tbody>
           </table>
         </div>
+        <p className="mt-6 font-mono-xs text-muted-foreground">
+          Masuratori in cm, pe produs intins. *TREBUIE SCHIMBAT* - valori estimative, de confirmat
+          cu masuratorile reale ale produselor.
+        </p>
       </article>
     </main>
   );

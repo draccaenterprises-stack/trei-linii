@@ -261,7 +261,7 @@ const defaults: SiteSettings = {
     "Comenzile sunt pregatite dupa confirmarea platii. Estimarea de livrare este afisata la finalizare, in functie de adresa si metoda disponibila.",
   returnsTitle: "Retur",
   returnsBody:
-    "Returul este acceptat in 14 zile pentru produse nepurtate, nespalate, fara urme de folosire si cu etichetele intacte.",
+    "Conform legii (OUG 34/2014), ai dreptul de retur in 14 zile de la primire, fara a invoca un motiv. Produsele trebuie sa fie nepurtate, nespalate, fara urme de folosire si cu etichetele intacte. Rambursarea se face dupa receptia produsului returnat.",
   exchangeTitle: "Schimb marime",
   exchangeBody:
     "Daca marimea nu se potriveste, poti cere schimb cu o alta marime disponibila. Produsul trebuie sa fie nepurtat, nespalat si cu etichetele intacte.",
