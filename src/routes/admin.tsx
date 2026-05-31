@@ -700,8 +700,8 @@ function Admin() {
               </div>
               <p className="text-sm text-muted-foreground">
                 Produsele, preturile, variantele si stocul vin din Shopify cand sunt publicate pe
-                canalul Headless. Checkout-ul se activeaza doar in modul Magazin activ si doar
-                pentru variante Shopify reale.
+                canalul Headless. Finalizarea comenzii se activeaza doar in modul Magazin activ si
+                doar pentru variante Shopify reale.
               </p>
             </Panel>
 

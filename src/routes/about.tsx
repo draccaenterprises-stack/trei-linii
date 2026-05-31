@@ -54,7 +54,7 @@ function About() {
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Marimi</h3>
-              <p>S - XL · Croiala oversized</p>
+              <p>S - XL - Croiala oversized</p>
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Lansari</h3>

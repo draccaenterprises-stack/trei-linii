@@ -31,7 +31,7 @@ function CartPage() {
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1400px]">
         <p className="font-mono-xs opacity-60">Cos</p>
-        <h1 className="font-display text-5xl md:text-7xl mt-2">Produse · {lines.length}</h1>
+        <h1 className="font-display text-5xl md:text-7xl mt-2">Produse - {lines.length}</h1>
 
         <div className="mt-12 grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 divide-y divide-border border-y border-border">
@@ -63,7 +63,7 @@ function CartPage() {
                       </button>
                     </div>
                     <p className="font-mono-xs opacity-60 mt-2">
-                      {l.color} · Marime {l.size}
+                      {l.color} - Marime {l.size}
                     </p>
                   </div>
                   <div className="flex items-center justify-between">

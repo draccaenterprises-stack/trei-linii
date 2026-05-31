@@ -16,16 +16,17 @@ npm run build
 npm run lint
 ```
 
-## Date demo
+## Date locale de pre-lansare
 
-Proiectul poate afisa produse, categorii, FAQ, recenzii si setari homepage mock din:
+Proiectul poate afisa produse, categorii, FAQ, recenzii si setari homepage locale din:
 
 ```text
 src/lib/mock-data.ts
 src/lib/site-context.tsx
 ```
 
-Aceste date raman fallback pana exista produse publicate in Shopify pe canalul Headless.
+Aceste date raman fallback de pre-lansare pana exista produse publicate in Shopify pe canalul
+Headless.
 
 ## Cum se adauga produse
 
@@ -75,4 +76,6 @@ Status integrare:
 Nu construim checkout custom.
 
 Pentru Trei Linii, domeniul Shopify curent este `aa01qm-mq.myshopify.com`.
-Tokenul Storefront este public si poate fi folosit din browser, dar variabilele de mediu raman metoda recomandata pentru Lovable/deploy. Daca Shopify nu are inca produse publicate pe canalul Headless, frontend-ul pastreaza produsele demo ca site-ul sa nu para gol.
+Tokenul Storefront este public si poate fi folosit din browser, dar variabilele de mediu raman metoda
+recomandata pentru Lovable/deploy. Daca Shopify nu are inca produse publicate pe canalul Headless,
+frontend-ul pastreaza produsele locale de pre-lansare ca site-ul sa nu para gol.

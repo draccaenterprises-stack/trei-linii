@@ -5,10 +5,10 @@ export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({
     meta: [
-      { title: "Contact — Trei Linii" },
+      { title: "Contact - Trei Linii" },
       {
         name: "description",
-        content: "Contact Trei Linii pentru comenzi, retururi, colaborări și întrebări generale.",
+        content: "Contact Trei Linii pentru comenzi, retururi, colaborari si intrebari generale.",
       },
     ],
   }),
@@ -36,7 +36,7 @@ function Contact() {
               <p>support@treilinii.ro</p>
             </div>
             <div>
-              <h3 className="opacity-50 mb-2">Colaborări</h3>
+              <h3 className="opacity-50 mb-2">Colaborari</h3>
               <p>collab@treilinii.ro</p>
             </div>
           </div>

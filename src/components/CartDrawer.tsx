@@ -175,7 +175,7 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
         className={`w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors disabled:opacity-50 ${className}`}
       >
         {siteMode === "pre-launch"
-          ? "Checkout disponibil la lansare"
+          ? "Plata disponibila la lansare"
           : !shopifyReady
             ? "Finalizarea comenzii este indisponibila momentan"
             : !hasRealShopifyVariants

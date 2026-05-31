@@ -66,7 +66,7 @@ export function ProductCard({ product }: { product: Product }) {
             <h3 className="text-sm md:text-base font-display tracking-tight">{product.title}</h3>
           </Link>
           <p className="font-mono-xs opacity-50 mt-1">
-            {productCardMetaText} · {product.sizes.length} marimi
+            {productCardMetaText} - {product.sizes.length} marimi
           </p>
         </div>
         {showPrice && <div className="text-sm tabular-nums">{formatRON(product.price)}</div>}

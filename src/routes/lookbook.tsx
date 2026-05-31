@@ -6,10 +6,10 @@ export const Route = createFileRoute("/lookbook")({
   component: Lookbook,
   head: () => ({
     meta: [
-      { title: "Pe stradă — Lansarea 01 — Trei Linii" },
+      { title: "Pe strada - Lansarea 01 - Trei Linii" },
       {
         name: "description",
-        content: "Trei Linii pe stradă: tricouri oversized în context urban.",
+        content: "Trei Linii pe strada: tricouri oversized in context urban.",
       },
     ],
   }),
@@ -20,14 +20,14 @@ function Lookbook() {
   return (
     <div className="py-12 md:py-20">
       <header className="px-5 md:px-10 mb-16 md:mb-24 max-w-[1600px] mx-auto">
-        <p className="font-mono-xs opacity-60">Pe stradă</p>
+        <p className="font-mono-xs opacity-60">Pe strada</p>
         <h1 className="font-display text-5xl md:text-[10vw] leading-[0.95] mt-2">
           Lansarea 01.
           <br />
           <span className="opacity-50">Trei Linii.</span>
         </h1>
         <p className="mt-6 text-muted-foreground max-w-xl">
-          Cadre editoriale pentru direcția brandului: piese simple, spațiu mult și styling urban.
+          Cadre editoriale pentru directia brandului: piese simple, spatiu mult si styling urban.
         </p>
       </header>
 
@@ -48,7 +48,7 @@ function Lookbook() {
               loading="lazy"
               className="w-full aspect-[3/4] object-cover"
             />
-            <p className="font-mono-xs opacity-60 mt-3">FIG. 01 · Ore de beton</p>
+            <p className="font-mono-xs opacity-60 mt-3">FIG. 01 - Ore de beton</p>
           </div>
         </div>
 
@@ -60,15 +60,15 @@ function Lookbook() {
               loading="lazy"
               className="w-full aspect-[3/4] object-cover"
             />
-            <p className="font-mono-xs opacity-60 mt-3">FIG. 02 · Note de teren</p>
+            <p className="font-mono-xs opacity-60 mt-3">FIG. 02 - Note de teren</p>
           </div>
           <div className="md:col-span-5 md:pt-32 self-start">
             <p className="font-display text-3xl md:text-5xl leading-tight">
-              “Simplu de purtat.
+              Simplu de purtat.
               <br />
-              Ușor de recunoscut.”
+              Usor de recunoscut.
             </p>
-            <p className="font-mono-xs opacity-50 mt-6">— Notă de studio, 2026</p>
+            <p className="font-mono-xs opacity-50 mt-6">Nota de studio, 2026</p>
           </div>
         </div>
 
@@ -80,7 +80,7 @@ function Lookbook() {
               loading="lazy"
               className="w-full aspect-[5/6] object-cover"
             />
-            <p className="font-mono-xs opacity-60 mt-3">FIG. 03 · Traversări</p>
+            <p className="font-mono-xs opacity-60 mt-3">FIG. 03 - Traversari</p>
           </div>
         </div>
       </div>
