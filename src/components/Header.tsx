@@ -1,8 +1,28 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Menu, ShoppingBag } from "lucide-react";
+import * as React from "react";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
+
+/** Returns ms left until target, null if target is empty/invalid. Updates each minute. */
+function useCountdown(target: string): number | null {
+  const [remaining, setRemaining] = React.useState<number | null>(null);
+
+  React.useEffect(() => {
+    const ts = new Date(target).getTime();
+    if (!target || Number.isNaN(ts)) {
+      setRemaining(null);
+      return;
+    }
+    const tick = () => setRemaining(ts - Date.now());
+    tick();
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, [target]);
+
+  return remaining;
+}
 
 const preLaunchNav = [
   { to: "/about", label: "Concept" },
@@ -40,8 +60,32 @@ function NavLink({ to, label }: { to: string; label: string }) {
 }
 
 export function Announcement() {
-  const { announcement, announcementVisible } = useSite();
-  if (!announcementVisible || !announcement.trim()) return null;
+  const { announcement, announcementVisible, launchDate } = useSite();
+  const remaining = useCountdown(launchDate);
+
+  if (!announcementVisible) return null;
+
+  if (remaining !== null && remaining > 0) {
+    const days = Math.floor(remaining / 86_400_000);
+    const hours = Math.floor((remaining % 86_400_000) / 3_600_000);
+    const mins = Math.floor((remaining % 3_600_000) / 60_000);
+    return (
+      <div className="bg-charcoal text-cream border-b border-charcoal">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-center gap-3 px-5 md:px-10 py-2 font-mono-xs">
+          <span className="opacity-70">Lansare in</span>
+          <span className="tabular-nums">
+            {days}z {hours}h {mins}m
+          </span>
+          <span className="opacity-40">/</span>
+          <a href="/#newsletter" className="underline underline-offset-4 hover:opacity-70">
+            Acces early
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  if (!announcement.trim()) return null;
 
   return (
     <div className="bg-charcoal text-cream overflow-hidden border-b border-charcoal">
