@@ -242,7 +242,7 @@ export const faqs = [
   },
   {
     q: "Din ce material sunt tricourile?",
-    a: "Directia brandului este bumbac dens, cu guler stabil si croiala relaxata. Specificatiile exacte apar pe fiecare pagina de produs.",
+    a: "Bumbac 100%, material dens de 240 g/mp, cu guler stabil si croiala relaxata. Gramajul apare si pe fiecare pagina de produs.",
   },
   {
     q: "Unde este plasat designul?",

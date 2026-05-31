@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import * as React from "react";
 import { CreditCard, RefreshCw, RotateCcw, Ruler, ShieldCheck, Truck } from "lucide-react";
+import { subscribeToKlaviyo } from "@/lib/klaviyo";
 import { lookbookImages, reviews } from "@/lib/mock-data";
 import { useSite, type TrustItem } from "@/lib/site-context";
 
@@ -128,24 +129,40 @@ export function Newsletter() {
     newsletterButtonText,
     newsletterSuccessText,
   } = useSite();
-  const [status, setStatus] = React.useState<"idle" | "success" | "error">("idle");
+  const [status, setStatus] = React.useState<"idle" | "success" | "invalid" | "error">("idle");
   const [email, setEmail] = React.useState("");
   const [trap, setTrap] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
 
-  const submit = (event: React.FormEvent) => {
+  const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (trap) return;
+    if (trap || loading) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setStatus("error");
+      setStatus("invalid");
       return;
     }
-    const stored = JSON.parse(localStorage.getItem("trei-linii-launch-list") ?? "[]") as string[];
-    localStorage.setItem(
-      "trei-linii-launch-list",
-      JSON.stringify([...new Set([...stored, email])]),
-    );
-    setStatus("success");
-    setEmail("");
+    setLoading(true);
+    try {
+      await subscribeToKlaviyo(email);
+      // Local backup so a list is never silently lost if Klaviyo is unreachable.
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem("trei-linii-launch-list") ?? "[]",
+        ) as string[];
+        localStorage.setItem(
+          "trei-linii-launch-list",
+          JSON.stringify([...new Set([...stored, email])]),
+        );
+      } catch {
+        /* best-effort backup */
+      }
+      setStatus("success");
+      setEmail("");
+    } catch {
+      setStatus("error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -178,13 +195,24 @@ export function Newsletter() {
               placeholder="email@exemplu.ro"
               className="flex-1 bg-transparent py-3 outline-none placeholder:opacity-40"
             />
-            <button className="font-mono-xs px-4 hover:opacity-60">{newsletterButtonText}</button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="font-mono-xs px-4 hover:opacity-60 disabled:opacity-40"
+            >
+              {loading ? "Se trimite..." : newsletterButtonText}
+            </button>
           </div>
           {status === "success" && (
             <p className="mt-3 font-mono-xs text-olive">{newsletterSuccessText}</p>
           )}
-          {status === "error" && (
+          {status === "invalid" && (
             <p className="mt-3 font-mono-xs text-red-700">Introdu o adresa de email valida.</p>
+          )}
+          {status === "error" && (
+            <p className="mt-3 font-mono-xs text-red-700">
+              Ceva n-a mers. Incearca din nou intr-un moment.
+            </p>
           )}
         </form>
       </div>

@@ -125,7 +125,7 @@ const defaults: SiteSettings = {
   conceptEyebrow: "Concept",
   conceptTitle: "Tricouri simple in fata, gandite sa arate bine din spate.",
   conceptBody:
-    "Trei Linii porneste de la o idee clara: fit oversized, material dens si design minimalist plasat pe spate. Fara logo mare pe piept, fara zgomot vizual inutil.",
+    "Trei Linii porneste de la o idee clara: fit oversized, material dens (bumbac 100%, 240 g/mp) si design minimalist plasat pe spate. Fara logo mare pe piept, fara zgomot vizual inutil.",
   featuredEyebrowPreLaunch: "01 - Previzualizare modele",
   featuredEyebrowLiveShop: "01 - Modele disponibile",
   featuredTitlePreLaunch: "Primele directii.",
@@ -229,7 +229,7 @@ const defaults: SiteSettings = {
     {
       id: "material",
       q: "Din ce material sunt tricourile?",
-      a: "Directia este bumbac dens, cu textura stabila si cadere curata. Detaliile exacte vor fi afisate pe fiecare pagina de produs.",
+      a: "Bumbac 100%, material dens de 240 g/mp, cu textura stabila si cadere curata. Gramajul apare si pe pagina fiecarui produs.",
       enabled: true,
     },
     {
