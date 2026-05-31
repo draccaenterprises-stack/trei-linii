@@ -13,6 +13,7 @@ import { Footer } from "@/components/Footer";
 import { Announcement, Header } from "@/components/Header";
 import { CartProvider } from "@/lib/cart-context";
 import { SiteProvider } from "@/lib/site-context";
+import { SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -57,26 +58,63 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+const seoTitle = "Trei Linii - Tricouri oversized cu design pe spate";
 const seoDescription =
   "Trei Linii - tricouri oversized din bumbac dens, cu fata curata si print mai puternic pe spate. Lansarea 01 disponibila in curand.";
+const ogImage = absoluteUrl("/og-image.jpg");
+
+// Organization + WebSite structured data for Google.
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: absoluteUrl("/favicon.png"),
+      image: ogImage,
+      email: "contact@treilinii.ro",
+      description: seoDescription,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: SITE_NAME,
+      inLanguage: "ro-RO",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Trei Linii - Tricouri oversized si streetwear curat" },
+      { title: seoTitle },
       { name: "description", content: seoDescription },
-      { property: "og:title", content: "Trei Linii - Tricouri oversized si streetwear curat" },
+      { name: "theme-color", content: "#2b2a28" },
+      { property: "og:site_name", content: SITE_NAME },
+      { property: "og:locale", content: "ro_RO" },
+      { property: "og:title", content: seoTitle },
       { property: "og:description", content: seoDescription },
       { property: "og:type", content: "website" },
+      { property: "og:url", content: SITE_URL },
+      { property: "og:image", content: ogImage },
+      { property: "og:image:width", content: "1600" },
+      { property: "og:image:height", content: "1200" },
+      { property: "og:image:alt", content: "Tricou oversized Trei Linii" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Trei Linii - Tricouri oversized si streetwear curat" },
+      { name: "twitter:title", content: seoTitle },
       { name: "twitter:description", content: seoDescription },
+      { name: "twitter:image", content: ogImage },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.png" },
+      { rel: "canonical", href: SITE_URL },
     ],
   }),
   shellComponent: RootShell,
@@ -90,6 +128,10 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="ro">
       <head>
         <HeadContent />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </head>
       <body>
         {children}
