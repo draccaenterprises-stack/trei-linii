@@ -18,7 +18,6 @@ import {
 } from "./mock-data";
 
 const DEFAULT_STORE_DOMAIN = "aa01qm-mq.myshopify.com";
-const DEFAULT_PUBLIC_STOREFRONT_TOKEN = "2e7349a2b51f0c348441461382242f23";
 
 function normalizeStoreDomain(value?: string) {
   if (!value) return undefined;
@@ -33,9 +32,7 @@ export const shopifyConfig = {
   domain: normalizeStoreDomain(
     (import.meta.env.VITE_SHOPIFY_STORE_DOMAIN as string | undefined) ?? DEFAULT_STORE_DOMAIN,
   ),
-  token:
-    (import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN as string | undefined) ??
-    DEFAULT_PUBLIC_STOREFRONT_TOKEN,
+  token: (import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN as string | undefined) ?? undefined,
   apiVersion: (import.meta.env.VITE_SHOPIFY_API_VERSION as string | undefined) ?? "2026-01",
 };
 
