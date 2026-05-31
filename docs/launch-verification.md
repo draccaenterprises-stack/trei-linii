@@ -10,7 +10,8 @@ Ultima actualizare: 2026-05-31.
 - Checkout custom nu este construit. Cosul creeaza un cart Shopify si redirectioneaza catre `checkoutUrl`.
 - Adminul actual este temporar, local, protejat cu PIN si salveaza in browser.
 - GitHub `main` contine ultima versiune verificata local.
-- Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` nu reflecta inca ultima versiune GitHub la verificarea din 2026-05-31: inca afiseaza produse Shopify test de tip `model1/model2` si texte vechi. Este necesar `Publish` / update din Lovable dupa ultimul push.
+- Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` reflecta partial proiectul Trei Linii, dar nu ultima versiune GitHub la verificarea din 2026-05-31: inca afiseaza produse Shopify test de tip `model1/model2`, colectii test si texte intermediare. Este necesar `Publish` / update din Lovable dupa ultimul push.
+- Verificatorul automat `npm run verify:storefront -- <URL>` trebuie sa treaca pe URL-ul public inainte sa consideram deployment-ul gata.
 
 ## Cerinte verificate
 
@@ -28,6 +29,8 @@ Ultima actualizare: 2026-05-31.
 ```bash
 npm run build
 npm run lint
+npm run verify:storefront -- http://127.0.0.1:5175
+npm run verify:storefront -- https://blank-atelier-canvas.lovable.app
 ```
 
 ## QA browser obligatoriu
@@ -73,7 +76,7 @@ Pentru magazin activ:
 
 ## De reverificat inainte de lansare publica
 
-- Publicare Lovable dupa ultimul push GitHub si confirmare ca homepage-ul public nu mai afiseaza `model1/model2`.
+- Publicare Lovable dupa ultimul push GitHub si confirmare ca `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app` trece.
 - Variabilele de mediu setate in Lovable: `VITE_SHOPIFY_STORE_DOMAIN`, `VITE_SHOPIFY_STOREFRONT_TOKEN`, `VITE_SHOPIFY_API_VERSION`.
 - Produsele Shopify publicate pe canalul Headless.
 - Shopify store fara password storefront sau cu domeniu custom public configurat.

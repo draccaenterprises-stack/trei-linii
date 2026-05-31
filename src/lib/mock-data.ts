@@ -31,7 +31,6 @@ export interface ProductVariant {
 export interface Product {
   id: string;
   handle: string;
-  shopifyHandle?: string;
   title: string;
   price: number;
   collection: string;

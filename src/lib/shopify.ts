@@ -357,7 +357,6 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
   return {
     id: product.id,
     handle: publicProductHandle(product, index),
-    shopifyHandle: product.handle,
     title: publicProductTitle(product.title, index),
     price: Number(product.priceRange.minVariantPrice.amount),
     collection: publicCollection,
@@ -456,15 +455,13 @@ export async function fetchProductByHandle(handle: string): Promise<Product | un
 
     const products = await fetchProducts();
     return (
-      products.find((p) => p.handle === handle || p.shopifyHandle === handle) ??
-      mockProducts.find((p) => p.handle === handle)
+      products.find((p) => p.handle === handle) ?? mockProducts.find((p) => p.handle === handle)
     );
   } catch (error) {
     console.error(`Nu am putut citi produsul ${handle} din Shopify.`, error);
     const products = await fetchProducts();
     return (
-      products.find((p) => p.handle === handle || p.shopifyHandle === handle) ??
-      mockProducts.find((p) => p.handle === handle)
+      products.find((p) => p.handle === handle) ?? mockProducts.find((p) => p.handle === handle)
     );
   }
 }
