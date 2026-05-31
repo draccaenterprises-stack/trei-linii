@@ -14,6 +14,7 @@ Verificari:
 ```bash
 npm run build
 npm run lint
+npm run verify:storefront -- http://127.0.0.1:5175
 ```
 
 ## Date locale de pre-lansare
@@ -79,3 +80,27 @@ Pentru Trei Linii, domeniul Shopify curent este `aa01qm-mq.myshopify.com`.
 Tokenul Storefront este public si poate fi folosit din browser, dar variabilele de mediu raman metoda
 recomandata pentru Lovable/deploy. Daca Shopify nu are inca produse publicate pe canalul Headless,
 frontend-ul pastreaza produsele locale de pre-lansare ca site-ul sa nu para gol.
+
+## Publicare Lovable
+
+Dupa fiecare push pe GitHub:
+
+1. Deschide proiectul in Lovable.
+2. Confirma ca proiectul este sincronizat cu repository-ul GitHub `draccaenterprises-stack/trei-linii`.
+3. Seteaza Environment Variables in Lovable daca nu sunt deja setate:
+
+```text
+VITE_SHOPIFY_STORE_DOMAIN=aa01qm-mq.myshopify.com
+VITE_SHOPIFY_STOREFRONT_TOKEN=2e7349a2b51f0c348441461382242f23
+VITE_SHOPIFY_API_VERSION=2026-01
+```
+
+4. Apasa `Publish`.
+5. Verifica URL-ul public:
+
+```bash
+npm run verify:storefront -- https://blank-atelier-canvas.lovable.app
+```
+
+Deployment-ul public nu este gata daca verificarea gaseste `model1`, `model2`, texte test,
+pagini lipsa sau mesajul Lovable de proiect nepublicat.
