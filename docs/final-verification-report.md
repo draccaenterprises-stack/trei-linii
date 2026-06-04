@@ -1,7 +1,7 @@
 # Trei Linii - raport final de verificare
 
-Generat: 2026-06-04T18:38:05.849Z
-Commit: 5decaf8
+Generat: 2026-06-04T18:44:56.213Z
+Commit: dcb84fb
 Branch: main
 URL public verificat: https://blank-atelier-canvas.lovable.app
 
@@ -24,34 +24,37 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\lib\cart-context.tsx
       108:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
     C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\lib\site-context.tsx
-      355:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-      361:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+      353:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+      359:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
     ? 9 problems (0 errors, 9 warnings)
 
 [x] build
     Comanda: npm run build
     Status: passed, exit 0
     Output relevant:
-    dist/server/assets/contact-5JAk4DIz.js                               4.04 kB
-    dist/server/assets/_tanstack-start-manifest_v-CORgHaNn.js            4.09 kB
-    dist/server/assets/privacy-B-jK8Mbn.js                               4.25 kB
-    dist/server/assets/terms-BeK2SSmV.js                                 4.80 kB
-    dist/server/assets/ProductCard-BMNeQy1k.js                           5.66 kB
-    dist/server/assets/cart-CR62sd1d.js                                  5.79 kB
-    dist/server/assets/product._handle-B37QjZHH.js                      14.46 kB
-    dist/server/assets/worker-entry-bEvj0myp.js                         21.31 kB
-    dist/server/assets/index-CVDkZlhb.js                                24.36 kB
-    dist/server/assets/router-0rGdVGP9.js                              342.18 kB
-    dist/server/assets/server-lFST2H7R.js                              735.14 kB
-    ? built in 4.76s
+    dist/server/assets/contact-C4U9FR__.js                               4.04 kB
+    dist/server/assets/_tanstack-start-manifest_v-Tgwh4eBl.js            4.09 kB
+    dist/server/assets/privacy-CFxMUZ6-.js                               4.61 kB
+    dist/server/assets/terms-Dt8FjMWX.js                                 5.14 kB
+    dist/server/assets/ProductCard-D4lut6dJ.js                           5.66 kB
+    dist/server/assets/cart-LH0VxSvS.js                                  5.79 kB
+    dist/server/assets/product._handle-Dkx3DK_c.js                      14.46 kB
+    dist/server/assets/worker-entry-oU0rzWVw.js                         21.31 kB
+    dist/server/assets/index-ClxRgBRR.js                                24.36 kB
+    dist/server/assets/router-Ds6A7TeK.js                              341.91 kB
+    dist/server/assets/server-Bglo4I2j.js                              735.14 kB
+    ? built in 5.78s
 
-[x] public storefront
+[ ] public storefront
     Comanda: npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
-    Status: passed, exit 0
+    Status: blocked, exit 1
+    Nota: Poate ramane blocat pana cand Lovable publica ultima versiune a storefront-ului.
     Output relevant:
     > verify:storefront
     > node scripts/verify-storefront.mjs https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
-    Storefront verification passed for https://blank-atelier-canvas.lovable.app
+    Storefront verification failed for https://blank-atelier-canvas.lovable.app
+    - /terms: text interzis gasit: /trebuie schimbat/i
+    - /privacy: text interzis gasit: /trebuie schimbat/i
 
 [ ] public SEO/static assets
     Comanda: npm run verify:seo -- https://blank-atelier-canvas.lovable.app
@@ -72,7 +75,7 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     Comanda: npm install --package-lock-only --ignore-scripts
     Status: passed, exit 0
     Output relevant:
-    up to date, audited 524 packages in 20s
+    up to date, audited 524 packages in 3s
     120 packages are looking for funding
       run `npm fund` for details
     found 0 vulnerabilities
@@ -96,6 +99,7 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
 ## Blocaje inainte de comenzi reale
 
 - Token Shopify Storefront nou, rotit si setat in Lovable env.
+- Lovable republished dupa ultimul push GitHub, ca site-ul public sa serveasca fisierele actuale.
 - Produse reale publicate pe canalul Shopify Headless.
 - Test checkout real Shopify cu o comanda de test.
 - Date firma reale si politici legale finale validate pentru Romania.
