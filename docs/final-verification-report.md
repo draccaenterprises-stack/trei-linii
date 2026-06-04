@@ -1,7 +1,7 @@
 # Trei Linii - raport final de verificare
 
-Generat: 2026-06-04T18:32:55.865Z
-Commit: 23cb818
+Generat: 2026-06-04T18:38:05.849Z
+Commit: 5decaf8
 Branch: main
 URL public verificat: https://blank-atelier-canvas.lovable.app
 
@@ -43,7 +43,7 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     dist/server/assets/index-CVDkZlhb.js                                24.36 kB
     dist/server/assets/router-0rGdVGP9.js                              342.18 kB
     dist/server/assets/server-lFST2H7R.js                              735.14 kB
-    ? built in 3.54s
+    ? built in 4.76s
 
 [x] public storefront
     Comanda: npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
@@ -52,6 +52,16 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     > verify:storefront
     > node scripts/verify-storefront.mjs https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
     Storefront verification passed for https://blank-atelier-canvas.lovable.app
+
+[ ] public SEO/static assets
+    Comanda: npm run verify:seo -- https://blank-atelier-canvas.lovable.app
+    Status: blocked, exit 1
+    Nota: Poate ramane blocat pana cand Lovable publica ultima versiune de robots/sitemap.
+    Output relevant:
+    > verify:seo
+    > node scripts/verify-public-seo.mjs https://blank-atelier-canvas.lovable.app
+    Public SEO verification failed for https://blank-atelier-canvas.lovable.app
+    - robots.txt: text interzis gasit: /trebuie schimbat/i
 
 [x] source secret/demo scan
     Comanda: rg -n "<forbidden patterns>" src public .env.example --glob "!routeTree.gen.ts"
@@ -62,7 +72,7 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     Comanda: npm install --package-lock-only --ignore-scripts
     Status: passed, exit 0
     Output relevant:
-    up to date, audited 524 packages in 11s
+    up to date, audited 524 packages in 20s
     120 packages are looking for funding
       run `npm fund` for details
     found 0 vulnerabilities
