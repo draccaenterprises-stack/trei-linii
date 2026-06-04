@@ -31,7 +31,7 @@ Ultima actualizare: 2026-06-04.
 npm run build
 npm run lint
 npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8
-npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8
+npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
 ```
 
 ## QA browser obligatoriu
@@ -91,7 +91,7 @@ Pentru magazin activ:
 - `npm run build` - trecut.
 - `npm run lint` - trecut cu warning-uri existente `react-refresh/only-export-components`, fara erori.
 - `npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8` - trecut.
-- `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8` - trecut.
+- `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets` - trecut.
 - `npm audit --audit-level=moderate`, cu lockfile temporar - 0 vulnerabilitati.
 - Public bundle check - tokenul Storefront compromis anterior nu apare in JS-ul public.
 - Public `/admin` - admin local dezactivat.
