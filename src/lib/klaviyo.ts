@@ -2,9 +2,13 @@
 // Uses the public Client API (company_id is a public site id, safe in the browser).
 // No server needed, which keeps the Lovable static frontend simple.
 
-const COMPANY_ID = (import.meta.env.VITE_KLAVIYO_COMPANY_ID as string | undefined) ?? "W7dmRC";
-const LIST_ID = (import.meta.env.VITE_KLAVIYO_LIST_ID as string | undefined) ?? "XRJZd4";
+const COMPANY_ID = publicId(import.meta.env.VITE_KLAVIYO_COMPANY_ID as string | undefined);
+const LIST_ID = publicId(import.meta.env.VITE_KLAVIYO_LIST_ID as string | undefined);
 const REVISION = "2024-10-15";
+
+export function isKlaviyoConfigured(): boolean {
+  return Boolean(COMPANY_ID && LIST_ID);
+}
 
 /**
  * Subscribes an email to the configured Klaviyo list.
@@ -44,4 +48,11 @@ export async function subscribeToKlaviyo(email: string): Promise<void> {
   if (res.status !== 202 && !res.ok) {
     throw new Error(`Klaviyo subscribe failed: ${res.status}`);
   }
+}
+
+function publicId(value?: string) {
+  const trimmed = value?.trim();
+  if (!trimmed || !/^[A-Za-z0-9_-]{3,80}$/.test(trimmed)) return undefined;
+
+  return trimmed;
 }

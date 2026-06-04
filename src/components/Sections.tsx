@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import * as React from "react";
 import { CreditCard, RefreshCw, RotateCcw, Ruler, ShieldCheck, Truck } from "lucide-react";
-import { subscribeToKlaviyo } from "@/lib/klaviyo";
+import { isKlaviyoConfigured, subscribeToKlaviyo } from "@/lib/klaviyo";
 import { lookbookImages, reviews } from "@/lib/mock-data";
 import { useSite, type TrustItem } from "@/lib/site-context";
 
@@ -129,7 +129,9 @@ export function Newsletter() {
     newsletterButtonText,
     newsletterSuccessText,
   } = useSite();
-  const [status, setStatus] = React.useState<"idle" | "success" | "invalid" | "error">("idle");
+  const [status, setStatus] = React.useState<
+    "idle" | "success" | "invalid" | "unconfigured" | "error"
+  >("idle");
   const [email, setEmail] = React.useState("");
   const [trap, setTrap] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -141,10 +143,14 @@ export function Newsletter() {
       setStatus("invalid");
       return;
     }
+    if (!isKlaviyoConfigured()) {
+      setStatus("unconfigured");
+      return;
+    }
+
     setLoading(true);
     try {
       await subscribeToKlaviyo(email);
-      // Local backup so a list is never silently lost if Klaviyo is unreachable.
       try {
         const stored = JSON.parse(
           localStorage.getItem("trei-linii-launch-list") ?? "[]",
@@ -212,6 +218,11 @@ export function Newsletter() {
           {status === "error" && (
             <p className="mt-3 font-mono-xs text-red-700">
               Ceva n-a mers. Incearca din nou intr-un moment.
+            </p>
+          )}
+          {status === "unconfigured" && (
+            <p className="mt-3 font-mono-xs text-red-700">
+              Lista de email nu este configurata momentan.
             </p>
           )}
         </form>

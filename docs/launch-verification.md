@@ -85,6 +85,8 @@ Pentru magazin activ:
 
 - Tokenul Storefront compromis anterior trebuie rotit in Shopify inainte de comenzi reale.
 - Variabilele de mediu Shopify trebuie completate in Lovable dupa token rotation: `VITE_SHOPIFY_STORE_DOMAIN`, `VITE_SHOPIFY_STOREFRONT_TOKEN`, `VITE_SHOPIFY_API_VERSION`.
+- Newsletter: `VITE_KLAVIYO_COMPANY_ID` si `VITE_KLAVIYO_LIST_ID` trebuie setate in Lovable daca formularul de email ramane activ.
+- Analytics: `VITE_GA_ID` si `VITE_META_PIXEL_ID` se seteaza doar cu ID-uri reale validate si se incarca numai dupa accept cookies.
 - Produsele finale Shopify trebuie publicate pe canalul Headless.
 - Shopify store fara password storefront sau cu domeniu custom public configurat.
 - Date firma reale completate in admin: nume firma, CUI, Registrul Comertului, adresa.
