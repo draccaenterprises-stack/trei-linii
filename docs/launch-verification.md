@@ -32,6 +32,7 @@ npm run build
 npm run lint
 npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8
 npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
+npm run verify:shopify
 ```
 
 ## QA browser obligatoriu
@@ -85,6 +86,22 @@ Pentru magazin activ:
 - Date firma reale completate in admin: nume firma, CUI, Registrul Comertului, adresa.
 - Politici legale finale validate pentru Romania.
 - Test checkout real cu o comanda de test in Shopify.
+
+## Verificare Shopify dupa token rotation
+
+Ruleaza local, dupa ce setezi env cu tokenul nou:
+
+```bash
+npm run verify:shopify
+```
+
+Scriptul verifica:
+
+- tokenul Storefront nu este tokenul compromis anterior;
+- Storefront API raspunde pentru domeniul configurat;
+- exista produse publicate pe Storefront;
+- produsele au variante Shopify `ProductVariant` reale;
+- `cartCreate` returneaza `checkoutUrl`.
 
 ## Verificari rulate pe 2026-06-04
 
