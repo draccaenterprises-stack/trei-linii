@@ -40,6 +40,7 @@ const forbiddenPatterns = [
   /colectie\s*\d+\s*test/i,
   /frontend demo/i,
   /React \+ TypeScript frontend demo/i,
+  /trebuie schimbat/i,
   /se completeaza/i,
   /finalizarea Shopify se conecteaza dupa configurare/i,
   /Publish or update your Lovable project/i,

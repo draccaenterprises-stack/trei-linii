@@ -1,6 +1,5 @@
 // Generates public/sitemap.xml from the list of public routes.
 // Run: node scripts/generate-sitemap.mjs
-// *TREBUIE SCHIMBAT*: keep SITE_URL in sync with src/lib/site.ts (the real domain at launch).
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";

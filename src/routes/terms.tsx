@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
-import { LEGAL } from "@/lib/site";
+import { LEGAL, hasLegalBusinessDetails } from "@/lib/site";
 
 export const Route = createFileRoute("/terms")({
   component: Terms,
@@ -16,6 +16,8 @@ export const Route = createFileRoute("/terms")({
 });
 
 function Terms() {
+  const legalDetailsReady = hasLegalBusinessDetails();
+
   return (
     <LegalPage title="Termeni si conditii">
       <p>
@@ -25,10 +27,18 @@ function Terms() {
       </p>
 
       <LegalSection title="1. Vanzator">
-        <p>
-          {LEGAL.company}, cu sediul in {LEGAL.address}, CUI {LEGAL.cui}, inregistrata la Registrul
-          Comertului sub nr. {LEGAL.regCom}. Contact: {LEGAL.email}, telefon {LEGAL.phone}.
-        </p>
+        {legalDetailsReady ? (
+          <p>
+            {LEGAL.company}, cu sediul in {LEGAL.address}, CUI {LEGAL.cui}, inregistrata la
+            Registrul Comertului sub nr. {LEGAL.regCom}. Contact: {LEGAL.email}
+            {LEGAL.phone ? `, telefon ${LEGAL.phone}` : ""}.
+          </p>
+        ) : (
+          <p>
+            Datele comerciale complete ale vanzatorului vor fi publicate aici inainte ca magazinul
+            sa accepte comenzi reale. Pentru intrebari de pre-lansare, scrie la {LEGAL.email}.
+          </p>
+        )}
       </LegalSection>
 
       <LegalSection title="2. Produse si preturi">

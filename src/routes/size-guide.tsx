@@ -54,8 +54,8 @@ function SizeGuide() {
           </table>
         </div>
         <p className="mt-6 font-mono-xs text-muted-foreground">
-          Masuratori in cm, pe produs intins. *TREBUIE SCHIMBAT* - valori estimative, de confirmat
-          cu masuratorile reale ale produselor.
+          Masuratori in cm, pe produs intins. Valorile sunt orientative pana la publicarea
+          specificatiilor finale pentru fiecare model.
         </p>
       </article>
     </main>

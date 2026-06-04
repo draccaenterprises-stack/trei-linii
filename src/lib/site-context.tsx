@@ -114,8 +114,6 @@ const defaults: SiteSettings = {
   accentColor: "#ff006f",
   font: "Serif Editorial",
   announcement: "Acces early la prima colectie - intra pe lista, locuri limitate",
-  // *TREBUIE SCHIMBAT*: pune data lansarii (ex. "2026-07-01T10:00:00") ca sa apara
-  // countdown-ul in bara de sus. Gol = ramane mesajul derulant.
   launchDate: "",
   heroEyebrow: "Pre-lansare - Trei Linii",
   heroHeadline: "Fata curata.\nSpate care vorbeste.",

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
-import { LEGAL } from "@/lib/site";
+import { LEGAL, hasLegalBusinessDetails } from "@/lib/site";
 
 export const Route = createFileRoute("/privacy")({
   component: Privacy,
@@ -16,6 +16,8 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function Privacy() {
+  const legalDetailsReady = hasLegalBusinessDetails();
+
   return (
     <LegalPage title="Confidentialitate">
       <p>
@@ -24,10 +26,17 @@ function Privacy() {
       </p>
 
       <LegalSection title="1. Operator de date">
-        <p>
-          {LEGAL.company}, sediu in {LEGAL.address}, CUI {LEGAL.cui}. Pentru orice solicitare
-          privind datele tale, scrie la {LEGAL.email}.
-        </p>
+        {legalDetailsReady ? (
+          <p>
+            {LEGAL.company}, sediu in {LEGAL.address}, CUI {LEGAL.cui}. Pentru orice solicitare
+            privind datele tale, scrie la {LEGAL.email}.
+          </p>
+        ) : (
+          <p>
+            Datele complete ale operatorului vor fi publicate aici inainte de activarea comenzilor
+            reale. Pentru orice solicitare privind datele tale, scrie la {LEGAL.email}.
+          </p>
+        )}
       </LegalSection>
 
       <LegalSection title="2. Ce date colectam">
