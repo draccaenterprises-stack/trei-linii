@@ -2,5 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /admin
 
-# *TREBUIE SCHIMBAT* la lansare: schimba domeniul cu https://3linii.ro
 Sitemap: https://blank-atelier-canvas.lovable.app/sitemap.xml

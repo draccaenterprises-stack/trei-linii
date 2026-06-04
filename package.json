@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "verify:storefront": "node scripts/verify-storefront.mjs",
+    "verify:seo": "node scripts/verify-public-seo.mjs",
     "verify:shopify": "node scripts/verify-shopify-readiness.mjs",
     "verify:launch": "node scripts/verify-launch.mjs"
   },

@@ -180,6 +180,10 @@ runCheck(
   "public storefront",
   `npm run verify:storefront -- ${publicUrl} --min-products=8 --check-public-admin --check-public-assets`,
 );
+runCheck("public SEO/static assets", `npm run verify:seo -- ${publicUrl}`, {
+  allowedFailure: true,
+  note: "Poate ramane blocat pana cand Lovable publica ultima versiune de robots/sitemap.",
+});
 runSourceSecretScan();
 runAudit();
 runCheck("Shopify readiness", "npm run verify:shopify", {
