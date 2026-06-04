@@ -89,7 +89,7 @@ Pentru magazin activ:
 
 ## Verificare Shopify dupa token rotation
 
-Ruleaza local, dupa ce setezi env cu tokenul nou:
+Ruleaza local, dupa ce setezi env cu tokenul nou in `.env`, `.env.local` sau in shell:
 
 ```bash
 npm run verify:shopify
