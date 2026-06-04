@@ -1,6 +1,6 @@
 # Trei Linii - verificare lansare
 
-Ultima actualizare: 2026-05-31.
+Ultima actualizare: 2026-06-04.
 
 ## Status curent
 
@@ -11,8 +11,8 @@ Ultima actualizare: 2026-05-31.
 - Checkout custom nu este construit. Cosul creeaza un cart Shopify si redirectioneaza catre `checkoutUrl`.
 - Adminul actual este temporar, local, protejat cu PIN prin env si dezactivat implicit in build-ul public.
 - GitHub `main` contine ultima versiune verificata local.
-- Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` trebuie republicat dupa ultimul push GitHub ca sa preia catalogul vizual cu 8 produse.
-- Verificatorul automat `npm run verify:storefront -- <URL> --min-products=8` trebuie sa treaca pe URL-ul public inainte sa consideram deployment-ul gata.
+- Deployment-ul public Lovable `https://blank-atelier-canvas.lovable.app` a fost verificat cu catalog vizual de 8 produse.
+- Verificatorul automat `npm run verify:storefront -- <URL> --min-products=8` trece pe URL-ul public.
 
 ## Cerinte verificate
 
@@ -38,7 +38,7 @@ npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-prod
 
 - `/`
 - `/shop`
-- `/product/previzualizare-design-spate-01`
+- `/product/tricou-accent-line-08`
 - `/collections`
 - `/lookbook`
 - `/about`
@@ -63,10 +63,11 @@ Pentru fiecare ruta:
 
 Pentru admin:
 
-- `/admin` cere PIN pe sesiune blocata;
-- dupa PIN apar toate panourile editoriale;
+- in build public, `/admin` afiseaza doar mesajul "Admin local dezactivat";
+- adminul editorial este doar pentru local, cu `VITE_ENABLE_LOCAL_ADMIN=true` si `VITE_LOCAL_ADMIN_PIN`;
+- dupa PIN local apar toate panourile editoriale;
 - backup-ul local se genereaza si include campurile de footer;
-- panoul Shopify arata Storefront API configurat.
+- panoul Shopify arata Storefront API configurat cand env Shopify este setat.
 
 Pentru magazin activ:
 
@@ -77,10 +78,21 @@ Pentru magazin activ:
 
 ## De reverificat inainte de lansare publica
 
-- Publicare Lovable dupa ultimul push GitHub si confirmare ca `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8` trece.
-- Variabilele de mediu setate in Lovable: `VITE_SHOPIFY_STORE_DOMAIN`, `VITE_SHOPIFY_STOREFRONT_TOKEN`, `VITE_SHOPIFY_API_VERSION`.
-- Produsele Shopify publicate pe canalul Headless.
+- Tokenul Storefront compromis anterior trebuie rotit in Shopify inainte de comenzi reale.
+- Variabilele de mediu Shopify trebuie completate in Lovable dupa token rotation: `VITE_SHOPIFY_STORE_DOMAIN`, `VITE_SHOPIFY_STOREFRONT_TOKEN`, `VITE_SHOPIFY_API_VERSION`.
+- Produsele finale Shopify trebuie publicate pe canalul Headless.
 - Shopify store fara password storefront sau cu domeniu custom public configurat.
 - Date firma reale completate in admin: nume firma, CUI, Registrul Comertului, adresa.
 - Politici legale finale validate pentru Romania.
 - Test checkout real cu o comanda de test in Shopify.
+
+## Verificari rulate pe 2026-06-04
+
+- `npm run build` - trecut.
+- `npm run lint` - trecut cu warning-uri existente `react-refresh/only-export-components`, fara erori.
+- `npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8` - trecut.
+- `npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8` - trecut.
+- `npm audit --audit-level=moderate`, cu lockfile temporar - 0 vulnerabilitati.
+- Public bundle check - tokenul Storefront compromis anterior nu apare in JS-ul public.
+- Public `/admin` - admin local dezactivat.
+- Responsive `/shop` la 375, 390, 430, 768, 1024 si 1440 px - 8 produse si fara overflow orizontal.
