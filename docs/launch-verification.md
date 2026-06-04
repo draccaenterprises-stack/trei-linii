@@ -28,12 +28,17 @@ Ultima actualizare: 2026-06-04.
 ## Comenzi de verificare
 
 ```bash
+npm run verify:launch
 npm run build
 npm run lint
 npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8
 npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
 npm run verify:shopify
 ```
+
+`npm run verify:launch` ruleaza lint, build, verificarea storefront-ului public,
+scanarea surselor pentru texte/secrete interzise, auditul de dependinte si verificarea
+Shopify readiness. Rezultatul este scris in `docs/final-verification-report.md`.
 
 Pentru audit de secret compromis, seteaza doar local `COMPROMISED_SHOPIFY_STOREFRONT_TOKEN`
 in `.env` sau in shell. Nu pune tokenuri reale sau compromise in cod, documentatie publica
