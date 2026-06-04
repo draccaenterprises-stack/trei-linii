@@ -6,9 +6,9 @@ loadEnvFile(".env.local");
 
 const env = process.env;
 
-const compromisedToken = ["2e7349a2", "b51f0c348", "441461382", "242f23"].join("");
 const domain = normalizeDomain(env.VITE_SHOPIFY_STORE_DOMAIN ?? env.SHOPIFY_STORE_DOMAIN);
 const token = env.VITE_SHOPIFY_STOREFRONT_TOKEN ?? env.SHOPIFY_STOREFRONT_TOKEN;
+const compromisedToken = env.COMPROMISED_SHOPIFY_STOREFRONT_TOKEN?.trim();
 const apiVersion = env.VITE_SHOPIFY_API_VERSION ?? env.SHOPIFY_API_VERSION ?? "2026-01";
 const minProducts = Number(env.MIN_SHOPIFY_PRODUCTS ?? 1);
 
@@ -77,7 +77,7 @@ async function storefrontFetch(query, variables) {
 
 if (!domain) errors.push("Lipseste VITE_SHOPIFY_STORE_DOMAIN.");
 if (!token) errors.push("Lipseste VITE_SHOPIFY_STOREFRONT_TOKEN.");
-if (token === compromisedToken) {
+if (token && compromisedToken && token === compromisedToken) {
   errors.push("Tokenul Storefront este tokenul compromis anterior. Genereaza unul nou in Shopify.");
 }
 if (!Number.isFinite(minProducts) || minProducts < 1) {

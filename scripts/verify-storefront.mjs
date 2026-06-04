@@ -6,11 +6,13 @@ const checkPublicAdmin = args.includes("--check-public-admin");
 const checkPublicAssets = args.includes("--check-public-assets");
 
 const baseUrl = (targetArg ?? process.env.BASE_URL ?? "http://127.0.0.1:5175").replace(/\/$/, "");
-
-const compromisedStorefrontTokenPattern = new RegExp(
-  ["2e7349a2", "b51f0c348", "441461382", "242f23"].join(""),
-  "i",
-);
+const compromisedStorefrontToken = process.env.COMPROMISED_SHOPIFY_STOREFRONT_TOKEN;
+const forbiddenPublicSecrets = [
+  compromisedStorefrontToken,
+  ...(process.env.FORBIDDEN_PUBLIC_SECRETS?.split(",") ?? []),
+]
+  .map((secret) => secret?.trim())
+  .filter(Boolean);
 
 const routes = [
   "/",
@@ -31,7 +33,6 @@ const routes = [
 ];
 
 const forbiddenPatterns = [
-  compromisedStorefrontTokenPattern,
   /\bmodel\s*\d+\b/i,
   /\bmodel\d+\b/i,
   /test pentru/i,
@@ -53,8 +54,6 @@ const requiredByRoute = {
   "/privacy": [/Confidentialitate/i],
   "/cookies": [/Cookies/i],
 };
-
-const compromisedSecretPatterns = [compromisedStorefrontTokenPattern];
 
 const errors = [];
 
@@ -95,9 +94,9 @@ async function verifyPublicAssets(homeHtml) {
     }
 
     const assetText = await response.text();
-    for (const pattern of compromisedSecretPatterns) {
-      if (pattern.test(assetText)) {
-        errors.push(`asset ${assetPath}: secret compromis gasit: ${pattern}`);
+    for (const secret of forbiddenPublicSecrets) {
+      if (assetText.includes(secret)) {
+        errors.push(`asset ${assetPath}: secret interzis gasit in bundle-ul public`);
       }
     }
   }

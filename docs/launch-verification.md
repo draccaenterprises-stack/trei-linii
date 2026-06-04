@@ -35,6 +35,10 @@ npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-prod
 npm run verify:shopify
 ```
 
+Pentru audit de secret compromis, seteaza doar local `COMPROMISED_SHOPIFY_STOREFRONT_TOKEN`
+in `.env` sau in shell. Nu pune tokenuri reale sau compromise in cod, documentatie publica
+sau fisiere commitate.
+
 ## QA browser obligatoriu
 
 - `/`
@@ -89,7 +93,9 @@ Pentru magazin activ:
 
 ## Verificare Shopify dupa token rotation
 
-Ruleaza local, dupa ce setezi env cu tokenul nou in `.env`, `.env.local` sau in shell:
+Ruleaza local, dupa ce setezi env cu tokenul nou in `.env`, `.env.local` sau in shell.
+Daca vrei sa verifici explicit ca nu folosesti tokenul vechi, seteaza si
+`COMPROMISED_SHOPIFY_STOREFRONT_TOKEN` doar local:
 
 ```bash
 npm run verify:shopify
