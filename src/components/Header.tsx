@@ -5,6 +5,12 @@ import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
 
+const tickerMessages = [
+  "8 modele noi · lansare 2026",
+  "Locuri limitate pentru drop-ul 2026",
+  "Bumbac dens 240gsm · oversized fit",
+] as const;
+
 /** Returns ms left until target, null if target is empty/invalid. Updates each minute. */
 function useCountdown(target: string): number | null {
   const [remaining, setRemaining] = React.useState<number | null>(null);
@@ -67,8 +73,18 @@ function NavLink({ to, label, accentColor }: { to: string; label: string; accent
 }
 
 export function Announcement() {
-  const { announcement, announcementVisible, launchDate } = useSite();
+  const { accentColor, announcement, announcementVisible, launchDate } = useSite();
+  const [tickerIndex, setTickerIndex] = React.useState(0);
   const remaining = useCountdown(launchDate);
+
+  React.useEffect(() => {
+    if (!announcementVisible) return undefined;
+    const id = window.setInterval(() => {
+      setTickerIndex((index) => (index + 1) % tickerMessages.length);
+    }, 3_000);
+
+    return () => window.clearInterval(id);
+  }, [announcementVisible]);
 
   if (!announcementVisible) return null;
 
@@ -84,8 +100,8 @@ export function Announcement() {
             {days}z {hours}h {mins}m
           </span>
           <span className="opacity-40">/</span>
-          <a href="/#newsletter" className="underline underline-offset-4 hover:opacity-70">
-            Acces early
+          <a href="/shop" className="underline underline-offset-4 hover:opacity-70">
+            Vezi shop
           </a>
         </div>
       </div>
@@ -96,12 +112,19 @@ export function Announcement() {
 
   return (
     <div className="bg-charcoal text-cream overflow-hidden border-b border-charcoal">
-      <div className="marquee-track py-2 font-mono-xs">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <span key={i} className="px-8 inline-block">
-            {announcement} <span className="opacity-50 mx-3">/</span>
+      <div className="relative flex h-9 items-center justify-center px-5 md:px-10 font-mono-xs">
+        {tickerMessages.map((message, index) => (
+          <span
+            key={message}
+            className={`absolute transition-all duration-700 ease-out ${
+              index === tickerIndex ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+            }`}
+            style={index === tickerIndex ? { color: accentColor } : undefined}
+          >
+            {message}
           </span>
         ))}
+        <span className="sr-only">{announcement}</span>
       </div>
     </div>
   );
@@ -137,8 +160,12 @@ export function Header() {
               <span>Cos ({count})</span>
             </button>
           ) : (
-            <a href="/#newsletter" className="font-mono-xs hover:opacity-60 transition-opacity">
-              Lista lansare
+            <a
+              href="/shop"
+              className="font-mono-xs rounded-full px-4 py-2 text-charcoal transition-opacity hover:opacity-80"
+              style={{ backgroundColor: accentColor }}
+            >
+              Vezi shop
             </a>
           )}
           <details className="md:hidden">

@@ -360,6 +360,9 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
     badge: badgeFromProduct(product, variants),
     images: images.length ? images : [firstMockImage],
     description: publicProductDescription(product),
+    vibe:
+      mockProducts[index % mockProducts.length]?.vibe ??
+      "Design minimalist construit pentru purtare zilnica.",
     fitNote:
       "Croiala oversized. Verifica tabelul de marimi inainte de comanda pentru potrivirea corecta.",
     sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],

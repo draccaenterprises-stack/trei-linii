@@ -37,6 +37,7 @@ export interface Product {
   badge?: Badge;
   images: string[];
   description: string;
+  vibe: string;
   fitNote: string;
   sizes: Size[];
   colors: ColorVariant[];
@@ -55,6 +56,7 @@ export const products: Product[] = [
     images: [p1a, p2a],
     description:
       "Tricou oversized cu fata curata si compozitie liniara pe spate. Gandit ca piesa de baza pentru prima lansare Trei Linii.",
+    vibe: "Structura liniara inspirata din arhitectura industriala.",
     fitNote: "Croiala oversized. Alege marimea normala pentru o cadere relaxata.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -73,6 +75,7 @@ export const products: Product[] = [
     images: [p2b, p2a],
     description:
       "Model cu print mai puternic pe spate si semn discret pe fata. Purtabil zilnic, fara incarcare vizuala inutila.",
+    vibe: "Un cadru care incadreaza spatiul negativ ca pe o opera.",
     fitNote: "Oversized relaxat, cu umeri usor cazuti.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -91,6 +94,7 @@ export const products: Product[] = [
     images: [p3b, p3a],
     description:
       "Directie grafica mai accentuata, construita pe forme simple si spatiu liber. Fata ramane minimalista.",
+    vibe: "Grid modular construit din elemente repetate cu precizie.",
     fitNote: "Boxy oversized. Cade usor sub sold.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -108,6 +112,7 @@ export const products: Product[] = [
     images: [p4b, p4a],
     description:
       "Baza olive cu aspect spalat, potrivita pentru tinute simple. Designul ramane concentrat pe silueta si spate.",
+    vibe: "Culoare de camp, atitudine de oras.",
     fitNote: "Oversized pe marimea normala.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -125,6 +130,7 @@ export const products: Product[] = [
     images: [p1a, p3a],
     description:
       "Tricou off-white cu semn frontal mic si grafica aerisita pe spate. Creat pentru o estetica urbana, curata.",
+    vibe: "Minimalism extrem - o singura urma lasata intentionat.",
     fitNote: "Oversized echilibrat, bun pentru layering.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -143,6 +149,7 @@ export const products: Product[] = [
     images: [p3a, p4a],
     description:
       "Model charcoal cu compozitie tipografica pe spate. Contrast controlat, potrivit pentru tinute negre sau neutre.",
+    vibe: "Tipografie ca design. Cuvantul ca motiv grafic.",
     fitNote: "Boxy oversized, cu umar coborat.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -160,6 +167,7 @@ export const products: Product[] = [
     images: [p2a, p1a],
     description:
       "Albastru spalat, croiala relaxata si print discret pe spate. O varianta mai deschisa pentru sezonul cald.",
+    vibe: "Spalat, decolorat, intentionat imperfect.",
     fitNote: "Relaxed oversized, cade drept pe corp.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -178,6 +186,7 @@ export const products: Product[] = [
     images: [p4a, p2b],
     description:
       "Model cu accent cromatic fin si print de spate mai vizibil. Pastreaza fata curata si ritmul grafic al brandului.",
+    vibe: "O linie. Un accent. Nimic in plus.",
     fitNote: "Oversized pronuntat. Alege marimea normala pentru efect complet.",
     sizes: ["S", "M", "L", "XL"],
     colors: [
@@ -254,7 +263,7 @@ export const faqs = [
   },
   {
     q: "Cand apar modele noi?",
-    a: "Modelele noi sunt anuntate prin lista de lansare si pe canalele sociale ale brandului.",
+    a: "Modelele noi sunt anuntate prin update-uri de produs si pe canalele sociale ale brandului.",
   },
 ];
 

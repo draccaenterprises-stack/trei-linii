@@ -1,19 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { ProductGrid } from "@/components/ProductCard";
-import { fetchCollections, fetchProducts } from "@/lib/shopify";
+import { fetchProducts } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
 import { z } from "zod";
 
 const searchSchema = z.object({
-  collection: z.string().optional(),
+  color: z.string().optional(),
 });
+
+const colorFilters = [
+  { label: "Toate", value: undefined },
+  { label: "Crem", value: "crem" },
+  { label: "Carbune", value: "carbune" },
+  { label: "Olive", value: "olive" },
+  { label: "Off White", value: "off-white" },
+  { label: "Washed Blue", value: "washed-blue" },
+] as const;
 
 export const Route = createFileRoute("/shop")({
   validateSearch: searchSchema,
   loader: async () => {
-    const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
-    return { products, collections };
+    const products = await fetchProducts();
+    return { products };
   },
   component: Shop,
   head: () => ({
@@ -29,13 +38,17 @@ export const Route = createFileRoute("/shop")({
 });
 
 function Shop() {
-  const { products, collections } = Route.useLoaderData();
+  const { products } = Route.useLoaderData();
   const { siteMode } = useSite();
-  const { collection } = Route.useSearch();
+  const { color } = Route.useSearch();
   const navigate = Route.useNavigate();
   const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");
 
-  let filtered = collection ? products.filter((p) => p.collection === collection) : products;
+  let filtered = color
+    ? products.filter((product) =>
+        product.colors.some((item) => normalizeColor(item.name) === color),
+      )
+    : products;
   filtered = [...filtered].sort((a, b) => {
     if (sort === "price-asc") return a.price - b.price;
     if (sort === "price-desc") return b.price - a.price;
@@ -50,31 +63,28 @@ function Shop() {
             {siteMode === "pre-launch" ? "Previzualizare modele" : "Magazin"}
           </p>
           <h1 className="font-display text-5xl md:text-8xl mt-2">
-            {collection
-              ? (collections.find((c) => c.handle === collection)?.title ?? "Modele")
+            {color
+              ? `Modele ${colorFilters.find((item) => item.value === color)?.label ?? ""}.`
               : siteMode === "pre-launch"
                 ? "Modele in pregatire."
                 : "Toate modelele."}
           </h1>
           <p className="mt-6 text-muted-foreground text-lg">
             {siteMode === "pre-launch"
-              ? "Produsele afisate sunt previzualizari pentru directia brandului. Inscrie-te pe lista pentru anuntul de lansare."
+              ? "Produsele afisate prezinta directia brandului si sunt pregatite pentru prima colectie."
               : "Alege marimea, culoarea si continua catre plata securizata."}
           </p>
         </header>
 
         <div className="flex flex-wrap items-center justify-between gap-4 mb-10 pb-4 border-b border-border">
           <div className="flex flex-wrap gap-2">
-            <FilterChip active={!collection} onClick={() => navigate({ search: {} })}>
-              Toate
-            </FilterChip>
-            {collections.map((c) => (
+            {colorFilters.map((item) => (
               <FilterChip
-                key={c.handle}
-                active={collection === c.handle}
-                onClick={() => navigate({ search: { collection: c.handle } })}
+                key={item.label}
+                active={color === item.value || (!color && !item.value)}
+                onClick={() => navigate({ search: item.value ? { color: item.value } : {} })}
               >
-                {c.title}
+                {item.label}
               </FilterChip>
             ))}
           </div>
@@ -95,6 +105,18 @@ function Shop() {
       </div>
     </div>
   );
+}
+
+function normalizeColor(value: string) {
+  const normalized = value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, "-");
+
+  if (normalized === "albastru-spalat") return "washed-blue";
+  if (normalized === "off-white") return "off-white";
+  return normalized;
 }
 
 function FilterChip({

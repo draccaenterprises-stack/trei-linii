@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
-import { RotateCcw, Shield, Truck } from "lucide-react";
+import { Bell, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/product/$handle")({
 
 function ProductPage() {
   const { product, related } = Route.useLoaderData();
-  const { siteMode, reviewsEnabled } = useSite();
+  const { accentColor, siteMode, reviewsEnabled } = useSite();
   const { addItem } = useCart();
   const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
   const [color, setColor] = useState<string>(product.colors[0].name);
@@ -88,11 +88,26 @@ function ProductPage() {
               <span className="font-mono-xs opacity-60">design pe spate</span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl leading-tight">{product.title}</h1>
+            <p className="mt-3 font-mono-xs" style={{ color: accentColor }}>
+              🔥 47 de persoane sunt pe lista de asteptare
+            </p>
+            <div className="mt-4">
+              <div
+                className="font-display text-3xl md:text-4xl tabular-nums"
+                style={{ color: accentColor }}
+              >
+                ~149 RON
+              </div>
+              <p className="mt-1 font-mono-xs text-muted-foreground">
+                Pretul final va fi confirmat la lansare
+              </p>
+            </div>
             {siteMode === "live-shop" && (
               <div className="mt-3 text-xl tabular-nums">{formatRON(product.price)}</div>
             )}
 
             <p className="mt-8 text-muted-foreground leading-relaxed">{product.description}</p>
+            <p className="mt-3 text-sm italic text-muted-foreground/80">{product.vibe}</p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 font-mono-xs">
               <div className="border border-border p-3">
@@ -141,29 +156,31 @@ function ProductPage() {
               ) : (
                 <a
                   href="/#newsletter"
-                  className="block text-center w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors"
+                  className="flex w-full items-center justify-center gap-2 border bg-transparent py-4 font-mono-xs transition-colors hover:bg-charcoal hover:text-cream"
+                  style={{ borderColor: accentColor, color: accentColor }}
                 >
-                  Anunta-ma la lansare
+                  <Bell className="h-4 w-4" strokeWidth={1.5} />
+                  Primeste update produs
                 </a>
               )}
 
+              <ul className="flex flex-wrap items-center gap-3 text-muted-foreground">
+                <li className="flex items-center gap-1.5">
+                  <Truck className="h-4 w-4" strokeWidth={1.25} />
+                  <span className="font-mono-xs">Livrare</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <RotateCcw className="h-4 w-4" strokeWidth={1.25} />
+                  <span className="font-mono-xs">Retur 14 zile</span>
+                </li>
+                <li className="flex items-center gap-1.5">
+                  <ShieldCheck className="h-4 w-4" strokeWidth={1.25} />
+                  <span className="font-mono-xs">Plata securizata</span>
+                </li>
+              </ul>
+
               <p className="font-mono-xs opacity-60">Croiala: {product.fitNote}</p>
             </div>
-
-            <ul className="mt-10 grid grid-cols-3 gap-4 pt-6 border-t border-border">
-              <li className="flex flex-col items-start gap-2">
-                <Truck className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">Livrare</span>
-              </li>
-              <li className="flex flex-col items-start gap-2">
-                <RotateCcw className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">Retur 14 zile</span>
-              </li>
-              <li className="flex flex-col items-start gap-2">
-                <Shield className="h-4 w-4" strokeWidth={1.25} />
-                <span className="font-mono-xs">Plata securizata</span>
-              </li>
-            </ul>
 
             <div className="mt-10 space-y-8 border-t border-border pt-8">
               <InfoBlock title="Ce il diferentiaza">
@@ -226,9 +243,7 @@ function ProductPage() {
         <section className="mt-20 md:mt-32 border-t border-border pt-12">
           <div className="flex items-end justify-between gap-6 mb-8">
             <div>
-              <p className="font-mono-xs opacity-60">
-                {siteMode === "pre-launch" ? "Alte previzualizari" : "Completeaza cosul"}
-              </p>
+              <p className="font-mono-xs opacity-60">S-ar putea sa-ti placa si</p>
               <h2 className="font-display text-4xl md:text-6xl mt-3">Mai multe modele.</h2>
             </div>
             <Link to="/shop" className="font-mono-xs underline underline-offset-4">

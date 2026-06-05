@@ -58,7 +58,7 @@ function Privacy() {
       <LegalSection title="4. Cine ne ajuta sa procesam datele">
         <p>
           Folosim furnizori care actioneaza ca persoane imputernicite: Shopify (magazin si
-          checkout), Klaviyo (email / lista de lansare), firme de curierat pentru livrare si
+          checkout), Klaviyo (email / update-uri de produs), firme de curierat pentru livrare si
           procesatorii de plata. Acestia prelucreaza datele doar pentru serviciile prestate.
         </p>
       </LegalSection>

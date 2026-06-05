@@ -99,14 +99,14 @@ export function Footer() {
 
           <div className="md:col-span-3">
             <h4 className="font-mono-xs opacity-50 mb-4">
-              {siteMode === "pre-launch" ? "Lista de lansare" : "Noutati"}
+              {siteMode === "pre-launch" ? "Noutati produs" : "Noutati"}
             </h4>
             <p className="text-sm opacity-70 mb-3">{footerNewsletterText}</p>
             <a
               href="/#newsletter"
               className="font-mono-xs underline underline-offset-4 hover:opacity-60"
             >
-              Inscrie-te
+              Primesc update
             </a>
           </div>
         </div>

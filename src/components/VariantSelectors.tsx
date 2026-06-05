@@ -23,7 +23,7 @@ export function SizeSelector({
             onClick={() => onChange(s)}
             className={`min-w-12 h-12 px-4 font-mono-xs border transition-colors ${
               selected
-                ? "bg-charcoal text-cream border-charcoal"
+                ? "bg-charcoal text-cream border-charcoal ring-2 ring-charcoal ring-offset-2 ring-offset-background"
                 : "bg-transparent border-border hover:border-charcoal"
             } ${disabled ? "opacity-30 line-through cursor-not-allowed" : ""}`}
           >
