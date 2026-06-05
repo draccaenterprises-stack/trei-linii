@@ -26,23 +26,29 @@ function useCountdown(target: string): number | null {
 
 const preLaunchNav = [
   { to: "/about", label: "Concept" },
-  { to: "/shop", label: "Modele" },
+  { to: "/shop", label: "SHOP" },
   { to: "/size-guide", label: "Marimi" },
   { to: "/#newsletter", label: "Inscriere" },
 ] as const;
 
 const liveShopNav = [
-  { to: "/shop", label: "Magazin" },
+  { to: "/shop", label: "SHOP" },
   { to: "/collections", label: "Modele" },
   { to: "/size-guide", label: "Ghid marimi" },
   { to: "/lookbook", label: "Lookbook" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
-function NavLink({ to, label }: { to: string; label: string }) {
+function NavLink({ to, label, accentColor }: { to: string; label: string; accentColor: string }) {
+  const isShopLink = to === "/shop";
+  const className = isShopLink
+    ? "font-mono text-sm font-bold tracking-normal hover:opacity-70 transition-opacity"
+    : "font-mono-xs hover:opacity-60 transition-opacity";
+  const style = isShopLink ? { color: accentColor } : undefined;
+
   if (to.includes("#")) {
     return (
-      <a href={to} className="font-mono-xs hover:opacity-60 transition-opacity">
+      <a href={to} className={className} style={style}>
         {label}
       </a>
     );
@@ -51,8 +57,9 @@ function NavLink({ to, label }: { to: string; label: string }) {
   return (
     <Link
       to={to}
-      className="font-mono-xs hover:opacity-60 transition-opacity"
-      activeProps={{ className: "font-mono-xs underline underline-offset-4" }}
+      className={className}
+      style={style}
+      activeProps={{ className: `${className} underline underline-offset-4` }}
     >
       {label}
     </Link>
@@ -102,7 +109,7 @@ export function Announcement() {
 
 export function Header() {
   const { count, open } = useCart();
-  const { logoText, siteMode } = useSite();
+  const { accentColor, logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const nav = siteMode === "pre-launch" ? preLaunchNav : liveShopNav;
 
@@ -115,7 +122,7 @@ export function Header() {
 
         <nav className="hidden md:flex items-center gap-8">
           {nav.map((n) => (
-            <NavLink key={n.to} to={n.to} label={n.label} />
+            <NavLink key={n.to} to={n.to} label={n.label} accentColor={accentColor} />
           ))}
         </nav>
 
@@ -149,7 +156,14 @@ export function Header() {
                       {n.label}
                     </a>
                   ) : (
-                    <Link key={n.to} to={n.to} className="font-display text-3xl">
+                    <Link
+                      key={n.to}
+                      to={n.to}
+                      className={
+                        n.to === "/shop" ? "font-display text-4xl" : "font-display text-3xl"
+                      }
+                      style={n.to === "/shop" ? { color: accentColor } : undefined}
+                    >
                       {n.label}
                     </Link>
                   ),
