@@ -167,6 +167,7 @@ const PRODUCT_FIELDS = `
       id
       title
       availableForSale
+      quantityAvailable
       selectedOptions {
         name
         value
@@ -388,15 +389,6 @@ function mapShopifyCollection(collection: ShopifyCollectionNode, index: number):
   };
 }
 
-function fillVisualCatalog(products: Product[]) {
-  if (products.length >= mockProducts.length) return products.slice(0, mockProducts.length);
-
-  const usedHandles = new Set(products.map((product) => product.handle));
-  const supplemental = mockProducts.filter((product) => !usedHandles.has(product.handle));
-
-  return [...products, ...supplemental].slice(0, mockProducts.length);
-}
-
 function mergeCollections(collections: Collection[]) {
   const byHandle = new Map(collections.map((collection) => [collection.handle, collection]));
 
@@ -417,6 +409,22 @@ export function findSelectedVariant(
     product.variants?.find((variant) => variant.size === size) ??
     product.variants?.find((variant) => variant.color === color)
   );
+}
+
+export function getStockForColor(product: Product, color: string): Record<Size, number> {
+  if (!product.variants?.length) return product.stock;
+
+  return product.sizes.reduce<Record<Size, number>>((stock, size) => {
+    stock[size] =
+      product.variants
+        ?.filter((variant) => variant.size === size && variant.color === color)
+        .reduce(
+          (sum, variant) =>
+            sum + (variant.quantityAvailable ?? (variant.availableForSale ? 99 : 0)),
+          0,
+        ) ?? 0;
+    return stock;
+  }, {});
 }
 
 export function getSelectedVariantId(product: Product, size: Size, color: string) {
@@ -446,7 +454,7 @@ export async function fetchProducts(): Promise<Product[]> {
     `);
 
     const products = data.products.nodes.map(mapShopifyProduct);
-    return products.length ? fillVisualCatalog(products) : mockProducts;
+    return products.length ? products : mockProducts;
   } catch (error) {
     console.error("Nu am putut citi produsele din Shopify.", error);
     return mockProducts;

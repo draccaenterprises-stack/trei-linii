@@ -3,6 +3,7 @@ import type { Product } from "@/lib/mock-data";
 import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
+import { getStockForColor } from "@/lib/shopify";
 
 const badgeStyles: Record<string, string> = {
   noutate: "bg-charcoal text-cream",
@@ -20,7 +21,9 @@ export function ProductCard({ product }: { product: Product }) {
     productCardQuickAdd,
     productCardMetaText,
   } = useSite();
-  const availableSizes = product.sizes.filter((size) => product.stock[size] > 0);
+  const quickAddColor = product.colors[0]?.name ?? "";
+  const quickAddStock = getStockForColor(product, quickAddColor);
+  const availableSizes = product.sizes.filter((size) => quickAddStock[size] > 0);
   const showPrice = siteMode === "live-shop";
   const primaryImage = productCardBackImageFirst
     ? (product.images[1] ?? product.images[0])
@@ -79,7 +82,7 @@ export function ProductCard({ product }: { product: Product }) {
             style={{ gridTemplateColumns: `repeat(${product.sizes.length}, minmax(0, 1fr))` }}
           >
             {product.sizes.map((size) => {
-              const disabled = product.stock[size] === 0;
+              const disabled = quickAddStock[size] === 0;
               return (
                 <button
                   type="button"

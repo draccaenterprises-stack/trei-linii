@@ -106,7 +106,7 @@ export interface SiteSettings {
 }
 
 const defaults: SiteSettings = {
-  siteMode: "pre-launch",
+  siteMode: "live-shop",
   logoText: "Trei Linii",
   favicon: "/favicon.png",
   announcementVisible: true,
@@ -296,7 +296,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v9";
+const STORAGE_KEY = "trei-linii-site-v10";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

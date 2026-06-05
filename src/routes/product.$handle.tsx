@@ -1,10 +1,10 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Bell, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
-import { fetchProductByHandle, fetchProducts } from "@/lib/shopify";
+import { fetchProductByHandle, fetchProducts, getStockForColor } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
 
 export const Route = createFileRoute("/product/$handle")({
@@ -45,11 +45,20 @@ function ProductPage() {
   const { addItem } = useCart();
   const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
   const [color, setColor] = useState<string>(product.colors[0].name);
+  const selectedColorStock = useMemo(() => getStockForColor(product, color), [product, color]);
+
+  useEffect(() => {
+    if (size && selectedColorStock[size] === 0) setSize(null);
+  }, [selectedColorStock, size]);
 
   const handleAdd = () => {
     if (siteMode === "pre-launch") return;
     if (!size) {
       alert("Alege o marime inainte de a adauga produsul in cos.");
+      return;
+    }
+    if (selectedColorStock[size] === 0) {
+      alert("Varianta aleasa nu este momentan in stoc.");
       return;
     }
     addItem(product, size, color);
@@ -89,22 +98,21 @@ function ProductPage() {
             </div>
             <h1 className="font-display text-4xl md:text-5xl leading-tight">{product.title}</h1>
             <p className="mt-3 font-mono-xs" style={{ color: accentColor }}>
-              🔥 47 de persoane sunt pe lista de asteptare
+              🔥 47 de persoane au vazut produsul azi
             </p>
             <div className="mt-4">
               <div
                 className="font-display text-3xl md:text-4xl tabular-nums"
                 style={{ color: accentColor }}
               >
-                ~149 RON
+                {siteMode === "live-shop" ? formatRON(product.price) : "~149 RON"}
               </div>
               <p className="mt-1 font-mono-xs text-muted-foreground">
-                Pretul final va fi confirmat la lansare
+                {siteMode === "live-shop"
+                  ? "Pret final afisat inainte de plata securizata"
+                  : "Pretul final va fi confirmat la lansare"}
               </p>
             </div>
-            {siteMode === "live-shop" && (
-              <div className="mt-3 text-xl tabular-nums">{formatRON(product.price)}</div>
-            )}
 
             <p className="mt-8 text-muted-foreground leading-relaxed">{product.description}</p>
             <p className="mt-3 text-sm italic text-muted-foreground/80">{product.vibe}</p>
@@ -140,7 +148,7 @@ function ProductPage() {
                 </div>
                 <SizeSelector
                   sizes={product.sizes}
-                  stock={product.stock}
+                  stock={selectedColorStock}
                   value={size}
                   onChange={setSize}
                 />
