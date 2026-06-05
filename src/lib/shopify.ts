@@ -167,7 +167,6 @@ const PRODUCT_FIELDS = `
       id
       title
       availableForSale
-      quantityAvailable
       selectedOptions {
         name
         value
