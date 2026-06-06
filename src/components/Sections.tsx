@@ -1,6 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import * as React from "react";
-import { CreditCard, RefreshCw, RotateCcw, Ruler, ShieldCheck, Truck } from "lucide-react";
+import {
+  CreditCard,
+  Flame,
+  Package,
+  RefreshCw,
+  RotateCcw,
+  Ruler,
+  ShieldCheck,
+  Sparkles,
+  Truck,
+} from "lucide-react";
 import { isKlaviyoConfigured, subscribeToKlaviyo } from "@/lib/klaviyo";
 import { lookbookImages, reviews } from "@/lib/mock-data";
 import { useSite, type TrustItem } from "@/lib/site-context";
@@ -84,6 +94,121 @@ export function BundleBanner() {
           >
             {liveBannerCtaText}
           </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const bundleDeals = [
+  {
+    title: "2 tricouri",
+    value: "look complet",
+    text: "Alege doua modele diferite si construieste rotatia de zi cu zi.",
+    cta: "Vezi combinatii",
+  },
+  {
+    title: "3 tricouri",
+    value: "best value",
+    text: "Pachet gandit pentru drop-uri compacte si garderoba minimalista.",
+    cta: "Construieste pachetul",
+  },
+  {
+    title: "Stoc limitat",
+    value: "drop activ",
+    text: "Serii mici, marimi clare, fara pagina aglomerata de promotii.",
+    cta: "Verifica marimile",
+  },
+];
+
+export function BundlePreview() {
+  return (
+    <section className="px-5 md:px-10 py-20 md:py-28 border-y border-border bg-charcoal text-cream">
+      <div className="mx-auto max-w-[1600px]">
+        <div className="grid gap-8 md:grid-cols-12 md:items-end">
+          <div className="md:col-span-7">
+            <p className="font-mono-xs text-[#ff006f]">
+              Preview conversie - inspirat din retail urban
+            </p>
+            <h2 className="mt-3 font-display text-4xl md:text-6xl leading-tight">
+              Pachete simple, vizibile inainte de checkout.
+            </h2>
+          </div>
+          <p className="md:col-span-5 text-cream/68 leading-relaxed">
+            Competitorii care vand bine imping valoarea cosului fara sa rupa estetica brandului:
+            bundle-uri clare, beneficii scurte si CTA-uri care duc direct la produs.
+          </p>
+        </div>
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {bundleDeals.map((deal) => (
+            <article key={deal.title} className="border border-cream/20 p-5 md:p-6">
+              <div className="flex items-center justify-between gap-4">
+                <h3 className="font-display text-3xl">{deal.title}</h3>
+                <span className="border border-[#ff006f] px-2 py-1 font-mono-xs text-[#ff006f]">
+                  {deal.value}
+                </span>
+              </div>
+              <p className="mt-6 min-h-16 text-sm leading-relaxed text-cream/68">{deal.text}</p>
+              <Link
+                to="/shop"
+                className="mt-8 inline-flex bg-cream px-4 py-2 font-mono-xs text-charcoal hover:bg-cream/90"
+              >
+                {deal.cta}
+              </Link>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const competitivePlays = [
+  {
+    icon: Flame,
+    title: "Drop-uri si badge-uri",
+    text: "Cardurile arata rapid ce e nou, ce are stoc mic si ce se potriveste la bundle.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Incredere la vedere",
+    text: "Retur, schimb marime, plata securizata si materialul apar inainte de decizia de cumparare.",
+  },
+  {
+    icon: Package,
+    title: "Cos mai mare",
+    text: "Pachetele de 2 sau 3 tricouri dau un motiv real sa nu cumperi un singur model.",
+  },
+  {
+    icon: Sparkles,
+    title: "Poveste scurta",
+    text: "Despre noi ramane vizual si concret: de ce, proces, look final.",
+  },
+];
+
+export function CompetitivePlaybook() {
+  return (
+    <section className="px-5 md:px-10 py-20 md:py-28 bg-cream border-y border-border">
+      <div className="mx-auto max-w-[1600px]">
+        <div className="grid gap-10 md:grid-cols-12">
+          <div className="md:col-span-4">
+            <p className="font-mono-xs opacity-60">Ce pastram din piata</p>
+            <h2 className="mt-3 font-display text-4xl md:text-6xl leading-tight">
+              Lucruri care vand, fara sa arate ieftin.
+            </h2>
+          </div>
+          <div className="md:col-span-8 grid gap-4 md:grid-cols-2">
+            {competitivePlays.map((play) => {
+              const Icon = play.icon;
+              return (
+                <article key={play.title} className="border border-border p-5 md:p-6 bg-background">
+                  <Icon className="h-5 w-5 text-[#ff006f]" strokeWidth={1.5} />
+                  <h3 className="mt-6 font-display text-2xl">{play.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{play.text}</p>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

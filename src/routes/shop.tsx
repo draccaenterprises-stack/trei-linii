@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
+import { PackageCheck, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { ProductGrid } from "@/components/ProductCard";
 import { fetchProducts } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
@@ -99,6 +100,26 @@ function Shop() {
               <option value="price-desc">Pret: mare spre mic</option>
             </select>
           )}
+        </div>
+
+        <div className="mb-10 grid gap-3 md:grid-cols-4">
+          {[
+            { icon: PackageCheck, title: "Bumbac 240gsm", text: "dens, stabil, oversized" },
+            { icon: Truck, title: "Livrare rapida", text: "estimare la checkout" },
+            { icon: RotateCcw, title: "Schimb marime", text: "fit-ul trebuie sa cada bine" },
+            { icon: ShieldCheck, title: "Plata securizata", text: "checkout prin Shopify" },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <div key={item.title} className="border border-border px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Icon className="h-4 w-4 text-[#ff006f]" strokeWidth={1.5} />
+                  <p className="font-mono-xs">{item.title}</p>
+                </div>
+                <p className="mt-2 text-sm text-muted-foreground">{item.text}</p>
+              </div>
+            );
+          })}
         </div>
 
         <ProductGrid products={filtered} />

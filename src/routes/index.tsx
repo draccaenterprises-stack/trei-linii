@@ -5,6 +5,8 @@ import { Hero } from "@/components/Hero";
 import { ProductGrid } from "@/components/ProductCard";
 import {
   BundleBanner,
+  BundlePreview,
+  CompetitivePlaybook,
   Newsletter,
   Reviews,
   SocialProofGrid,
@@ -104,6 +106,8 @@ function Index() {
 
       <BundleBanner />
 
+      <BundlePreview />
+
       {sectionEnabled(sections, "collections") && (
         <section className="px-5 md:px-10 py-20 md:py-32 bg-cream border-y border-border">
           <div className="mx-auto max-w-[1600px]">
@@ -161,6 +165,8 @@ function Index() {
       )}
 
       {sectionEnabled(sections, "reviews") && <Reviews />}
+
+      <CompetitivePlaybook />
 
       <SocialProofGrid />
 

@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Flame, PackageCheck, Percent } from "lucide-react";
 import type { Product } from "@/lib/mock-data";
 import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
@@ -29,6 +30,7 @@ export function ProductCard({ product }: { product: Product }) {
     ? (product.images[1] ?? product.images[0])
     : product.images[0];
   const hoverImage = primaryImage === product.images[0] ? product.images[1] : product.images[0];
+  const lowStockCount = availableSizes.length;
 
   return (
     <article className="group">
@@ -59,6 +61,22 @@ export function ProductCard({ product }: { product: Product }) {
             <span className="absolute top-3 left-3 px-2 py-1 font-mono-xs bg-charcoal text-cream">
               previzualizare
             </span>
+          )}
+          {siteMode === "live-shop" && (
+            <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
+              <span className="inline-flex items-center gap-1 bg-cream/92 px-2 py-1 font-mono-xs text-charcoal backdrop-blur">
+                <PackageCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
+                240gsm
+              </span>
+              <span className="inline-flex items-center gap-1 bg-cream/92 px-2 py-1 font-mono-xs text-charcoal backdrop-blur">
+                <Flame className="h-3.5 w-3.5" strokeWidth={1.5} />
+                {lowStockCount <= 2 ? "stoc mic" : "oversized"}
+              </span>
+              <span className="inline-flex items-center gap-1 bg-[#ff006f] px-2 py-1 font-mono-xs text-cream">
+                <Percent className="h-3.5 w-3.5" strokeWidth={1.5} />
+                bundle
+              </span>
+            </div>
           )}
         </div>
       </Link>
