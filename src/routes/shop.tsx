@@ -90,6 +90,7 @@ function Shop() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
+              aria-label="Sorteaza produsele"
               className="font-mono-xs bg-transparent border border-border px-3 py-2 outline-none"
             >
               <option value="featured">Sortare: recomandate</option>
