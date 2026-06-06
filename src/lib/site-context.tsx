@@ -168,7 +168,7 @@ const defaults: SiteSettings = {
   productCardShowLiveBadges: true,
   productCardQuickAdd: true,
   productCardMetaText: "Design pe spate",
-  reviewsEnabled: false,
+  reviewsEnabled: true,
   trustItemsPreLaunch: [
     {
       id: "fit",
@@ -276,9 +276,7 @@ const defaults: SiteSettings = {
   seoTitle: "Trei Linii - Tricouri oversized cu design pe spate",
   seoDescription:
     "Tricouri oversized cu fata curata si design minimalist pe spate. Croiala relaxata, material dens si modele simple.",
-  sections: defaultSections.map((section) =>
-    section.id === "reviews" ? { ...section, enabled: false } : section,
-  ),
+  sections: defaultSections,
   featuredProductIds: ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
   featuredCollectionHandles: ["fit", "material", "spate", "grafica"],
 };
@@ -296,7 +294,7 @@ interface Ctx extends SiteSettings {
 }
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v10";
+const STORAGE_KEY = "trei-linii-site-v11";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<SiteSettings>(defaults);

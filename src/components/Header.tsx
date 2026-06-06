@@ -31,17 +31,14 @@ function useCountdown(target: string): number | null {
 }
 
 const preLaunchNav = [
-  { to: "/about", label: "Concept" },
   { to: "/shop", label: "SHOP" },
-  { to: "/size-guide", label: "Marimi" },
+  { to: "/about", label: "Despre noi" },
   { to: "/#newsletter", label: "Inscriere" },
 ] as const;
 
 const liveShopNav = [
   { to: "/shop", label: "SHOP" },
-  { to: "/collections", label: "Modele" },
-  { to: "/size-guide", label: "Ghid marimi" },
-  { to: "/lookbook", label: "Lookbook" },
+  { to: "/about", label: "Despre noi" },
   { to: "/contact", label: "Contact" },
 ] as const;
 

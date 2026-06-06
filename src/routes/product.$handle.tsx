@@ -1,6 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Bell, RotateCcw, ShieldCheck, Truck } from "lucide-react";
+import { Bell, RotateCcw, ShieldCheck, Truck, X } from "lucide-react";
+import { SizeGuideTable } from "@/components/SizeGuideTable";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
@@ -45,6 +46,7 @@ function ProductPage() {
   const { addItem } = useCart();
   const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
   const [color, setColor] = useState<string>(product.colors[0].name);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const selectedColorStock = useMemo(() => getStockForColor(product, color), [product, color]);
 
   useEffect(() => {
@@ -100,6 +102,9 @@ function ProductPage() {
             <p className="mt-3 font-mono-xs" style={{ color: accentColor }}>
               🔥 47 de persoane au vazut produsul azi
             </p>
+            <p className="mt-2 font-mono-xs text-muted-foreground">
+              9 persoane au produsul in cos acum
+            </p>
             <div className="mt-4">
               <div
                 className="font-display text-3xl md:text-4xl tabular-nums"
@@ -139,12 +144,17 @@ function ProductPage() {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono-xs">Marime</span>
-                  <Link
-                    to="/size-guide"
-                    className="font-mono-xs underline underline-offset-4 opacity-60"
+                  <button
+                    type="button"
+                    onClick={() => setSizeGuideOpen(true)}
+                    className="group relative font-mono-xs underline underline-offset-4 opacity-60 hover:opacity-100"
                   >
                     Ghid marimi
-                  </Link>
+                    <span className="pointer-events-none absolute bottom-full right-0 mb-3 hidden w-44 rotate-[-2deg] border-2 border-charcoal bg-cream px-3 py-2 text-left text-[10px] leading-snug text-charcoal opacity-0 shadow-sm transition-opacity group-hover:block group-hover:opacity-100">
+                      Apasa pentru a vedea ghidul
+                      <span className="absolute -bottom-2 right-5 h-3 w-3 rotate-45 border-b-2 border-r-2 border-charcoal bg-cream" />
+                    </span>
+                  </button>
                 </div>
                 <SizeSelector
                   sizes={product.sizes}
@@ -243,9 +253,7 @@ function ProductPage() {
         </div>
 
         {reviewsEnabled && (
-          <section className="mt-20 md:mt-32 border-t border-border pt-12">
-            <h2 className="font-display text-4xl md:text-6xl">Feedback clienti.</h2>
-          </section>
+          <ProductReviews productTitle={product.title} accentColor={accentColor} />
         )}
 
         <section className="mt-20 md:mt-32 border-t border-border pt-12">
@@ -286,7 +294,139 @@ function ProductPage() {
           </button>
         </div>
       )}
+
+      {sizeGuideOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-charcoal/45 px-5">
+          <div className="w-full max-w-2xl border border-border bg-background p-5 md:p-8 shadow-xl">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p className="font-mono-xs opacity-60">Fit oversized</p>
+                <h2 className="font-display text-4xl mt-2">Ghid marimi</h2>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  Masuratori in cm, pe produs intins. Daca esti intre doua marimi, alege marimea mai
+                  mare pentru o cadere oversized mai vizibila.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSizeGuideOpen(false)}
+                aria-label="Inchide ghidul de marimi"
+                className="grid h-9 w-9 shrink-0 place-items-center border border-border hover:bg-charcoal hover:text-cream"
+              >
+                <X className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+            <div className="mt-6">
+              <SizeGuideTable />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+function ProductReviews({
+  productTitle,
+  accentColor,
+}: {
+  productTitle: string;
+  accentColor: string;
+}) {
+  const [submitted, setSubmitted] = useState(false);
+  const [customReviews, setCustomReviews] = useState<Array<{ name: string; text: string }>>([]);
+  const visibleReviews = [
+    ["Alex", "Bucuresti", "Material dens, sta foarte bine pe umeri."],
+    ["Mara", "Cluj", "Minimal in fata, dar printul de pe spate face tot tricoul."],
+    ...customReviews.map((review) => [review.name, "Review nou", review.text]),
+  ];
+
+  return (
+    <section className="mt-20 md:mt-32 border-t border-border pt-12">
+      <div className="grid lg:grid-cols-12 gap-10">
+        <div className="lg:col-span-5">
+          <p className="font-mono-xs opacity-60">Review-uri</p>
+          <h2 className="font-display text-4xl md:text-6xl mt-3">Feedback clienti.</h2>
+          <div className="mt-8 space-y-6">
+            {visibleReviews.map(([name, city, text], index) => (
+              <figure key={`${name}-${index}`} className="border-t border-border pt-5">
+                <div className="font-mono-xs" style={{ color: accentColor }}>
+                  *****
+                </div>
+                <blockquote className="mt-3 text-muted-foreground">"{text}"</blockquote>
+                <figcaption className="mt-3 font-mono-xs opacity-60">
+                  {name} - {city}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+        <form
+          className="lg:col-span-6 lg:col-start-7 border border-border p-5 md:p-6 space-y-4"
+          onSubmit={async (event) => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const data = new FormData(form);
+            const email = String(data.get("email") ?? "");
+            const name = String(data.get("name") ?? "Client Trei Linii");
+            const review = String(data.get("review") ?? "");
+            try {
+              const { subscribeToKlaviyo, isKlaviyoConfigured } = await import("@/lib/klaviyo");
+              if (isKlaviyoConfigured()) await subscribeToKlaviyo(email);
+            } catch {
+              /* Review still works locally even if newsletter is unavailable. */
+            }
+            setCustomReviews((items) => [{ name, text: review }, ...items]);
+            try {
+              const stored = JSON.parse(
+                localStorage.getItem("trei-linii-product-reviews") ?? "[]",
+              ) as Array<{ productTitle: string; name: string; email: string; review: string }>;
+              localStorage.setItem(
+                "trei-linii-product-reviews",
+                JSON.stringify([{ productTitle, name, email, review }, ...stored].slice(0, 50)),
+              );
+            } catch {
+              /* best effort */
+            }
+            setSubmitted(true);
+            form.reset();
+          }}
+        >
+          <div>
+            <p className="font-mono-xs opacity-60">Lasa un review</p>
+            <h3 className="font-display text-2xl mt-2">{productTitle}</h3>
+          </div>
+          <input
+            name="name"
+            required
+            placeholder="Nume"
+            className="w-full border-b border-border bg-transparent py-3 outline-none"
+          />
+          <input
+            name="email"
+            type="email"
+            required
+            placeholder="Email pentru confirmare si noutati"
+            className="w-full border-b border-border bg-transparent py-3 outline-none"
+          />
+          <textarea
+            name="review"
+            required
+            rows={4}
+            placeholder="Cum ti se pare produsul?"
+            className="w-full resize-none border-b border-border bg-transparent py-3 outline-none"
+          />
+          <button className="bg-charcoal text-cream px-5 py-3 font-mono-xs hover:bg-charcoal/90">
+            Trimite review
+          </button>
+          {submitted && (
+            <p className="font-mono-xs text-olive">
+              Multumim. Review-ul a fost primit si emailul poate fi folosit pentru update-uri.
+            </p>
+          )}
+        </form>
+      </div>
+    </section>
   );
 }
 

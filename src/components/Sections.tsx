@@ -98,7 +98,17 @@ export function Reviews() {
     <section className="px-5 md:px-10 py-20 md:py-32">
       <div className="mx-auto max-w-[1600px]">
         <div className="flex items-end justify-between mb-12">
-          <h2 className="font-display text-4xl md:text-6xl">Feedback clienti.</h2>
+          <div>
+            <p className="font-mono-xs opacity-60">Social proof</p>
+            <h2 className="font-display text-4xl md:text-6xl mt-3">Feedback clienti.</h2>
+          </div>
+        </div>
+        <div className="mb-10 flex flex-wrap gap-2">
+          {["Fit oversized validat", "Material dens 240gsm", "Retur 14 zile"].map((item) => (
+            <span key={item} className="border border-border px-3 py-1.5 font-mono-xs opacity-70">
+              {item}
+            </span>
+          ))}
         </div>
         <div className="grid md:grid-cols-3 gap-8 md:gap-12">
           {reviews.map((r) => (

@@ -1,6 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
+const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT as string | undefined;
+const CONTACT_EMAIL = "contact@treilinii.ro";
+
 export const Route = createFileRoute("/contact")({
   component: Contact,
   head: () => ({
@@ -15,7 +18,7 @@ export const Route = createFileRoute("/contact")({
 });
 
 function Contact() {
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "mailto" | "error">("idle");
   return (
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1400px] grid md:grid-cols-12 gap-12">
@@ -29,7 +32,7 @@ function Contact() {
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Email</h3>
-              <p>contact@treilinii.ro</p>
+              <p>{CONTACT_EMAIL}</p>
             </div>
             <div>
               <h3 className="opacity-50 mb-2">Comenzi</h3>
@@ -44,27 +47,79 @@ function Contact() {
 
         <div className="md:col-span-6 md:col-start-7">
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              setSent(true);
+              const form = e.currentTarget;
+              const data = new FormData(form);
+              const payload = {
+                name: String(data.get("name") ?? ""),
+                email: String(data.get("email") ?? ""),
+                subject: String(data.get("subject") ?? "Mesaj client Trei Linii"),
+                message: String(data.get("message") ?? ""),
+              };
+
+              if (CONTACT_ENDPOINT?.trim()) {
+                setStatus("sending");
+                try {
+                  const response = await fetch(CONTACT_ENDPOINT, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                  });
+                  if (!response.ok) throw new Error("Contact endpoint failed");
+                  setStatus("sent");
+                  form.reset();
+                } catch {
+                  setStatus("error");
+                }
+                return;
+              }
+
+              const body = [
+                `Nume: ${payload.name}`,
+                `Email: ${payload.email}`,
+                "",
+                payload.message,
+              ].join("\n");
+              window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
+                payload.subject,
+              )}&body=${encodeURIComponent(body)}`;
+              setStatus("mailto");
             }}
             className="space-y-8"
           >
             <Field label="Nume">
-              <input required className="input" />
+              <input name="name" required className="input" />
             </Field>
             <Field label="Email">
-              <input type="email" required className="input" />
+              <input name="email" type="email" required className="input" />
             </Field>
             <Field label="Subiect">
-              <input className="input" />
+              <input name="subject" className="input" />
             </Field>
             <Field label="Mesaj">
-              <textarea rows={6} required className="input resize-none" />
+              <textarea name="message" rows={6} required className="input resize-none" />
             </Field>
             <button className="bg-charcoal text-cream px-6 py-3 font-mono-xs hover:bg-charcoal/90">
-              {sent ? "Trimis" : "Trimite mesajul"}
+              {status === "sending"
+                ? "Se trimite..."
+                : CONTACT_ENDPOINT?.trim()
+                  ? "Trimite mesajul"
+                  : "Trimite pe email"}
             </button>
+            {status === "sent" && (
+              <p className="font-mono-xs text-olive">Mesaj trimis. Iti raspundem pe email.</p>
+            )}
+            {status === "mailto" && (
+              <p className="font-mono-xs text-olive">
+                S-a deschis aplicatia de email cu mesajul completat.
+              </p>
+            )}
+            {status === "error" && (
+              <p className="font-mono-xs text-red-700">
+                Mesajul nu a putut fi trimis. Scrie-ne direct la {CONTACT_EMAIL}.
+              </p>
+            )}
           </form>
         </div>
       </div>

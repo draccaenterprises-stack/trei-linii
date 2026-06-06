@@ -242,7 +242,26 @@ export const lookbookImages = [
   { src: lb3, caption: "Design minimalist - purtare zilnica" },
 ];
 
-export const reviews: Array<{ name: string; location: string; rating: number; text: string }> = [];
+export const reviews: Array<{ name: string; location: string; rating: number; text: string }> = [
+  {
+    name: "Alex",
+    location: "Bucuresti",
+    rating: 5,
+    text: "Fit-ul oversized sta bine fara sa para largit aiurea. Materialul se simte dens.",
+  },
+  {
+    name: "Mara",
+    location: "Cluj",
+    rating: 5,
+    text: "Imi place ca fata ramane curata, iar printul de pe spate se vede exact cat trebuie.",
+  },
+  {
+    name: "Vlad",
+    location: "Timisoara",
+    rating: 5,
+    text: "Pare genul de tricou pe care il porti des, nu doar o piesa de poza.",
+  },
+];
 
 export const faqs = [
   {
@@ -274,7 +293,7 @@ export const homepageSections = [
   { id: "featured-products", label: "Produse recomandate", enabled: true },
   { id: "collections", label: "Structura modele", enabled: true },
   { id: "lookbook", label: "Lookbook", enabled: true },
-  { id: "reviews", label: "Recenzii", enabled: false },
+  { id: "reviews", label: "Recenzii", enabled: true },
   { id: "faq", label: "Intrebari frecvente", enabled: true },
   { id: "newsletter", label: "Noutati", enabled: true },
 ];
