@@ -1,0 +1,23 @@
+# Trei Linii
+
+> Tricouri oversized din bumbac dens, cu fata curata si print mai puternic pe spate. Lansare in serii compacte.
+
+## Pages
+
+- [Acasa](/): Prezentare brand, hero si highlights din colectia curenta.
+- [Magazin](/shop): Toate modelele disponibile, cu filtre si sortare.
+- [Colectii](/collections): Colectiile tematice Trei Linii.
+- [Lookbook](/lookbook): Imagini editoriale cu tricourile in context.
+- [Despre](/about): Povestea brandului si principiile de design.
+- [Contact](/contact): Date de contact si formular.
+- [FAQ](/faq): Raspunsuri despre marimi, materiale, livrare si retur.
+- [Ghid marimi](/size-guide): Tabel de masuri pentru fit oversized.
+- [Livrare](/delivery): Termene si optiuni de livrare.
+- [Retur](/returns): Politica de retur.
+- [Schimb](/exchange): Procedura de schimb produs.
+
+## Optional
+
+- [Termeni](/terms): Termeni si conditii.
+- [Confidentialitate](/privacy): Politica de confidentialitate.
+- [Cookies](/cookies): Politica de cookies.
