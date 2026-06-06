@@ -3,19 +3,17 @@ import heroImg from "@/assets/hero.jpg";
 import lookbookOne from "@/assets/lookbook-1.jpg";
 import lookbookTwo from "@/assets/lookbook-2.jpg";
 import productDetail from "@/assets/product-2b.jpg";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
   component: About,
-  head: () => ({
-    meta: [
-      { title: "Despre - Trei Linii" },
-      {
-        name: "description",
-        content:
-          "Trei Linii este un brand de streetwear minimal construit in jurul tricourilor oversized si al graficii curate.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/about",
+      title: "Despre - Trei Linii",
+      description:
+        "Trei Linii este un brand de streetwear minimal construit in jurul tricourilor oversized si al graficii curate.",
+    }),
 });
 
 function About() {

@@ -1,18 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
 import { LEGAL, hasLegalBusinessDetails } from "@/lib/site";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
   component: Terms,
-  head: () => ({
-    meta: [
-      { title: "Termeni si conditii - Trei Linii" },
-      {
-        name: "description",
-        content: "Termenii si conditiile de utilizare a magazinului Trei Linii.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/terms",
+      title: "Termeni si conditii - Trei Linii",
+      description: "Termenii si conditiile de utilizare a magazinului Trei Linii.",
+    }),
 });
 
 function Terms() {
