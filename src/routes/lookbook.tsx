@@ -1,18 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lookbookImages } from "@/lib/mock-data";
 import heroImg from "@/assets/hero.jpg";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/lookbook")({
   component: Lookbook,
-  head: () => ({
-    meta: [
-      { title: "Pe strada - Lansarea 01 - Trei Linii" },
-      {
-        name: "description",
-        content: "Trei Linii pe strada: tricouri oversized in context urban.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/lookbook",
+      title: "Pe strada - Lansarea 01 - Trei Linii",
+      description: "Trei Linii pe strada: tricouri oversized in context urban.",
+    }),
 });
 
 function Lookbook() {

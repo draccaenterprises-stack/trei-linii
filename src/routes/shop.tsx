@@ -4,6 +4,7 @@ import { PackageCheck, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { ProductGrid } from "@/components/ProductCard";
 import { fetchProducts } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
+import { pageMeta } from "@/lib/seo";
 import { z } from "zod";
 
 const searchSchema = z.object({
@@ -26,16 +27,13 @@ export const Route = createFileRoute("/shop")({
     return { products };
   },
   component: Shop,
-  head: () => ({
-    meta: [
-      { title: "Modele - Trei Linii" },
-      {
-        name: "description",
-        content:
-          "Tricouri oversized cu fata curata si design minimalist pe spate. Previzualizare de modele Trei Linii.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/shop",
+      title: "Modele - Trei Linii",
+      description:
+        "Tricouri oversized cu fata curata si design minimalist pe spate. Previzualizare de modele Trei Linii.",
+    }),
 });
 
 function Shop() {
@@ -93,6 +91,7 @@ function Shop() {
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
+              aria-label="Sorteaza produsele"
               className="font-mono-xs bg-transparent border border-border px-3 py-2 outline-none"
             >
               <option value="featured">Sortare: recomandate</option>

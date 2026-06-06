@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { fetchProductByHandle, fetchProducts, getStockForColor } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
+import { SITE_URL } from "@/lib/site";
 
 export const Route = createFileRoute("/product/$handle")({
   loader: async ({ params }) => {
@@ -18,17 +19,48 @@ export const Route = createFileRoute("/product/$handle")({
     const related = products.filter((p) => p.id !== product.id).slice(0, 3);
     return { product, related };
   },
-  head: ({ loaderData }) => ({
-    meta: loaderData
-      ? [
-          { title: `${loaderData.product.title} - Trei Linii` },
-          { name: "description", content: loaderData.product.description },
-          { property: "og:title", content: loaderData.product.title },
-          { property: "og:description", content: loaderData.product.description },
-          { property: "og:image", content: loaderData.product.images[0] },
-        ]
-      : [],
-  }),
+  head: ({ loaderData, params }) => {
+    if (!loaderData) return {};
+    const url = `${SITE_URL}/product/${params.handle}`;
+    const title = `${loaderData.product.title} - Trei Linii`;
+    const description = loaderData.product.description;
+    const image = loaderData.product.images[0];
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "product" },
+        { property: "og:image", content: image },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:image", content: image },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: loaderData.product.title,
+            description,
+            image: loaderData.product.images,
+            url,
+            offers: {
+              "@type": "Offer",
+              price: loaderData.product.price,
+              priceCurrency: "RON",
+              availability: "https://schema.org/InStock",
+              url,
+            },
+          }),
+        },
+      ],
+    };
+  },
   component: ProductPage,
   notFoundComponent: () => (
     <div className="px-5 py-32 text-center">
@@ -365,6 +397,7 @@ function ProductReviews({
             name="name"
             required
             placeholder="Nume"
+            aria-label="Numele tau"
             className="w-full border-b border-border bg-transparent py-3 outline-none"
           />
           <input
@@ -372,6 +405,7 @@ function ProductReviews({
             type="email"
             required
             placeholder="Email pentru confirmare si noutati"
+            aria-label="Adresa de email"
             className="w-full border-b border-border bg-transparent py-3 outline-none"
           />
           <textarea
@@ -379,6 +413,7 @@ function ProductReviews({
             required
             rows={4}
             placeholder="Cum ti se pare produsul?"
+            aria-label="Mesajul tau despre produs"
             className="w-full resize-none border-b border-border bg-transparent py-3 outline-none"
           />
           <button className="bg-charcoal text-cream px-5 py-3 font-mono-xs hover:bg-charcoal/90">

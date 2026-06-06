@@ -1,17 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/cookies")({
   component: Cookies,
-  head: () => ({
-    meta: [
-      { title: "Cookies - Trei Linii" },
-      {
-        name: "description",
-        content: "Ce cookies folosim pe site-ul Trei Linii si cum le poti controla.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/cookies",
+      title: "Cookies - Trei Linii",
+      description: "Ce cookies folosim pe site-ul Trei Linii si cum le poti controla.",
+    }),
 });
 
 function Cookies() {
