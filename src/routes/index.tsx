@@ -62,7 +62,7 @@ function Index() {
 
   return (
     <>
-      {sectionEnabled(sections, "hero") && <Hero />}
+      {sectionEnabled(sections, "hero") && <Hero products={products} />}
 
       <TrustStrip />
 

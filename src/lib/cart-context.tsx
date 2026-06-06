@@ -6,6 +6,7 @@ export interface CartLine {
   lineId: string;
   productId: string;
   merchandiseId?: string;
+  product?: Product;
   handle: string;
   title: string;
   image: string;
@@ -23,6 +24,7 @@ interface CartContextValue {
   addItem: (product: Product, size: Size, color: string, quantity?: number) => void;
   removeItem: (lineId: string) => void;
   updateQuantity: (lineId: string, quantity: number) => void;
+  updateOptions: (lineId: string, size: Size, color: string) => void;
   clear: () => void;
   subtotal: number;
   count: number;
@@ -77,6 +79,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
               lineId,
               productId: product.id,
               merchandiseId,
+              product,
               handle: product.handle,
               title: product.title,
               image: product.images[0],
@@ -96,6 +99,31 @@ export function CartProvider({ children }: { children: ReactNode }) {
             .map((l) => (l.lineId === lineId ? { ...l, quantity } : l))
             .filter((l) => l.quantity > 0),
         ),
+      updateOptions: (lineId, size, color) =>
+        setLines((prev) => {
+          const line = prev.find((l) => l.lineId === lineId);
+          if (!line?.product) return prev;
+
+          const merchandiseId = getSelectedVariantId(line.product, size, color);
+          const nextLineId = `${merchandiseId ?? line.product.id}-${size}-${color}`;
+          const updatedLine = { ...line, lineId: nextLineId, merchandiseId, size, color };
+
+          return prev
+            .filter((l) => l.lineId !== lineId)
+            .reduce<CartLine[]>(
+              (lines, current) => {
+                if (current.lineId === nextLineId) {
+                  return lines.map((item) =>
+                    item.lineId === nextLineId
+                      ? { ...item, quantity: item.quantity + current.quantity }
+                      : item,
+                  );
+                }
+                return [...lines, current];
+              },
+              [updatedLine],
+            );
+        }),
       clear: () => setLines([]),
       subtotal,
       count,

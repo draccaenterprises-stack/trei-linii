@@ -3,6 +3,7 @@ import { Minus, Plus } from "lucide-react";
 import { ShopifyCheckoutButton } from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
+import { getStockForColor } from "@/lib/shopify";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
@@ -10,7 +11,7 @@ export const Route = createFileRoute("/cart")({
 });
 
 function CartPage() {
-  const { lines, removeItem, updateQuantity, subtotal } = useCart();
+  const { lines, removeItem, updateQuantity, updateOptions, subtotal } = useCart();
 
   if (lines.length === 0) {
     return (
@@ -36,56 +37,13 @@ function CartPage() {
         <div className="mt-12 grid lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 divide-y divide-border border-y border-border">
             {lines.map((l) => (
-              <div key={l.lineId} className="py-6 flex gap-5">
-                <div className="w-28 h-36 bg-warm-grey shrink-0">
-                  <img
-                    src={l.image}
-                    alt={l.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <div className="flex items-start justify-between gap-3">
-                      <Link
-                        to="/product/$handle"
-                        params={{ handle: l.handle }}
-                        className="font-display text-xl hover:opacity-60"
-                      >
-                        {l.title}
-                      </Link>
-                      <button
-                        onClick={() => removeItem(l.lineId)}
-                        className="font-mono-xs opacity-60 hover:opacity-100"
-                      >
-                        Elimina
-                      </button>
-                    </div>
-                    <p className="font-mono-xs opacity-60 mt-2">
-                      {l.color} - Marime {l.size}
-                    </p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center border border-border">
-                      <button
-                        className="h-9 w-9 grid place-items-center"
-                        onClick={() => updateQuantity(l.lineId, l.quantity - 1)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </button>
-                      <span className="w-8 text-center tabular-nums">{l.quantity}</span>
-                      <button
-                        className="h-9 w-9 grid place-items-center"
-                        onClick={() => updateQuantity(l.lineId, l.quantity + 1)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    </div>
-                    <span className="tabular-nums">{formatRON(l.price * l.quantity)}</span>
-                  </div>
-                </div>
-              </div>
+              <CartPageLine
+                key={l.lineId}
+                line={l}
+                onRemove={removeItem}
+                onQty={updateQuantity}
+                onOptions={updateOptions}
+              />
             ))}
           </div>
 
@@ -110,6 +68,117 @@ function CartPage() {
               </p>
             </div>
           </aside>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CartPageLine({
+  line,
+  onRemove,
+  onQty,
+  onOptions,
+}: {
+  line: ReturnType<typeof useCart>["lines"][number];
+  onRemove: (id: string) => void;
+  onQty: (id: string, quantity: number) => void;
+  onOptions: (id: string, size: string, color: string) => void;
+}) {
+  const product = line.product;
+  const colorStock = product ? getStockForColor(product, line.color) : null;
+  const availableSizes = product?.sizes.filter((size) => colorStock && colorStock[size] > 0) ?? [];
+
+  const handleColorChange = (color: string) => {
+    if (!product) return;
+    const nextStock = getStockForColor(product, color);
+    const nextSize =
+      nextStock[line.size] > 0 ? line.size : product.sizes.find((s) => nextStock[s] > 0);
+    onOptions(line.lineId, nextSize ?? line.size, color);
+  };
+
+  return (
+    <div className="py-6 flex gap-5">
+      <div className="w-28 h-36 bg-warm-grey shrink-0">
+        <img
+          src={line.image}
+          alt={line.title}
+          loading="lazy"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="flex-1 flex flex-col justify-between gap-5">
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <Link
+              to="/product/$handle"
+              params={{ handle: line.handle }}
+              className="font-display text-xl hover:opacity-60"
+            >
+              {line.title}
+            </Link>
+            <button
+              onClick={() => onRemove(line.lineId)}
+              className="font-mono-xs opacity-60 hover:opacity-100"
+            >
+              Elimina
+            </button>
+          </div>
+
+          {product ? (
+            <div className="mt-4 grid sm:grid-cols-2 gap-3 max-w-md">
+              <label className="font-mono-xs opacity-70">
+                Culoare
+                <select
+                  value={line.color}
+                  onChange={(event) => handleColorChange(event.target.value)}
+                  className="mt-1 w-full border border-border bg-transparent px-3 py-2 outline-none"
+                >
+                  {product.colors.map((color) => (
+                    <option key={color.name} value={color.name}>
+                      {color.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="font-mono-xs opacity-70">
+                Marime
+                <select
+                  value={line.size}
+                  onChange={(event) => onOptions(line.lineId, event.target.value, line.color)}
+                  className="mt-1 w-full border border-border bg-transparent px-3 py-2 outline-none"
+                >
+                  {product.sizes.map((size) => (
+                    <option key={size} value={size} disabled={!availableSizes.includes(size)}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : (
+            <p className="font-mono-xs opacity-60 mt-2">
+              {line.color} - Marime {line.size}
+            </p>
+          )}
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center border border-border">
+            <button
+              className="h-9 w-9 grid place-items-center"
+              onClick={() => onQty(line.lineId, line.quantity - 1)}
+            >
+              <Minus className="h-3 w-3" />
+            </button>
+            <span className="w-8 text-center tabular-nums">{line.quantity}</span>
+            <button
+              className="h-9 w-9 grid place-items-center"
+              onClick={() => onQty(line.lineId, line.quantity + 1)}
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
+          <span className="tabular-nums">{formatRON(line.price * line.quantity)}</span>
         </div>
       </div>
     </div>

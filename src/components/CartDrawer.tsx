@@ -7,13 +7,14 @@ import { useSite } from "@/lib/site-context";
 import {
   addCartLines,
   createCart,
+  getStockForColor,
   isShopifyConfigured,
   isShopifyProductVariantId,
   redirectToShopifyCheckout,
 } from "@/lib/shopify";
 
 export function CartDrawer() {
-  const { isOpen, close, lines, removeItem, updateQuantity, subtotal } = useCart();
+  const { isOpen, close, lines, removeItem, updateQuantity, updateOptions, subtotal } = useCart();
   if (!isOpen) return null;
 
   return (
@@ -43,6 +44,7 @@ export function CartDrawer() {
                   line={line}
                   onRemove={removeItem}
                   onQty={updateQuantity}
+                  onOptions={updateOptions}
                 />
               ))}
             </div>
@@ -58,11 +60,26 @@ function CartRow({
   line,
   onRemove,
   onQty,
+  onOptions,
 }: {
   line: CartLine;
   onRemove: (id: string) => void;
   onQty: (id: string, q: number) => void;
+  onOptions: (id: string, size: string, color: string) => void;
 }) {
+  const product = line.product;
+  const colorStock = product ? getStockForColor(product, line.color) : null;
+  const availableSizes = product?.sizes.filter((size) => colorStock && colorStock[size] > 0) ?? [];
+  const hasVariantControls = Boolean(product);
+
+  const handleColorChange = (color: string) => {
+    if (!product) return;
+    const nextStock = getStockForColor(product, color);
+    const nextSize =
+      nextStock[line.size] > 0 ? line.size : product.sizes.find((s) => nextStock[s] > 0);
+    onOptions(line.lineId, nextSize ?? line.size, color);
+  };
+
   return (
     <div className="flex gap-4 py-4">
       <div className="w-20 h-24 bg-warm-grey shrink-0">
@@ -84,9 +101,42 @@ function CartRow({
               Elimina
             </button>
           </div>
-          <p className="font-mono-xs opacity-50 mt-1">
-            {line.color} / {line.size}
-          </p>
+          {hasVariantControls ? (
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <label className="font-mono-xs opacity-70">
+                Culoare
+                <select
+                  value={line.color}
+                  onChange={(event) => handleColorChange(event.target.value)}
+                  className="mt-1 w-full border border-border bg-transparent px-2 py-2 text-xs outline-none"
+                >
+                  {product?.colors.map((color) => (
+                    <option key={color.name} value={color.name}>
+                      {color.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="font-mono-xs opacity-70">
+                Marime
+                <select
+                  value={line.size}
+                  onChange={(event) => onOptions(line.lineId, event.target.value, line.color)}
+                  className="mt-1 w-full border border-border bg-transparent px-2 py-2 text-xs outline-none"
+                >
+                  {product?.sizes.map((size) => (
+                    <option key={size} value={size} disabled={!availableSizes.includes(size)}>
+                      {size}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : (
+            <p className="font-mono-xs opacity-50 mt-1">
+              {line.color} / {line.size}
+            </p>
+          )}
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center border border-border">
