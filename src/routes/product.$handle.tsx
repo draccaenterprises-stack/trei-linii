@@ -397,6 +397,7 @@ function ProductReviews({
             name="name"
             required
             placeholder="Nume"
+            aria-label="Numele tau"
             className="w-full border-b border-border bg-transparent py-3 outline-none"
           />
           <input
@@ -404,6 +405,7 @@ function ProductReviews({
             type="email"
             required
             placeholder="Email pentru confirmare si noutati"
+            aria-label="Adresa de email"
             className="w-full border-b border-border bg-transparent py-3 outline-none"
           />
           <textarea
@@ -411,6 +413,7 @@ function ProductReviews({
             required
             rows={4}
             placeholder="Cum ti se pare produsul?"
+            aria-label="Mesajul tau despre produs"
             className="w-full resize-none border-b border-border bg-transparent py-3 outline-none"
           />
           <button className="bg-charcoal text-cream px-5 py-3 font-mono-xs hover:bg-charcoal/90">
