@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSite } from "@/lib/site-context";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/returns")({
   component: Returns,
-  head: () => ({
-    meta: [
-      { title: "Retur - Trei Linii" },
-      { name: "description", content: "Informatii despre retur pentru produsele Trei Linii." },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/returns",
+      title: "Retur - Trei Linii",
+      description: "Informatii despre retur pentru produsele Trei Linii.",
+    }),
 });
 
 function Returns() {

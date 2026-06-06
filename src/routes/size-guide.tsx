@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SizeGuideTable } from "@/components/SizeGuideTable";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/size-guide")({
   component: SizeGuide,
-  head: () => ({
-    meta: [
-      { title: "Ghid marimi - Trei Linii" },
-      { name: "description", content: "Ghid de marimi pentru tricouri oversized Trei Linii." },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/size-guide",
+      title: "Ghid marimi - Trei Linii",
+      description: "Ghid de marimi pentru tricouri oversized Trei Linii.",
+    }),
 });
 
 function SizeGuide() {

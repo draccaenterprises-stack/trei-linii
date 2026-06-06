@@ -14,12 +14,21 @@ import { lookbookImages } from "@/lib/mock-data";
 import { fetchCollections, fetchProducts } from "@/lib/shopify";
 import { sectionEnabled, useSite } from "@/lib/site-context";
 
+import { pageMeta } from "@/lib/seo";
+
 export const Route = createFileRoute("/")({
   loader: async () => {
     const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
     return { products, collections };
   },
   component: Index,
+  head: () =>
+    pageMeta({
+      path: "/",
+      title: "Trei Linii - Tricouri oversized cu design pe spate",
+      description:
+        "Trei Linii - tricouri oversized din bumbac dens, cu fata curata si print mai puternic pe spate. Lansarea 01 disponibila in curand.",
+    }),
 });
 
 function Index() {
