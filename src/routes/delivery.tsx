@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSite } from "@/lib/site-context";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/delivery")({
   component: Delivery,
-  head: () => ({
-    meta: [
-      { title: "Livrare - Trei Linii" },
-      { name: "description", content: "Informatii despre livrare pentru Trei Linii." },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/delivery",
+      title: "Livrare - Trei Linii",
+      description: "Informatii despre livrare pentru Trei Linii.",
+    }),
 });
 
 function Delivery() {

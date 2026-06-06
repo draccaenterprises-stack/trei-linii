@@ -209,6 +209,7 @@ export function Newsletter() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="email@exemplu.ro"
+              aria-label="Adresa de email pentru newsletter"
               className="flex-1 bg-transparent py-3 outline-none placeholder:opacity-40"
             />
             <button

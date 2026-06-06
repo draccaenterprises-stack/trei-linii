@@ -1,20 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { pageMeta } from "@/lib/seo";
 
 const CONTACT_ENDPOINT = import.meta.env.VITE_CONTACT_FORM_ENDPOINT as string | undefined;
 const CONTACT_EMAIL = "contact@treilinii.ro";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
-  head: () => ({
-    meta: [
-      { title: "Contact - Trei Linii" },
-      {
-        name: "description",
-        content: "Contact Trei Linii pentru comenzi, retururi, colaborari si intrebari generale.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/contact",
+      title: "Contact - Trei Linii",
+      description: "Contact Trei Linii pentru comenzi, retururi, colaborari si intrebari generale.",
+    }),
 });
 
 function Contact() {

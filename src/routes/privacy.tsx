@@ -1,18 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
 import { LEGAL, hasLegalBusinessDetails } from "@/lib/site";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
   component: Privacy,
-  head: () => ({
-    meta: [
-      { title: "Confidentialitate - Trei Linii" },
-      {
-        name: "description",
-        content: "Politica de confidentialitate si protectia datelor (GDPR) Trei Linii.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/privacy",
+      title: "Confidentialitate - Trei Linii",
+      description: "Politica de confidentialitate si protectia datelor (GDPR) Trei Linii.",
+    }),
 });
 
 function Privacy() {

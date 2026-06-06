@@ -1,19 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CollectionCard } from "@/components/CollectionCard";
 import { fetchCollections } from "@/lib/shopify";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/collections")({
   loader: () => fetchCollections(),
   component: CollectionsPage,
-  head: () => ({
-    meta: [
-      { title: "Lansari - Trei Linii" },
-      {
-        name: "description",
-        content: "Lansarile si directiile Trei Linii: tricouri, materiale si design pe spate.",
-      },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/collections",
+      title: "Lansari - Trei Linii",
+      description: "Lansarile si directiile Trei Linii: tricouri, materiale si design pe spate.",
+    }),
 });
 
 function CollectionsPage() {

@@ -1,14 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSite } from "@/lib/site-context";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/exchange")({
   component: Exchange,
-  head: () => ({
-    meta: [
-      { title: "Schimb marime - Trei Linii" },
-      { name: "description", content: "Informatii despre schimbul de marime Trei Linii." },
-    ],
-  }),
+  head: () =>
+    pageMeta({
+      path: "/exchange",
+      title: "Schimb marime - Trei Linii",
+      description: "Informatii despre schimbul de marime Trei Linii.",
+    }),
 });
 
 function Exchange() {
