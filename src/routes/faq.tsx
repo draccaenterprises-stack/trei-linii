@@ -3,7 +3,25 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { useSite } from "@/lib/site-context";
 import { pageMeta } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
-import { faqItems as defaultFaqItems } from "@/lib/mock-data";
+
+const FAQ_SEO_ITEMS: Array<{ q: string; a: string }> = [
+  {
+    q: "Cum aleg marimea?",
+    a: "Tricourile sunt gandite oversized. Alege marimea normala pentru un fit relaxat sau o marime mai mica pentru o cadere mai apropiata de corp.",
+  },
+  {
+    q: "Din ce material sunt tricourile?",
+    a: "Bumbac 100%, material dens de 240 g/mp, cu textura stabila si cadere curata. Gramajul apare si pe pagina fiecarui produs.",
+  },
+  {
+    q: "Cand se lanseaza primele modele?",
+    a: "Colectia este pregatita in serii compacte. Lasa emailul pentru update-uri despre stoc si drop-uri noi.",
+  },
+  {
+    q: "Cum va functiona comanda?",
+    a: "Cand magazinul este activ, alegi marimea, adaugi produsul in cos si finalizezi comanda prin plata securizata.",
+  },
+];
 
 export const Route = createFileRoute("/faq")({
   component: FAQPage,
@@ -13,7 +31,6 @@ export const Route = createFileRoute("/faq")({
       title: "FAQ - Trei Linii",
       description: "Intrebari despre marimi, materiale, livrare si retur.",
     });
-    const items = (defaultFaqItems ?? []).filter((item) => item.enabled);
     return {
       ...base,
       scripts: [
@@ -23,10 +40,10 @@ export const Route = createFileRoute("/faq")({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             url: `${SITE_URL}/faq`,
-            mainEntity: items.map((item) => ({
+            mainEntity: FAQ_SEO_ITEMS.map((item) => ({
               "@type": "Question",
-              name: item.question,
-              acceptedAnswer: { "@type": "Answer", text: item.answer },
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
             })),
           }),
         },
