@@ -4,7 +4,7 @@ import { isShopifyConfigured, shopifyConfig } from "@/lib/shopify";
 import { useSite, type SiteMode, type SiteSettings } from "@/lib/site-context";
 
 const LOCAL_ADMIN_ENABLED = import.meta.env.VITE_ENABLE_LOCAL_ADMIN === "true";
-const LOCAL_ADMIN_PIN = import.meta.env.VITE_LOCAL_ADMIN_PIN as string | undefined;
+const LOCAL_ADMIN_AVAILABLE = import.meta.env.DEV && LOCAL_ADMIN_ENABLED;
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
@@ -15,7 +15,6 @@ export const Route = createFileRoute("/admin")({
 
 function Admin() {
   const site = useSite();
-  const [pin, setPin] = useState("");
   const [unlocked, setUnlocked] = useState(
     () => typeof window !== "undefined" && sessionStorage.getItem("trei-linii-admin") === "1",
   );
@@ -24,7 +23,7 @@ function Admin() {
   const missingLegal = !site.legalBusinessName || !site.legalBusinessDetails;
   const shopifyReady = isShopifyConfigured();
 
-  if (!LOCAL_ADMIN_ENABLED || !LOCAL_ADMIN_PIN) {
+  if (!LOCAL_ADMIN_AVAILABLE) {
     return (
       <div className="min-h-screen bg-cream px-5 py-20 grid place-items-center">
         <div className="w-full max-w-md border border-border bg-background p-6 space-y-4">
@@ -76,34 +75,26 @@ function Admin() {
   if (!unlocked) {
     return (
       <div className="min-h-screen bg-cream px-5 py-20 grid place-items-center">
-        <form
-          className="w-full max-w-sm border border-border bg-background p-6 space-y-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (pin === LOCAL_ADMIN_PIN) {
-              sessionStorage.setItem("trei-linii-admin", "1");
-              setUnlocked(true);
-            }
-          }}
-        >
+        <div className="w-full max-w-sm border border-border bg-background p-6 space-y-4">
           <div>
-            <p className="font-mono-xs opacity-60">Admin privat</p>
+            <p className="font-mono-xs opacity-60">Admin local</p>
             <h1 className="font-display text-4xl mt-2">Control site</h1>
           </div>
-          <input
-            type="password"
-            className="input"
-            value={pin}
-            onChange={(event) => setPin(event.target.value)}
-            placeholder="Cod acces"
-          />
-          <button className="w-full bg-charcoal text-cream py-3 font-mono-xs">
-            Intra in admin
+          <button
+            type="button"
+            className="w-full bg-charcoal text-cream py-3 font-mono-xs"
+            onClick={() => {
+              sessionStorage.setItem("trei-linii-admin", "1");
+              setUnlocked(true);
+            }}
+          >
+            Deschide admin local
           </button>
           <p className="text-xs text-muted-foreground">
-            Acces rezervat pentru administrarea continutului Trei Linii.
+            Disponibil doar pe serverul de dezvoltare local. Build-ul public afiseaza adminul ca
+            dezactivat.
           </p>
-        </form>
+        </div>
         <AdminStyles />
       </div>
     );

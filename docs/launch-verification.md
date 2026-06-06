@@ -77,8 +77,8 @@ Pentru fiecare ruta:
 Pentru admin:
 
 - in build public, `/admin` afiseaza doar mesajul "Admin local dezactivat";
-- adminul editorial este doar pentru local, cu `VITE_ENABLE_LOCAL_ADMIN=true` si `VITE_LOCAL_ADMIN_PIN`;
-- dupa PIN local apar toate panourile editoriale;
+- adminul editorial este doar pentru serverul de dezvoltare local, cu `VITE_ENABLE_LOCAL_ADMIN=true`;
+- dupa confirmarea locala apar toate panourile editoriale;
 - backup-ul local se genereaza si include campurile de footer;
 - panoul Shopify arata Storefront API configurat cand env Shopify este setat.
 

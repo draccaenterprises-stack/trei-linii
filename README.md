@@ -74,10 +74,11 @@ Adminul temporar este dezactivat implicit in build-urile publice. Pentru test lo
 
 ```text
 VITE_ENABLE_LOCAL_ADMIN=true
-VITE_LOCAL_ADMIN_PIN=schimba-acest-pin
 ```
 
-Nu seta `VITE_ENABLE_LOCAL_ADMIN=true` in Lovable sau in deployment public.
+Nu seta `VITE_ENABLE_LOCAL_ADMIN=true` in Lovable sau in deployment public. Adminul este
+disponibil doar pe serverul de dezvoltare local; nu folosi variabile `VITE_` pentru PIN-uri sau
+secrete, pentru ca ajung in bundle-ul public.
 
 Status integrare:
 
