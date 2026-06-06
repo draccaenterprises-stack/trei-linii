@@ -1,15 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { useSite } from "@/lib/site-context";
+import { pageMeta } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
+import { faqItems as defaultFaqItems } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/faq")({
   component: FAQPage,
-  head: () => ({
-    meta: [
-      { title: "FAQ - Trei Linii" },
-      { name: "description", content: "Intrebari despre marimi, materiale, livrare si retur." },
-    ],
-  }),
+  head: () => {
+    const base = pageMeta({
+      path: "/faq",
+      title: "FAQ - Trei Linii",
+      description: "Intrebari despre marimi, materiale, livrare si retur.",
+    });
+    const items = (defaultFaqItems ?? []).filter((item) => item.enabled);
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            url: `${SITE_URL}/faq`,
+            mainEntity: items.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: { "@type": "Answer", text: item.answer },
+            })),
+          }),
+        },
+      ],
+    };
+  },
 });
 
 function FAQPage() {
