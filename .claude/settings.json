@@ -1,0 +1,37 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent-status.cjs\" start"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/agent-status.cjs\" stop"
+          }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(curl http://localhost:3001/*)",
+      "Bash(bash .claude/hooks/agent-log.sh:*)",
+      "Bash(bash .claude/hooks/agent-spawn.sh:*)",
+      "Read",
+      "Glob",
+      "Grep",
+      "WebSearch"
+    ]
+  }
+}
