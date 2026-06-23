@@ -48,8 +48,34 @@ export function TrustStrip() {
 }
 
 export function ThreeLineDivider() {
+  const rootRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return undefined;
+
+    const update = () => {
+      const rect = root.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 1;
+      const progress = Math.min(
+        1,
+        Math.max(0, (viewportHeight - rect.top) / (viewportHeight * 0.3)),
+      );
+      root.style.setProperty("--tl-divider-progress", String(progress));
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
   return (
-    <div className="tl-divider" aria-hidden="true">
+    <div ref={rootRef} className="tl-divider" aria-hidden="true">
       <span />
       <span />
       <span />
@@ -113,21 +139,15 @@ export function BundleBanner() {
 const bundleDeals = [
   {
     title: "2 tricouri",
-    value: "look complet",
-    text: "Alege doua modele diferite si construieste rotatia de zi cu zi.",
-    cta: "Vezi combinatii",
+    value: "oferta duo",
+    text: "Alege doua modele si construieste rotatia de zi cu zi cu o reducere aplicata in cos.",
+    cta: "Alege 2 modele",
   },
   {
     title: "3 tricouri",
     value: "best value",
-    text: "Pachet gandit pentru drop-uri compacte si garderoba minimalista.",
-    cta: "Construieste pachetul",
-  },
-  {
-    title: "Stoc limitat",
-    value: "drop activ",
-    text: "Serii mici, marimi clare, fara pagina aglomerata de promotii.",
-    cta: "Verifica marimile",
+    text: "Pachetul cel mai bun pentru garderoba minimalista: trei printuri, aceeasi croiala.",
+    cta: "Alege 3 modele",
   },
 ];
 
@@ -137,19 +157,17 @@ export function BundlePreview() {
       <div className="mx-auto max-w-[1600px]">
         <div className="grid gap-8 md:grid-cols-12 md:items-end">
           <div className="md:col-span-7">
-            <p className="font-mono-xs text-[#ff006f]">
-              Preview conversie - inspirat din retail urban
-            </p>
+            <p className="font-mono-xs text-[#ff006f]">Oferta pentru 2 si 3 tricouri</p>
             <h2 className="mt-3 font-display text-4xl md:text-6xl leading-tight">
               Pachete simple, vizibile inainte de checkout.
             </h2>
           </div>
           <p className="md:col-span-5 text-cream/68 leading-relaxed">
-            Competitorii care vand bine imping valoarea cosului fara sa rupa estetica brandului:
-            bundle-uri clare, beneficii scurte si CTA-uri care duc direct la produs.
+            Ia doua tricouri pentru o rotatie scurta sau trei pentru un set complet. Fara promotii
+            permanente, doar o oferta clara pentru drop.
           </p>
         </div>
-        <div className="mt-12 grid gap-4 md:grid-cols-3">
+        <div className="mt-12 grid gap-4 md:grid-cols-2">
           {bundleDeals.map((deal) => (
             <article key={deal.title} className="border border-cream/20 p-5 md:p-6">
               <div className="flex items-center justify-between gap-4">

@@ -1,19 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CollectionCard } from "@/components/CollectionCard";
-import { FAQAccordion } from "@/components/FAQAccordion";
 import { Hero } from "@/components/Hero";
 import { ProductGrid } from "@/components/ProductCard";
 import {
-  BundleBanner,
   BundlePreview,
-  CompetitivePlaybook,
   Newsletter,
   Reviews,
-  SocialProofGrid,
   ThreeLineDivider,
   TrustStrip,
 } from "@/components/Sections";
-import { lookbookImages } from "@/lib/mock-data";
 import { fetchCollections, fetchProducts } from "@/lib/shopify";
 import { sectionEnabled, useSite } from "@/lib/site-context";
 
@@ -36,13 +30,12 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { products, collections } = Route.useLoaderData();
+  void collections;
   const site = useSite();
   const {
     sections,
     featuredProductIds,
-    featuredCollectionHandles,
     siteMode,
-    faqItems,
     conceptEyebrow,
     conceptTitle,
     conceptBody,
@@ -51,26 +44,11 @@ function Index() {
     featuredTitlePreLaunch,
     featuredTitleLiveShop,
     featuredLinkText,
-    collectionsEyebrow,
-    collectionsTitle,
-    lookbookEyebrow,
-    lookbookTitle,
-    lookbookLinkText,
-    faqEyebrow,
-    faqTitle,
-    faqLinkText,
   } = site;
   const configuredFeatured = featuredProductIds
     .map((id) => products.find((p) => p.id === id || p.handle === id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
   const featured = configuredFeatured.length ? configuredFeatured : products.slice(0, 4);
-  const configuredFeaturedCols = featuredCollectionHandles
-    .map((h) => collections.find((c) => c.handle === h))
-    .filter((c): c is NonNullable<typeof c> => Boolean(c));
-  const featuredCols = configuredFeaturedCols.length
-    ? configuredFeaturedCols
-    : collections.slice(0, 3);
-  const visibleFaqs = faqItems.filter((item) => item.enabled);
 
   return (
     <>
@@ -93,9 +71,9 @@ function Index() {
       <ThreeLineDivider />
 
       {sectionEnabled(sections, "featured-products") && (
-        <section className="px-5 md:px-10 py-20 md:py-32">
+        <section className="featured-showcase px-5 md:px-10 py-20 md:py-32">
           <div className="mx-auto max-w-[1600px]">
-            <div className="flex items-end justify-between gap-6 mb-12">
+            <div className="featured-heading mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="font-mono-xs opacity-60">
                   {siteMode === "pre-launch" ? featuredEyebrowPreLaunch : featuredEyebrowLiveShop}
@@ -118,89 +96,22 @@ function Index() {
       )}
       <ThreeLineDivider />
 
-      <BundleBanner />
-
       <BundlePreview />
-
-      {sectionEnabled(sections, "collections") && (
-        <section className="px-5 md:px-10 py-20 md:py-32 bg-cream border-y border-border">
-          <div className="mx-auto max-w-[1600px]">
-            <div className="flex items-end justify-between mb-12">
-              <div>
-                <p className="font-mono-xs opacity-60">{collectionsEyebrow}</p>
-                <h2 className="font-display text-4xl md:text-6xl mt-3">{collectionsTitle}</h2>
-              </div>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {featuredCols.map((c) => (
-                <CollectionCard key={c.handle} collection={c} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-      <ThreeLineDivider />
-
-      {sectionEnabled(sections, "lookbook") && (
-        <section className="px-5 md:px-10 py-20 md:py-32">
-          <div className="mx-auto max-w-[1600px]">
-            <div className="flex items-end justify-between gap-6 mb-12">
-              <div>
-                <p className="font-mono-xs opacity-60">{lookbookEyebrow}</p>
-                <h2 className="font-display text-4xl md:text-6xl mt-3">{lookbookTitle}</h2>
-              </div>
-              <Link
-                to="/lookbook"
-                className="font-mono-xs hover:opacity-60 underline underline-offset-4"
-              >
-                {lookbookLinkText}
-              </Link>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-              {lookbookImages.map((img, i) => (
-                <Link
-                  to="/lookbook"
-                  key={img.src}
-                  className={`img-zoom relative ${i === 1 ? "md:translate-y-12" : ""}`}
-                >
-                  <img
-                    src={img.src}
-                    alt={img.caption}
-                    loading="lazy"
-                    className="w-full aspect-[3/4] object-cover"
-                  />
-                  <span className="absolute bottom-3 left-3 font-mono-xs text-cream bg-charcoal/60 backdrop-blur px-2 py-1">
-                    {img.caption}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       {sectionEnabled(sections, "reviews") && <Reviews />}
 
-      <CompetitivePlaybook />
-
-      <SocialProofGrid />
-
       {sectionEnabled(sections, "faq") && (
-        <section className="px-5 md:px-10 py-20 md:py-32 bg-cream border-y border-border">
-          <div className="mx-auto max-w-[1600px] grid md:grid-cols-12 gap-12">
-            <div className="md:col-span-4">
-              <p className="font-mono-xs opacity-60">{faqEyebrow}</p>
-              <h2 className="font-display text-4xl md:text-6xl mt-3">{faqTitle}</h2>
-              <Link
-                to="/faq"
-                className="inline-block mt-6 font-mono-xs underline underline-offset-4"
-              >
-                {faqLinkText}
-              </Link>
+        <section className="px-5 md:px-10 py-20 md:py-28 bg-cream border-y border-border">
+          <div className="mx-auto flex max-w-[1600px] flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="font-mono-xs text-[#ff006f]">FAQ</p>
+              <h2 className="mt-3 font-display text-4xl md:text-6xl">
+                Ai intrebari? Intra in sectiunea de FAQ.
+              </h2>
             </div>
-            <div className="md:col-span-8">
-              <FAQAccordion items={visibleFaqs.slice(0, 4)} />
-            </div>
+            <Link to="/faq" className="font-mono-xs underline underline-offset-4 hover:opacity-60">
+              Deschide FAQ
+            </Link>
           </div>
         </section>
       )}
