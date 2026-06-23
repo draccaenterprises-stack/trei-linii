@@ -80,17 +80,17 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/delivery" className="hover:opacity-60">
+                <Link to="/livrare" className="hover:opacity-60">
                   Livrare
                 </Link>
               </li>
               <li>
-                <Link to="/returns" className="hover:opacity-60">
+                <Link to="/retur" className="hover:opacity-60">
                   Retur
                 </Link>
               </li>
               <li>
-                <Link to="/exchange" className="hover:opacity-60">
+                <Link to="/schimb-marime" className="hover:opacity-60">
                   Schimb marime
                 </Link>
               </li>
@@ -116,12 +116,12 @@ export function Footer() {
             <h4 className="font-mono-xs opacity-50 mb-4">Legal</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/terms" className="hover:opacity-60">
+                <Link to="/termeni-si-conditii" className="hover:opacity-60">
                   Termeni si conditii
                 </Link>
               </li>
               <li>
-                <Link to="/privacy" className="hover:opacity-60">
+                <Link to="/confidentialitate" className="hover:opacity-60">
                   Confidentialitate
                 </Link>
               </li>
@@ -131,14 +131,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="https://anpc.ro" className="hover:opacity-60">
+                <Link to="/anpc" className="hover:opacity-60">
                   ANPC
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="https://ec.europa.eu/consumers/odr" className="hover:opacity-60">
-                  SOL
-                </a>
+                <Link to="/sol" className="hover:opacity-60">
+                  SOL/SAL
+                </Link>
               </li>
             </ul>
           </div>

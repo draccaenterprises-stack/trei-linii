@@ -337,7 +337,7 @@ export function Newsletter() {
   return (
     <section
       id="newsletter"
-      className="px-5 md:px-10 py-20 md:py-32 bg-cream border-t border-border"
+      className="px-5 md:px-10 py-20 md:py-32 bg-background border-t border-border"
     >
       <div className="mx-auto max-w-3xl text-center">
         <p className="font-mono-xs opacity-60">

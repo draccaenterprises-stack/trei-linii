@@ -35,15 +35,13 @@ function Index() {
   const {
     sections,
     featuredProductIds,
-    siteMode,
     conceptEyebrow,
     conceptTitle,
     conceptBody,
-    featuredEyebrowPreLaunch,
-    featuredEyebrowLiveShop,
     featuredTitlePreLaunch,
     featuredTitleLiveShop,
     featuredLinkText,
+    siteMode,
   } = site;
   const configuredFeatured = featuredProductIds
     .map((id) => products.find((p) => p.id === id || p.handle === id))
@@ -75,10 +73,7 @@ function Index() {
           <div className="mx-auto max-w-[1600px]">
             <div className="featured-heading mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="font-mono-xs opacity-60">
-                  {siteMode === "pre-launch" ? featuredEyebrowPreLaunch : featuredEyebrowLiveShop}
-                </p>
-                <h2 className="font-display text-4xl md:text-6xl mt-3">
+                <h2 className="font-display text-4xl md:text-6xl">
                   {siteMode === "pre-launch" ? featuredTitlePreLaunch : featuredTitleLiveShop}
                 </h2>
               </div>
@@ -102,16 +97,14 @@ function Index() {
 
       {sectionEnabled(sections, "faq") && (
         <section className="px-5 md:px-10 py-20 md:py-28 bg-cream border-y border-border">
-          <div className="mx-auto flex max-w-[1600px] flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="font-mono-xs text-[#ff006f]">FAQ</p>
-              <h2 className="mt-3 font-display text-4xl md:text-6xl">
-                Ai intrebari? Intra in sectiunea de FAQ.
-              </h2>
-            </div>
-            <Link to="/faq" className="font-mono-xs underline underline-offset-4 hover:opacity-60">
-              Deschide FAQ
-            </Link>
+          <div className="mx-auto max-w-[980px] text-center">
+            <h2 className="font-display text-4xl md:text-6xl">
+              Ai intrebari? Intra in sectiunea de{" "}
+              <Link to="/faq" className="text-[#ff006f] hover:opacity-70">
+                FAQ
+              </Link>
+              .
+            </h2>
           </div>
         </section>
       )}

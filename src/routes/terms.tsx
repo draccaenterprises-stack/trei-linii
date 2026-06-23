@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
-import { LEGAL, hasLegalBusinessDetails } from "@/lib/site";
+import { LEGAL, hasLegalBusinessDetails, legalBusinessFallback } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
@@ -33,8 +33,7 @@ function Terms() {
           </p>
         ) : (
           <p>
-            Datele comerciale complete ale vanzatorului vor fi publicate aici inainte ca magazinul
-            sa accepte comenzi reale. Pentru intrebari de pre-lansare, scrie la {LEGAL.email}.
+            {legalBusinessFallback()} Pentru intrebari de pre-lansare, scrie la {LEGAL.email}.
           </p>
         )}
       </LegalSection>
@@ -101,15 +100,15 @@ function Terms() {
           >
             anpc.ro
           </a>
-          ) sau la platforma europeana de solutionare online a litigiilor (
+          ) sau la procedura SAL administrata de ANPC (
           <a
-            href="https://ec.europa.eu/consumers/odr"
+            href="https://reclamatiisal.anpc.ro/"
             className="underline underline-offset-4 hover:opacity-70"
             rel="noopener noreferrer"
           >
-            ec.europa.eu/consumers/odr
+            reclamatiisal.anpc.ro
           </a>
-          ).
+          ). Platforma europeana ODR/SOL nu mai este folosita.
         </p>
       </LegalSection>
 

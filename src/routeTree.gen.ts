@@ -10,19 +10,26 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as TermeniSiConditiiRouteImport } from './routes/termeni-si-conditii'
+import { Route as SolRouteImport } from './routes/sol'
 import { Route as SizeGuideRouteImport } from './routes/size-guide'
 import { Route as ShopRouteImport } from './routes/shop'
+import { Route as SchimbMarimeRouteImport } from './routes/schimb-marime'
 import { Route as ReturnsRouteImport } from './routes/returns'
+import { Route as ReturRouteImport } from './routes/retur'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LookbookRouteImport } from './routes/lookbook'
+import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as JournalRouteImport } from './routes/journal'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExchangeRouteImport } from './routes/exchange'
 import { Route as DeliveryRouteImport } from './routes/delivery'
 import { Route as CookiesRouteImport } from './routes/cookies'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ConfidentialitateRouteImport } from './routes/confidentialitate'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as CartRouteImport } from './routes/cart'
+import { Route as AnpcRouteImport } from './routes/anpc'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -31,6 +38,16 @@ import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermeniSiConditiiRoute = TermeniSiConditiiRouteImport.update({
+  id: '/termeni-si-conditii',
+  path: '/termeni-si-conditii',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolRoute = SolRouteImport.update({
+  id: '/sol',
+  path: '/sol',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SizeGuideRoute = SizeGuideRouteImport.update({
@@ -43,9 +60,19 @@ const ShopRoute = ShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SchimbMarimeRoute = SchimbMarimeRouteImport.update({
+  id: '/schimb-marime',
+  path: '/schimb-marime',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ReturnsRoute = ReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReturRoute = ReturRouteImport.update({
+  id: '/retur',
+  path: '/retur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -56,6 +83,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const LookbookRoute = LookbookRouteImport.update({
   id: '/lookbook',
   path: '/lookbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivrareRoute = LivrareRouteImport.update({
+  id: '/livrare',
+  path: '/livrare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JournalRoute = JournalRouteImport.update({
@@ -88,6 +120,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConfidentialitateRoute = ConfidentialitateRouteImport.update({
+  id: '/confidentialitate',
+  path: '/confidentialitate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CollectionsRoute = CollectionsRouteImport.update({
   id: '/collections',
   path: '/collections',
@@ -96,6 +133,11 @@ const CollectionsRoute = CollectionsRouteImport.update({
 const CartRoute = CartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnpcRoute = AnpcRouteImport.update({
+  id: '/anpc',
+  path: '/anpc',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -123,19 +165,26 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/anpc': typeof AnpcRoute
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
+  '/confidentialitate': typeof ConfidentialitateRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/delivery': typeof DeliveryRoute
   '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
   '/journal': typeof JournalRoute
+  '/livrare': typeof LivrareRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
+  '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
+  '/schimb-marime': typeof SchimbMarimeRoute
   '/shop': typeof ShopRoute
   '/size-guide': typeof SizeGuideRoute
+  '/sol': typeof SolRoute
+  '/termeni-si-conditii': typeof TermeniSiConditiiRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
@@ -143,19 +192,26 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/anpc': typeof AnpcRoute
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
+  '/confidentialitate': typeof ConfidentialitateRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/delivery': typeof DeliveryRoute
   '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
   '/journal': typeof JournalRoute
+  '/livrare': typeof LivrareRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
+  '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
+  '/schimb-marime': typeof SchimbMarimeRoute
   '/shop': typeof ShopRoute
   '/size-guide': typeof SizeGuideRoute
+  '/sol': typeof SolRoute
+  '/termeni-si-conditii': typeof TermeniSiConditiiRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
@@ -164,19 +220,26 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin': typeof AdminRoute
+  '/anpc': typeof AnpcRoute
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
+  '/confidentialitate': typeof ConfidentialitateRoute
   '/contact': typeof ContactRoute
   '/cookies': typeof CookiesRoute
   '/delivery': typeof DeliveryRoute
   '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
   '/journal': typeof JournalRoute
+  '/livrare': typeof LivrareRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
+  '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
+  '/schimb-marime': typeof SchimbMarimeRoute
   '/shop': typeof ShopRoute
   '/size-guide': typeof SizeGuideRoute
+  '/sol': typeof SolRoute
+  '/termeni-si-conditii': typeof TermeniSiConditiiRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
 }
@@ -186,19 +249,26 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/anpc'
     | '/cart'
     | '/collections'
+    | '/confidentialitate'
     | '/contact'
     | '/cookies'
     | '/delivery'
     | '/exchange'
     | '/faq'
     | '/journal'
+    | '/livrare'
     | '/lookbook'
     | '/privacy'
+    | '/retur'
     | '/returns'
+    | '/schimb-marime'
     | '/shop'
     | '/size-guide'
+    | '/sol'
+    | '/termeni-si-conditii'
     | '/terms'
     | '/product/$handle'
   fileRoutesByTo: FileRoutesByTo
@@ -206,19 +276,26 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/anpc'
     | '/cart'
     | '/collections'
+    | '/confidentialitate'
     | '/contact'
     | '/cookies'
     | '/delivery'
     | '/exchange'
     | '/faq'
     | '/journal'
+    | '/livrare'
     | '/lookbook'
     | '/privacy'
+    | '/retur'
     | '/returns'
+    | '/schimb-marime'
     | '/shop'
     | '/size-guide'
+    | '/sol'
+    | '/termeni-si-conditii'
     | '/terms'
     | '/product/$handle'
   id:
@@ -226,19 +303,26 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/admin'
+    | '/anpc'
     | '/cart'
     | '/collections'
+    | '/confidentialitate'
     | '/contact'
     | '/cookies'
     | '/delivery'
     | '/exchange'
     | '/faq'
     | '/journal'
+    | '/livrare'
     | '/lookbook'
     | '/privacy'
+    | '/retur'
     | '/returns'
+    | '/schimb-marime'
     | '/shop'
     | '/size-guide'
+    | '/sol'
+    | '/termeni-si-conditii'
     | '/terms'
     | '/product/$handle'
   fileRoutesById: FileRoutesById
@@ -247,19 +331,26 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRoute
+  AnpcRoute: typeof AnpcRoute
   CartRoute: typeof CartRoute
   CollectionsRoute: typeof CollectionsRoute
+  ConfidentialitateRoute: typeof ConfidentialitateRoute
   ContactRoute: typeof ContactRoute
   CookiesRoute: typeof CookiesRoute
   DeliveryRoute: typeof DeliveryRoute
   ExchangeRoute: typeof ExchangeRoute
   FaqRoute: typeof FaqRoute
   JournalRoute: typeof JournalRoute
+  LivrareRoute: typeof LivrareRoute
   LookbookRoute: typeof LookbookRoute
   PrivacyRoute: typeof PrivacyRoute
+  ReturRoute: typeof ReturRoute
   ReturnsRoute: typeof ReturnsRoute
+  SchimbMarimeRoute: typeof SchimbMarimeRoute
   ShopRoute: typeof ShopRoute
   SizeGuideRoute: typeof SizeGuideRoute
+  SolRoute: typeof SolRoute
+  TermeniSiConditiiRoute: typeof TermeniSiConditiiRoute
   TermsRoute: typeof TermsRoute
   ProductHandleRoute: typeof ProductHandleRoute
 }
@@ -271,6 +362,20 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/termeni-si-conditii': {
+      id: '/termeni-si-conditii'
+      path: '/termeni-si-conditii'
+      fullPath: '/termeni-si-conditii'
+      preLoaderRoute: typeof TermeniSiConditiiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sol': {
+      id: '/sol'
+      path: '/sol'
+      fullPath: '/sol'
+      preLoaderRoute: typeof SolRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/size-guide': {
@@ -287,11 +392,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/schimb-marime': {
+      id: '/schimb-marime'
+      path: '/schimb-marime'
+      fullPath: '/schimb-marime'
+      preLoaderRoute: typeof SchimbMarimeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/returns': {
       id: '/returns'
       path: '/returns'
       fullPath: '/returns'
       preLoaderRoute: typeof ReturnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retur': {
+      id: '/retur'
+      path: '/retur'
+      fullPath: '/retur'
+      preLoaderRoute: typeof ReturRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -306,6 +425,13 @@ declare module '@tanstack/react-router' {
       path: '/lookbook'
       fullPath: '/lookbook'
       preLoaderRoute: typeof LookbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/livrare': {
+      id: '/livrare'
+      path: '/livrare'
+      fullPath: '/livrare'
+      preLoaderRoute: typeof LivrareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/journal': {
@@ -350,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/confidentialitate': {
+      id: '/confidentialitate'
+      path: '/confidentialitate'
+      fullPath: '/confidentialitate'
+      preLoaderRoute: typeof ConfidentialitateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/collections': {
       id: '/collections'
       path: '/collections'
@@ -362,6 +495,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof CartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/anpc': {
+      id: '/anpc'
+      path: '/anpc'
+      fullPath: '/anpc'
+      preLoaderRoute: typeof AnpcRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -399,19 +539,26 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRoute,
+  AnpcRoute: AnpcRoute,
   CartRoute: CartRoute,
   CollectionsRoute: CollectionsRoute,
+  ConfidentialitateRoute: ConfidentialitateRoute,
   ContactRoute: ContactRoute,
   CookiesRoute: CookiesRoute,
   DeliveryRoute: DeliveryRoute,
   ExchangeRoute: ExchangeRoute,
   FaqRoute: FaqRoute,
   JournalRoute: JournalRoute,
+  LivrareRoute: LivrareRoute,
   LookbookRoute: LookbookRoute,
   PrivacyRoute: PrivacyRoute,
+  ReturRoute: ReturRoute,
   ReturnsRoute: ReturnsRoute,
+  SchimbMarimeRoute: SchimbMarimeRoute,
   ShopRoute: ShopRoute,
   SizeGuideRoute: SizeGuideRoute,
+  SolRoute: SolRoute,
+  TermeniSiConditiiRoute: TermeniSiConditiiRoute,
   TermsRoute: TermsRoute,
   ProductHandleRoute: ProductHandleRoute,
 }

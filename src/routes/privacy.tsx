@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
-import { LEGAL, hasLegalBusinessDetails } from "@/lib/site";
+import { LEGAL, hasLegalBusinessDetails, legalBusinessFallback } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
@@ -31,8 +31,8 @@ function Privacy() {
           </p>
         ) : (
           <p>
-            Datele complete ale operatorului vor fi publicate aici inainte de activarea comenzilor
-            reale. Pentru orice solicitare privind datele tale, scrie la {LEGAL.email}.
+            {legalBusinessFallback()} Pentru orice solicitare privind datele tale, scrie la{" "}
+            {LEGAL.email}.
           </p>
         )}
       </LegalSection>
