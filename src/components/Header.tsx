@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu, ShoppingBag } from "lucide-react";
+import { Menu } from "lucide-react";
 import * as React from "react";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
@@ -33,13 +33,15 @@ function useCountdown(target: string): number | null {
 const preLaunchNav = [
   { to: "/shop", label: "SHOP" },
   { to: "/about", label: "Despre noi" },
-  { to: "/#newsletter", label: "Inscriere" },
+  { to: "/lookbook", label: "Lookbook" },
+  { to: "/journal", label: "Jurnal" },
 ] as const;
 
 const liveShopNav = [
   { to: "/shop", label: "SHOP" },
   { to: "/about", label: "Despre noi" },
-  { to: "/contact", label: "Contact" },
+  { to: "/lookbook", label: "Lookbook" },
+  { to: "/journal", label: "Jurnal" },
 ] as const;
 
 function NavLink({ to, label, accentColor }: { to: string; label: string; accentColor: string }) {
@@ -66,6 +68,16 @@ function NavLink({ to, label, accentColor }: { to: string; label: string; accent
     >
       {label}
     </Link>
+  );
+}
+
+function ThreeLineMark({ className = "" }: { className?: string }) {
+  return (
+    <span className={`tl-line-mark ${className}`} aria-hidden="true">
+      <span />
+      <span />
+      <span />
+    </span>
   );
 }
 
@@ -136,7 +148,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-border">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 h-16 flex items-center justify-between gap-6">
-        <Link to="/" className="inline-flex items-center" aria-label={logoText}>
+        <Link to="/" className="inline-flex items-center gap-3" aria-label={logoText}>
           <img src={logoFull} alt={logoText} className="h-8 md:h-10 w-auto object-contain" />
         </Link>
 
@@ -150,10 +162,10 @@ export function Header() {
           {siteMode === "live-shop" ? (
             <button
               onClick={open}
-              className="font-mono-xs flex items-center gap-1.5 hover:opacity-60 transition-opacity"
+              className="font-mono-xs flex items-center gap-2 text-[#ff006f] hover:opacity-70 transition-opacity"
               aria-label="Deschide cosul"
             >
-              <ShoppingBag className="h-4 w-4" strokeWidth={1.25} />
+              <ThreeLineMark className="w-7" />
               <span>Cos ({count})</span>
             </button>
           ) : (

@@ -141,7 +141,25 @@ export function ProductCard({ product }: { product: Product }) {
   );
 }
 
-export function ProductGrid({ products }: { products: Product[] }) {
+export function ProductGrid({
+  products,
+  carousel = false,
+}: {
+  products: Product[];
+  carousel?: boolean;
+}) {
+  if (carousel) {
+    return (
+      <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden">
+        {products.map((p) => (
+          <div key={p.id} className="w-[74%] shrink-0 snap-start md:w-[300px]">
+            <ProductCard product={p} />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 md:gap-y-16">
       {products.map((p) => (

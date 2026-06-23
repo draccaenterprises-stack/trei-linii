@@ -47,6 +47,16 @@ export function TrustStrip() {
   );
 }
 
+export function ThreeLineDivider() {
+  return (
+    <div className="tl-divider" aria-hidden="true">
+      <span />
+      <span />
+      <span />
+    </div>
+  );
+}
+
 export function BundleBanner() {
   const {
     siteMode,

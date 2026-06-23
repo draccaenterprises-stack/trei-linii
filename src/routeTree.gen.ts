@@ -15,6 +15,7 @@ import { Route as ShopRouteImport } from './routes/shop'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LookbookRouteImport } from './routes/lookbook'
+import { Route as JournalRouteImport } from './routes/journal'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ExchangeRouteImport } from './routes/exchange'
 import { Route as DeliveryRouteImport } from './routes/delivery'
@@ -55,6 +56,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const LookbookRoute = LookbookRouteImport.update({
   id: '/lookbook',
   path: '/lookbook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JournalRoute = JournalRouteImport.update({
+  id: '/journal',
+  path: '/journal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -124,6 +130,7 @@ export interface FileRoutesByFullPath {
   '/delivery': typeof DeliveryRoute
   '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
+  '/journal': typeof JournalRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
   '/returns': typeof ReturnsRoute
@@ -143,6 +150,7 @@ export interface FileRoutesByTo {
   '/delivery': typeof DeliveryRoute
   '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
+  '/journal': typeof JournalRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
   '/returns': typeof ReturnsRoute
@@ -163,6 +171,7 @@ export interface FileRoutesById {
   '/delivery': typeof DeliveryRoute
   '/exchange': typeof ExchangeRoute
   '/faq': typeof FaqRoute
+  '/journal': typeof JournalRoute
   '/lookbook': typeof LookbookRoute
   '/privacy': typeof PrivacyRoute
   '/returns': typeof ReturnsRoute
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/exchange'
     | '/faq'
+    | '/journal'
     | '/lookbook'
     | '/privacy'
     | '/returns'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/exchange'
     | '/faq'
+    | '/journal'
     | '/lookbook'
     | '/privacy'
     | '/returns'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/delivery'
     | '/exchange'
     | '/faq'
+    | '/journal'
     | '/lookbook'
     | '/privacy'
     | '/returns'
@@ -242,6 +254,7 @@ export interface RootRouteChildren {
   DeliveryRoute: typeof DeliveryRoute
   ExchangeRoute: typeof ExchangeRoute
   FaqRoute: typeof FaqRoute
+  JournalRoute: typeof JournalRoute
   LookbookRoute: typeof LookbookRoute
   PrivacyRoute: typeof PrivacyRoute
   ReturnsRoute: typeof ReturnsRoute
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/lookbook'
       fullPath: '/lookbook'
       preLoaderRoute: typeof LookbookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journal': {
+      id: '/journal'
+      path: '/journal'
+      fullPath: '/journal'
+      preLoaderRoute: typeof JournalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -386,6 +406,7 @@ const rootRouteChildren: RootRouteChildren = {
   DeliveryRoute: DeliveryRoute,
   ExchangeRoute: ExchangeRoute,
   FaqRoute: FaqRoute,
+  JournalRoute: JournalRoute,
   LookbookRoute: LookbookRoute,
   PrivacyRoute: PrivacyRoute,
   ReturnsRoute: ReturnsRoute,

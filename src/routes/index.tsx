@@ -10,6 +10,7 @@ import {
   Newsletter,
   Reviews,
   SocialProofGrid,
+  ThreeLineDivider,
   TrustStrip,
 } from "@/components/Sections";
 import { lookbookImages } from "@/lib/mock-data";
@@ -76,6 +77,7 @@ function Index() {
       {sectionEnabled(sections, "hero") && <Hero products={products} />}
 
       <TrustStrip />
+      <ThreeLineDivider />
 
       <section className="px-5 md:px-10 py-16 md:py-24 border-b border-border">
         <div className="mx-auto max-w-[1600px] grid md:grid-cols-12 gap-10">
@@ -88,6 +90,7 @@ function Index() {
           </div>
         </div>
       </section>
+      <ThreeLineDivider />
 
       {sectionEnabled(sections, "featured-products") && (
         <section className="px-5 md:px-10 py-20 md:py-32">
@@ -108,10 +111,12 @@ function Index() {
                 {featuredLinkText}
               </Link>
             </div>
-            <ProductGrid products={featured} />
+            <ProductGrid products={featured} carousel />
+            <p className="mt-4 font-mono-xs opacity-45">← Gliseaza pentru mai multe modele</p>
           </div>
         </section>
       )}
+      <ThreeLineDivider />
 
       <BundleBanner />
 
@@ -134,6 +139,7 @@ function Index() {
           </div>
         </section>
       )}
+      <ThreeLineDivider />
 
       {sectionEnabled(sections, "lookbook") && (
         <section className="px-5 md:px-10 py-20 md:py-32">
