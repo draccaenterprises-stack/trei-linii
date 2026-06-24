@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { FAQAccordion } from "@/components/FAQAccordion";
 import { useSite } from "@/lib/site-context";
 import { pageMeta } from "@/lib/seo";
@@ -67,6 +67,15 @@ function FAQPage() {
         </p>
         <div className="mt-16">
           <FAQAccordion items={visibleFaqs} />
+        </div>
+        <div className="mt-14 border-t border-border pt-8">
+          <p className="font-display text-3xl md:text-4xl">
+            Ai alte intrebari?{" "}
+            <Link to="/contact" className="text-[#ff006f] hover:opacity-70">
+              Da-ne un mail
+            </Link>{" "}
+            si vom raspunde cat se poate de repede.
+          </p>
         </div>
       </div>
     </div>

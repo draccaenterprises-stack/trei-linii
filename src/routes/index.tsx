@@ -40,7 +40,6 @@ function Index() {
     conceptBody,
     featuredTitlePreLaunch,
     featuredTitleLiveShop,
-    featuredLinkText,
     siteMode,
   } = site;
   const configuredFeatured = featuredProductIds
@@ -77,19 +76,22 @@ function Index() {
                   {siteMode === "pre-launch" ? featuredTitlePreLaunch : featuredTitleLiveShop}
                 </h2>
               </div>
-              <Link
-                to="/shop"
-                className="font-mono-xs hover:opacity-60 underline underline-offset-4"
-              >
-                {featuredLinkText}
-              </Link>
             </div>
             <ProductGrid products={featured} carousel />
-            <p className="mt-4 font-mono-xs opacity-45">← Gliseaza pentru mai multe modele</p>
+            <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <p className="font-mono-xs opacity-45">← Gliseaza pentru mai multe modele</p>
+              <Link
+                to="/shop"
+                className="font-mono-xs text-[#ff006f] underline underline-offset-4 hover:opacity-70"
+              >
+                Vezi toate produsele si colectiile
+              </Link>
+            </div>
           </div>
         </section>
       )}
       <ThreeLineDivider />
+      <div className="h-8 bg-background md:h-10" aria-hidden="true" />
 
       <BundlePreview />
 

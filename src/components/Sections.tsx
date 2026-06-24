@@ -53,23 +53,30 @@ export function ThreeLineDivider() {
   React.useEffect(() => {
     const root = rootRef.current;
     if (!root) return undefined;
+    const lines = Array.from(root.querySelectorAll("span"));
 
     const update = () => {
       const rect = root.getBoundingClientRect();
       const viewportHeight = window.innerHeight || 1;
-      const progress = Math.min(
-        1,
-        Math.max(0, (viewportHeight - rect.top) / (viewportHeight * 0.3)),
-      );
+      const start = viewportHeight * 0.92;
+      const end = viewportHeight * 0.3;
+      const progress = Math.min(1, Math.max(0, (start - rect.top) / Math.max(1, start - end)));
       root.style.setProperty("--tl-divider-progress", String(progress));
+      lines.forEach((line, index) => {
+        const offset = index * 0.08;
+        const lineProgress = Math.min(1, Math.max(0, (progress - offset) / (1 - offset)));
+        line.style.transform = `scaleX(${lineProgress})`;
+      });
     };
 
     update();
     window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("touchmove", update, { passive: true });
     window.addEventListener("resize", update);
 
     return () => {
       window.removeEventListener("scroll", update);
+      window.removeEventListener("touchmove", update);
       window.removeEventListener("resize", update);
     };
   }, []);
@@ -255,13 +262,6 @@ export function Reviews() {
             <p className="font-mono-xs opacity-60">Social proof</p>
             <h2 className="font-display text-4xl md:text-6xl mt-3">Feedback clienti.</h2>
           </div>
-        </div>
-        <div className="mb-10 flex flex-wrap gap-2">
-          {["Fit oversized validat", "Material dens 240gsm", "Retur 14 zile"].map((item) => (
-            <span key={item} className="border border-border px-3 py-1.5 font-mono-xs opacity-70">
-              {item}
-            </span>
-          ))}
         </div>
         <div className="grid md:grid-cols-3 gap-8 md:gap-12">
           {reviews.map((r) => (
