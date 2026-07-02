@@ -162,16 +162,19 @@ function Chapter({
         }`}
       >
         <div className="chapter-media lg:col-span-6">
-          <div className="img-zoom bg-warm-grey">
+          <div className="shop-image-stage img-zoom relative bg-warm-grey">
             <img
               src={mainImage}
               alt={`${product.title} - imagine principala`}
-              className="aspect-[5/6] w-full object-cover"
+              className="shop-image-main aspect-[5/6] w-full object-cover"
               loading={index === 0 ? "eager" : "lazy"}
             />
+            <span className="shop-image-note absolute left-4 top-4 bg-charcoal px-3 py-2 font-mono-xs text-cream md:left-6 md:top-6">
+              capitol {number}
+            </span>
           </div>
           <div
-            className={`mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
+            className={`shop-image-pop mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
               reverse ? "md:ml-0" : "md:ml-[54%]"
             }`}
           >
@@ -204,12 +207,14 @@ function Chapter({
           <ChapterQuickAdd product={product} isDark={isDark} />
 
           <div className="mt-12 hidden md:block">
-            <img
-              src={contextImage}
-              alt=""
-              className="aspect-[16/10] w-full object-cover"
-              loading="lazy"
-            />
+            <div className="shop-context-image overflow-hidden">
+              <img
+                src={contextImage}
+                alt=""
+                className="aspect-[16/10] w-full object-cover"
+                loading="lazy"
+              />
+            </div>
             <p className={`mt-3 font-mono-xs ${isDark ? "text-cream/45" : "opacity-45"}`}>
               {contextCaptions[index]}
             </p>

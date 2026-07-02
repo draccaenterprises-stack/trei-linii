@@ -186,10 +186,89 @@
     opacity: 1;
     transform: none;
   }
+
+  .shop-image-stage,
+  .shop-image-pop,
+  .shop-context-image,
+  .shop-image-note {
+    will-change: transform, opacity;
+  }
+
+  .shop-image-main {
+    transform-origin: 50% 38%;
+  }
+
+  @keyframes shop-image-rise {
+    from {
+      opacity: 0;
+      transform: translateY(34px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes shop-image-zoom {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes shop-image-pop {
+    from {
+      opacity: 0;
+      transform: translateY(22px) scale(0.88) rotate(-1deg);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes shop-note-pop {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   @supports (animation-timeline: view()) {
     .shop-reveal {
       animation: fade-up 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
       animation-range: entry 0% cover 26%;
+      animation-timeline: view();
+    }
+    .shop-image-stage {
+      animation: shop-image-rise 950ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-range: entry 4% cover 34%;
+      animation-timeline: view();
+    }
+    .shop-image-main {
+      animation: shop-image-zoom 1200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-range: entry 0% cover 40%;
+      animation-timeline: view();
+    }
+    .shop-image-pop {
+      animation: shop-image-pop 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-range: entry 18% cover 42%;
+      animation-timeline: view();
+    }
+    .shop-image-note {
+      animation: shop-note-pop 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-range: entry 20% cover 34%;
+      animation-timeline: view();
+    }
+    .shop-context-image {
+      animation: shop-image-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-range: entry 8% cover 34%;
       animation-timeline: view();
     }
   }
@@ -304,11 +383,21 @@
   .hero-media img,
   .marquee-track,
   .marquee-divider-track,
-  .shop-reveal {
+  .shop-reveal,
+  .shop-image-stage,
+  .shop-image-main,
+  .shop-image-pop,
+  .shop-image-note,
+  .shop-context-image {
     animation: none !important;
   }
   .fade-up,
-  .shop-reveal {
+  .shop-reveal,
+  .shop-image-stage,
+  .shop-image-main,
+  .shop-image-pop,
+  .shop-image-note,
+  .shop-context-image {
     opacity: 1 !important;
     transform: none !important;
   }
