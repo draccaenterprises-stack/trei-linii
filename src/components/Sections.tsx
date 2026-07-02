@@ -28,14 +28,20 @@ export function TrustStrip() {
   );
 
   return (
-    <section className="border-y border-border bg-background">
-      <div className="mx-auto grid max-w-[1600px] md:grid-cols-4 divide-y md:divide-y-0 md:divide-x divide-border">
+    <section className="trust-strip border-y border-border bg-background">
+      <div className="trust-strip-grid mx-auto grid max-w-[1600px] grid-cols-2 gap-3 px-4 py-4 md:grid-cols-4 md:gap-0 md:divide-x md:divide-border md:px-0 md:py-0">
         {items.map((item, index) => {
           const Icon = trustIcons[index % trustIcons.length];
           return (
-            <div key={item.id} className="px-5 md:px-10 py-6 flex gap-4">
-              <Icon className="h-5 w-5 shrink-0" strokeWidth={1.25} />
-              <div>
+            <div
+              key={item.id}
+              className="trust-card flex min-h-36 flex-col justify-between rounded-xl border border-border bg-card p-4 md:min-h-0 md:flex-row md:justify-start md:gap-4 md:rounded-none md:border-0 md:bg-transparent md:px-10 md:py-6"
+            >
+              <Icon
+                className="h-5 w-5 shrink-0 text-[#ff006f] md:text-current"
+                strokeWidth={1.25}
+              />
+              <div className="pt-5 md:pt-0">
                 <h3 className="font-mono-xs">{item.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{item.text}</p>
               </div>

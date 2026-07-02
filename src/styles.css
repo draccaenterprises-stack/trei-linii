@@ -240,6 +240,17 @@
     }
   }
 
+  @keyframes trust-card-shadow {
+    from {
+      box-shadow: 0 5px 14px rgb(26 26 24 / 0.05);
+      transform: translateY(8px);
+    }
+    to {
+      box-shadow: 0 18px 40px rgb(26 26 24 / 0.15);
+      transform: translateY(0);
+    }
+  }
+
   @supports (animation-timeline: view()) {
     .shop-reveal {
       animation: fade-up 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -270,6 +281,32 @@
       animation: shop-image-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
       animation-range: entry 8% cover 34%;
       animation-timeline: view();
+    }
+  }
+
+  @media (max-width: 767px) {
+    .trust-card {
+      box-shadow: 0 8px 18px rgb(26 26 24 / 0.07);
+    }
+
+    @supports (animation-timeline: view()) {
+      .trust-card {
+        animation: trust-card-shadow 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        animation-range: entry 8% cover 48%;
+        animation-timeline: view();
+      }
+
+      .trust-card:nth-child(2) {
+        animation-range: entry 12% cover 52%;
+      }
+
+      .trust-card:nth-child(3) {
+        animation-range: entry 16% cover 56%;
+      }
+
+      .trust-card:nth-child(4) {
+        animation-range: entry 20% cover 60%;
+      }
     }
   }
 
@@ -405,5 +442,9 @@
   .tl-divider span:nth-child(2),
   .tl-divider span:nth-child(3) {
     transition: none !important;
+  }
+  .trust-card {
+    animation: none !important;
+    transform: none !important;
   }
 }
