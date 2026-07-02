@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { isKlaviyoConfigured, subscribeToKlaviyo } from "@/lib/klaviyo";
 import { lookbookImages, reviews } from "@/lib/mock-data";
+import { clamp, createFrameLoop, createFrameScheduler } from "@/lib/motion";
 import { useSite, type TrustItem } from "@/lib/site-context";
 
 const trustIcons = [Ruler, ShieldCheck, RefreshCw, CreditCard, Truck, RotateCcw];
@@ -34,43 +35,48 @@ export function TrustStrip() {
     const cards = Array.from(root.querySelectorAll<HTMLElement>(".trust-card"));
     if (!cards.length) return undefined;
 
-    const isMobile = () => window.matchMedia("(max-width: 767px)").matches;
+    const mobileQuery = window.matchMedia("(max-width: 767px)");
 
     const updateMobileDepth = () => {
-      if (!isMobile()) {
+      if (!mobileQuery.matches) {
         cards.forEach((card) => {
-          card.style.removeProperty("box-shadow");
-          card.style.removeProperty("transform");
+          card.style.removeProperty("--trust-depth");
+          card.style.removeProperty("--trust-lift");
+          card.style.removeProperty("--trust-scale");
         });
         return;
       }
 
       cards.forEach((card, index) => {
         const rect = card.getBoundingClientRect();
-        const progress = Math.min(
-          1,
-          Math.max(0, (window.innerHeight * 0.92 - rect.top) / (window.innerHeight * 0.44)),
+        const progress = clamp(
+          (window.innerHeight * 0.92 - rect.top) / (window.innerHeight * 0.44),
         );
         const lift = Math.round((1 - progress) * 10);
-        const blur = 22 + Math.round(progress * 28);
-        const alpha = 0.14 + progress * 0.1;
-        card.style.boxShadow = `0 ${10 + Math.round(progress * 10)}px ${blur}px rgb(26 26 24 / ${alpha})`;
-        card.style.transform = `translateY(${lift}px) scale(${0.985 + progress * 0.015})`;
+        card.style.setProperty("--trust-depth", (0.28 + progress * 0.58).toFixed(3));
+        card.style.setProperty("--trust-lift", `${lift}px`);
+        card.style.setProperty("--trust-scale", (0.985 + progress * 0.015).toFixed(3));
         card.style.transitionDelay = `${index * 55}ms`;
       });
     };
 
+    const scheduler = createFrameScheduler(updateMobileDepth);
+    const scheduleUpdate = () => scheduler.schedule();
+
     cards.forEach((card) => card.classList.add("is-visible"));
-    updateMobileDepth();
-    window.addEventListener("scroll", updateMobileDepth, { passive: true });
-    window.addEventListener("touchmove", updateMobileDepth, { passive: true });
-    window.addEventListener("resize", updateMobileDepth);
+    scheduler.runNow();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("touchmove", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    mobileQuery.addEventListener("change", scheduleUpdate);
 
     document.documentElement.classList.add("motion-ready");
     return () => {
-      window.removeEventListener("scroll", updateMobileDepth);
-      window.removeEventListener("touchmove", updateMobileDepth);
-      window.removeEventListener("resize", updateMobileDepth);
+      scheduler.cancel();
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("touchmove", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      mobileQuery.removeEventListener("change", scheduleUpdate);
     };
   }, [items.length]);
 
@@ -113,24 +119,28 @@ export function ThreeLineDivider() {
       const viewportHeight = window.innerHeight || 1;
       const start = viewportHeight * 0.92;
       const end = viewportHeight * 0.3;
-      const progress = Math.min(1, Math.max(0, (start - rect.top) / Math.max(1, start - end)));
+      const progress = clamp((start - rect.top) / Math.max(1, start - end));
       root.style.setProperty("--tl-divider-progress", String(progress));
       lines.forEach((line, index) => {
         const offset = index * 0.08;
-        const lineProgress = Math.min(1, Math.max(0, (progress - offset) / (1 - offset)));
+        const lineProgress = clamp((progress - offset) / (1 - offset));
         line.style.transform = `scaleX(${lineProgress})`;
       });
     };
 
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("touchmove", update, { passive: true });
-    window.addEventListener("resize", update);
+    const scheduler = createFrameScheduler(update);
+    const scheduleUpdate = () => scheduler.schedule();
+
+    scheduler.runNow();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("touchmove", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
 
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("touchmove", update);
-      window.removeEventListener("resize", update);
+      scheduler.cancel();
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("touchmove", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
     };
   }, []);
 
@@ -159,22 +169,49 @@ export function MarqueeDivider() {
     const track = trackRef.current;
     if (!track) return undefined;
 
-    let frame = 0;
     let offset = 0;
-    let lastTime = performance.now();
+    let loopWidth = 0;
+    const viewport = track.parentElement;
 
-    const tick = (time: number) => {
-      const delta = Math.min(40, time - lastTime);
-      lastTime = time;
+    const measure = () => {
       const firstStrip = track.firstElementChild as HTMLElement | null;
-      const loopWidth = firstStrip ? firstStrip.offsetWidth + 40 : track.scrollWidth / 3;
-      offset = (offset + delta * 0.055) % Math.max(1, loopWidth);
-      track.style.transform = `translate3d(${-offset}px, 0, 0)`;
-      frame = window.requestAnimationFrame(tick);
+      loopWidth = firstStrip ? firstStrip.offsetWidth + 40 : track.scrollWidth / 3;
     };
 
-    frame = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frame);
+    const loop = createFrameLoop((_, delta) => {
+      if (!loopWidth) measure();
+      offset = (offset + delta * 0.055) % Math.max(1, loopWidth);
+      track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+    });
+
+    const syncVisibility = () => {
+      if (document.hidden) loop.stop();
+      else loop.start();
+    };
+
+    const observer =
+      viewport && "IntersectionObserver" in window
+        ? new IntersectionObserver(
+            ([entry]) => {
+              if (entry?.isIntersecting && !document.hidden) loop.start();
+              else loop.stop();
+            },
+            { rootMargin: "160px 0px" },
+          )
+        : null;
+
+    measure();
+    if (observer && viewport) observer.observe(viewport);
+    else loop.start();
+    window.addEventListener("resize", measure);
+    document.addEventListener("visibilitychange", syncVisibility);
+
+    return () => {
+      observer?.disconnect();
+      loop.stop();
+      window.removeEventListener("resize", measure);
+      document.removeEventListener("visibilitychange", syncVisibility);
+    };
   }, []);
 
   const strip = (
@@ -527,6 +564,7 @@ export function SocialProofGrid() {
               <img
                 src={image.src}
                 alt={image.caption}
+                decoding="async"
                 loading="lazy"
                 className="aspect-[4/5] w-full object-cover"
               />

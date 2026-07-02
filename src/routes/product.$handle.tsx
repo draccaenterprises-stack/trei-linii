@@ -116,6 +116,7 @@ function ProductPage() {
                 <img
                   src={img}
                   alt={`${product.title} ${i === 0 ? "spate" : "detaliu"}`}
+                  decoding="async"
                   loading={i === 0 ? "eager" : "lazy"}
                   className="w-full h-full object-cover"
                 />
@@ -270,6 +271,7 @@ function ProductPage() {
                   src={item.images[0]}
                   alt={item.title}
                   className="aspect-[3/4] w-full object-cover bg-warm-grey"
+                  decoding="async"
                   loading="lazy"
                 />
                 <div className="mt-3 flex justify-between gap-3">

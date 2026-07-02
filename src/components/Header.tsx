@@ -123,7 +123,7 @@ export function Announcement() {
         {tickerMessages.map((message, index) => (
           <span
             key={message}
-            className={`absolute transition-all duration-700 ease-out ${
+            className={`absolute transition-[opacity,transform] duration-700 ease-out ${
               index === tickerIndex ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
             }`}
             style={index === tickerIndex ? { color: accentColor } : undefined}
@@ -144,7 +144,7 @@ export function Header() {
   const nav = siteMode === "pre-launch" ? preLaunchNav : liveShopNav;
 
   return (
-    <header className="sticky top-0 z-40 bg-background/85 backdrop-blur border-b border-border">
+    <header className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur">
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 h-16 flex items-center justify-between gap-6">
         <Link to="/" className="inline-flex items-center gap-3" aria-label={logoText}>
           <img src={logoFull} alt={logoText} className="h-8 md:h-10 w-auto object-contain" />

@@ -56,6 +56,7 @@ function Manifest() {
               src={lookbookOne}
               alt="Doua persoane purtand tricouri oversized Trei Linii"
               className="aspect-[4/5] w-full object-cover"
+              decoding="async"
               loading="eager"
             />
           </div>

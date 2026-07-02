@@ -86,6 +86,7 @@ function CartRow({
         <img
           src={line.image}
           alt={line.title}
+          decoding="async"
           className="w-full h-full object-cover"
           loading="lazy"
         />

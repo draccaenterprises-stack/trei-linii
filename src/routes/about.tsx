@@ -41,6 +41,7 @@ function About() {
               src={heroImg}
               alt="Trei Linii purtat in context urban"
               className="aspect-[4/5] w-full object-cover"
+              decoding="async"
               loading="eager"
             />
           </div>
@@ -82,18 +83,21 @@ function About() {
             src={lookbookOne}
             alt="Croiala oversized Trei Linii"
             className="md:col-span-5 aspect-[3/4] w-full object-cover bg-warm-grey"
+            decoding="async"
             loading="lazy"
           />
           <img
             src={productDetail}
             alt="Detaliu design pe spate Trei Linii"
             className="md:col-span-4 aspect-[3/4] w-full object-cover bg-warm-grey md:mt-20"
+            decoding="async"
             loading="lazy"
           />
           <img
             src={lookbookTwo}
             alt="Material dens si cadere relaxata"
             className="md:col-span-3 aspect-[3/4] w-full object-cover bg-warm-grey md:mt-40"
+            decoding="async"
             loading="lazy"
           />
         </div>

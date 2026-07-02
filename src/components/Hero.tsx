@@ -92,9 +92,12 @@ export function Hero({ products = [] }: { products?: Product[] }) {
               alt={slide.alt}
               width={1600}
               height={1200}
+              decoding="async"
               fetchPriority={index === 0 ? "high" : "auto"}
               loading={index === 0 ? "eager" : "lazy"}
-              className="h-full min-h-full w-full shrink-0 object-cover object-[50%_28%]"
+              className={`h-full min-h-full w-full shrink-0 object-cover object-[50%_28%] ${
+                index === activeSlide ? "hero-slide-active" : ""
+              }`}
             />
           ))}
         </div>
@@ -106,7 +109,7 @@ export function Hero({ products = [] }: { products?: Product[] }) {
             key={slide.src}
             type="button"
             onClick={() => setActiveSlide(index)}
-            className={`h-12 w-1.5 transition-all ${
+            className={`h-12 w-1.5 transition-colors ${
               index === activeSlide ? "bg-[#ff006f]" : "bg-cream/45 hover:bg-cream"
             }`}
             aria-label={`Schimba imaginea hero ${index + 1}`}

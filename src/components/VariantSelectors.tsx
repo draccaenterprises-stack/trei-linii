@@ -53,7 +53,7 @@ export function VariantSelector({
           className="flex items-center gap-2 group"
         >
           <span
-            className={`h-8 w-8 rounded-full border transition-all ${
+            className={`h-8 w-8 rounded-full border transition-[border-color,box-shadow] ${
               value === c.name
                 ? "ring-2 ring-charcoal ring-offset-2 ring-offset-background border-charcoal"
                 : "border-border"

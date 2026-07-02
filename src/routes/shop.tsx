@@ -4,6 +4,7 @@ import { formatRON } from "@/lib/format";
 import type { Product, Size } from "@/lib/mock-data";
 import { fetchProducts, getStockForColor } from "@/lib/shopify";
 import { useCart } from "@/lib/cart-context";
+import { clamp, createFrameScheduler } from "@/lib/motion";
 import { pageMeta } from "@/lib/seo";
 
 const chapterQuotes = [
@@ -68,6 +69,9 @@ function Shop() {
       ),
     );
     if (!nodes.length) return undefined;
+    const stages = nodes.filter((node) =>
+      node.matches(".shop-image-stage, .shop-context-image"),
+    ) as HTMLElement[];
 
     document.documentElement.classList.add("motion-ready");
     const animatedNodes = new Set<Element>();
@@ -79,15 +83,12 @@ function Shop() {
     };
 
     const updateImageMotion = () => {
-      const stages = Array.from(
-        document.querySelectorAll<HTMLElement>(".shop-image-stage, .shop-context-image"),
-      );
-
       stages.forEach((stage) => {
         const rect = stage.getBoundingClientRect();
-        const progress = Math.min(
-          1,
-          Math.max(0, (window.innerHeight * 0.96 - rect.top) / (window.innerHeight * 0.72)),
+        if (rect.bottom < -180 || rect.top > window.innerHeight + 180) return;
+
+        const progress = clamp(
+          (window.innerHeight * 0.96 - rect.top) / (window.innerHeight * 0.72),
         );
         const shift = Math.round((1 - progress) * 34);
         const scale = 1.12 - progress * 0.12;
@@ -108,16 +109,20 @@ function Shop() {
     );
 
     nodes.forEach((node) => observer.observe(node));
-    updateImageMotion();
-    window.addEventListener("scroll", updateImageMotion, { passive: true });
-    window.addEventListener("touchmove", updateImageMotion, { passive: true });
-    window.addEventListener("resize", updateImageMotion);
+    const scheduler = createFrameScheduler(updateImageMotion);
+    const scheduleUpdate = () => scheduler.schedule();
+
+    scheduler.runNow();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("touchmove", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
 
     return () => {
       observer.disconnect();
-      window.removeEventListener("scroll", updateImageMotion);
-      window.removeEventListener("touchmove", updateImageMotion);
-      window.removeEventListener("resize", updateImageMotion);
+      scheduler.cancel();
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("touchmove", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
     };
   }, [chapters.length]);
 
@@ -174,7 +179,7 @@ function Shop() {
             className="group mt-10 inline-flex items-center gap-4 bg-charcoal px-8 py-4 font-mono-xs text-cream"
           >
             Vezi lista completa
-            <span className="h-px w-7 bg-[#ff006f] transition-all group-hover:w-12" />
+            <span className="h-px w-12 origin-left scale-x-[0.58] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
           </Link>
         </div>
       </section>
@@ -227,6 +232,7 @@ function Chapter({
               src={mainImage}
               alt={`${product.title} - imagine principala`}
               className="shop-image-main aspect-[5/6] w-full object-cover"
+              decoding="async"
               loading={index === 0 ? "eager" : "lazy"}
             />
             <span className="shop-image-note absolute left-4 top-4 bg-charcoal px-3 py-2 font-mono-xs text-cream md:left-6 md:top-6">
@@ -242,6 +248,7 @@ function Chapter({
               src={secondaryImage}
               alt={`${product.title} - detaliu secundar`}
               className="aspect-[3/4] w-full object-cover"
+              decoding="async"
               loading="lazy"
             />
           </div>
@@ -272,6 +279,7 @@ function Chapter({
                 src={contextImage}
                 alt=""
                 className="aspect-[16/10] w-full object-cover"
+                decoding="async"
                 loading="lazy"
               />
             </div>
@@ -347,7 +355,7 @@ function ChapterQuickAdd({ product, isDark }: { product: Product; isDark: boolea
           }`}
         >
           Adauga in cos
-          <span className="h-px w-6 bg-[#ff006f] transition-all group-hover:w-10" />
+          <span className="h-px w-10 origin-left scale-x-[0.6] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
         </button>
         <Link
           to="/product/$handle"
@@ -373,7 +381,7 @@ function ChapterIndex({ products, activeChapter }: { products: Product[]; active
             <a
               key={product.id}
               href={`#capitol-${number}`}
-              className={`font-display text-lg italic transition-all ${
+              className={`font-display text-lg italic transition-[color,transform] ${
                 activeChapter === index ? "scale-125 text-[#ff006f]" : "text-charcoal/35"
               }`}
             >

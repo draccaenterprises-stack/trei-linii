@@ -8,6 +8,7 @@ export function CollectionCard({ collection }: { collection: Collection }) {
         <img
           src={collection.image}
           alt={collection.title}
+          decoding="async"
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover"
         />

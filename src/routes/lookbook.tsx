@@ -35,6 +35,7 @@ function Lookbook() {
             <img
               src={images[0]}
               alt=""
+              decoding="async"
               loading="lazy"
               className="w-full aspect-[4/5] object-cover"
             />
@@ -43,6 +44,7 @@ function Lookbook() {
             <img
               src={images[1]}
               alt=""
+              decoding="async"
               loading="lazy"
               className="w-full aspect-[3/4] object-cover"
             />
@@ -55,6 +57,7 @@ function Lookbook() {
             <img
               src={images[2]}
               alt=""
+              decoding="async"
               loading="lazy"
               className="w-full aspect-[3/4] object-cover"
             />
@@ -75,6 +78,7 @@ function Lookbook() {
             <img
               src={images[3]}
               alt=""
+              decoding="async"
               loading="lazy"
               className="w-full aspect-[5/6] object-cover"
             />

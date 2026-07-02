@@ -33,12 +33,13 @@ export function ProductCard({ product }: { product: Product }) {
   const lowStockCount = availableSizes.length;
 
   return (
-    <article className="group">
+    <article className="product-card group">
       <Link to="/product/$handle" params={{ handle: product.handle }} className="block">
         <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
           <img
             src={primaryImage}
             alt={`${product.title} - vedere produs`}
+            decoding="async"
             loading="lazy"
             className="absolute inset-0 w-full h-full object-cover"
           />
@@ -46,6 +47,7 @@ export function ProductCard({ product }: { product: Product }) {
             <img
               src={hoverImage}
               alt=""
+              decoding="async"
               loading="lazy"
               className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
             />
@@ -64,11 +66,11 @@ export function ProductCard({ product }: { product: Product }) {
           )}
           {siteMode === "live-shop" && (
             <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 bg-cream/92 px-2 py-1 font-mono-xs text-charcoal backdrop-blur">
+              <span className="inline-flex items-center gap-1 bg-cream/95 px-2 py-1 font-mono-xs text-charcoal">
                 <PackageCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
                 240gsm
               </span>
-              <span className="inline-flex items-center gap-1 bg-cream/92 px-2 py-1 font-mono-xs text-charcoal backdrop-blur">
+              <span className="inline-flex items-center gap-1 bg-cream/95 px-2 py-1 font-mono-xs text-charcoal">
                 <Flame className="h-3.5 w-3.5" strokeWidth={1.5} />
                 {lowStockCount <= 2 ? "stoc mic" : "oversized"}
               </span>
