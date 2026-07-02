@@ -23,12 +23,41 @@ function visibleTrustItems(items: TrustItem[]) {
 
 export function TrustStrip() {
   const { siteMode, trustItemsPreLaunch, trustItemsLiveShop } = useSite();
+  const rootRef = React.useRef<HTMLElement | null>(null);
   const items = visibleTrustItems(
     siteMode === "pre-launch" ? trustItemsPreLaunch : trustItemsLiveShop,
   );
 
+  React.useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return undefined;
+    const cards = Array.from(root.querySelectorAll<HTMLElement>(".trust-card"));
+    if (!cards.length) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      cards.forEach((card) => card.classList.add("is-visible"));
+      return undefined;
+    }
+
+    document.documentElement.classList.add("motion-ready");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight * 0.2) {
+            entry.target.classList.add("is-visible");
+          }
+        });
+      },
+      { rootMargin: "0px 0px -12% 0px", threshold: [0.05, 0.35] },
+    );
+
+    cards.forEach((card) => observer.observe(card));
+    return () => observer.disconnect();
+  }, [items.length]);
+
   return (
-    <section className="trust-strip border-y border-border bg-background">
+    <section ref={rootRef} className="trust-strip border-y border-border bg-background">
       <div className="trust-strip-grid mx-auto grid max-w-[1600px] grid-cols-2 gap-3 px-4 py-4 md:grid-cols-4 md:gap-0 md:divide-x md:divide-border md:px-0 md:py-0">
         {items.map((item, index) => {
           const Icon = trustIcons[index % trustIcons.length];

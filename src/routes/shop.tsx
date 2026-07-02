@@ -61,6 +61,36 @@ function Shop() {
     return () => observer.disconnect();
   }, [chapters.length]);
 
+  useEffect(() => {
+    const nodes = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        ".shop-image-stage, .shop-image-pop, .shop-image-note, .shop-context-image",
+      ),
+    );
+    if (!nodes.length) return undefined;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion || !("IntersectionObserver" in window)) {
+      nodes.forEach((node) => node.classList.add("is-visible"));
+      return undefined;
+    }
+
+    document.documentElement.classList.add("motion-ready");
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight * 0.18) {
+            entry.target.classList.add("is-visible");
+          }
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: [0.05, 0.25] },
+    );
+
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, [chapters.length]);
+
   return (
     <div>
       <ChapterIndex products={chapters} activeChapter={activeChapter} />
