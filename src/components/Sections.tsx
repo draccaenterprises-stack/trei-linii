@@ -113,8 +113,11 @@ export function MarqueeDivider() {
 
   return (
     <div className="overflow-hidden border-y border-charcoal bg-charcoal py-5 text-cream">
-      <div className="marquee-track flex w-max items-center gap-10">
+      <div className="marquee-divider-track flex w-max items-center gap-10">
         <div className="flex items-center gap-10">{strip}</div>
+        <div className="flex items-center gap-10" aria-hidden="true">
+          {strip}
+        </div>
         <div className="flex items-center gap-10" aria-hidden="true">
           {strip}
         </div>

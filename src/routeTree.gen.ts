@@ -34,6 +34,7 @@ import { Route as AnpcRouteImport } from './routes/anpc'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopListaRouteImport } from './routes/shop.lista'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 
 const TermsRoute = TermsRouteImport.update({
@@ -161,6 +162,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopListaRoute = ShopListaRouteImport.update({
+  id: '/lista',
+  path: '/lista',
+  getParentRoute: () => ShopRoute,
+} as any)
 const ProductHandleRoute = ProductHandleRouteImport.update({
   id: '/product/$handle',
   path: '/product/$handle',
@@ -188,12 +194,13 @@ export interface FileRoutesByFullPath {
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
   '/schimb-marime': typeof SchimbMarimeRoute
-  '/shop': typeof ShopRoute
+  '/shop': typeof ShopRouteWithChildren
   '/size-guide': typeof SizeGuideRoute
   '/sol': typeof SolRoute
   '/termeni-si-conditii': typeof TermeniSiConditiiRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
+  '/shop/lista': typeof ShopListaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -216,12 +223,13 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
   '/schimb-marime': typeof SchimbMarimeRoute
-  '/shop': typeof ShopRoute
+  '/shop': typeof ShopRouteWithChildren
   '/size-guide': typeof SizeGuideRoute
   '/sol': typeof SolRoute
   '/termeni-si-conditii': typeof TermeniSiConditiiRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
+  '/shop/lista': typeof ShopListaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -245,12 +253,13 @@ export interface FileRoutesById {
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
   '/schimb-marime': typeof SchimbMarimeRoute
-  '/shop': typeof ShopRoute
+  '/shop': typeof ShopRouteWithChildren
   '/size-guide': typeof SizeGuideRoute
   '/sol': typeof SolRoute
   '/termeni-si-conditii': typeof TermeniSiConditiiRoute
   '/terms': typeof TermsRoute
   '/product/$handle': typeof ProductHandleRoute
+  '/shop/lista': typeof ShopListaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/termeni-si-conditii'
     | '/terms'
     | '/product/$handle'
+    | '/shop/lista'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -309,6 +319,7 @@ export interface FileRouteTypes {
     | '/termeni-si-conditii'
     | '/terms'
     | '/product/$handle'
+    | '/shop/lista'
   id:
     | '__root__'
     | '/'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/termeni-si-conditii'
     | '/terms'
     | '/product/$handle'
+    | '/shop/lista'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -360,7 +372,7 @@ export interface RootRouteChildren {
   ReturRoute: typeof ReturRoute
   ReturnsRoute: typeof ReturnsRoute
   SchimbMarimeRoute: typeof SchimbMarimeRoute
-  ShopRoute: typeof ShopRoute
+  ShopRoute: typeof ShopRouteWithChildren
   SizeGuideRoute: typeof SizeGuideRoute
   SolRoute: typeof SolRoute
   TermeniSiConditiiRoute: typeof TermeniSiConditiiRoute
@@ -545,6 +557,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/lista': {
+      id: '/shop/lista'
+      path: '/lista'
+      fullPath: '/shop/lista'
+      preLoaderRoute: typeof ShopListaRouteImport
+      parentRoute: typeof ShopRoute
+    }
     '/product/$handle': {
       id: '/product/$handle'
       path: '/product/$handle'
@@ -554,6 +573,16 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface ShopRouteChildren {
+  ShopListaRoute: typeof ShopListaRoute
+}
+
+const ShopRouteChildren: ShopRouteChildren = {
+  ShopListaRoute: ShopListaRoute,
+}
+
+const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -576,7 +605,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReturRoute: ReturRoute,
   ReturnsRoute: ReturnsRoute,
   SchimbMarimeRoute: SchimbMarimeRoute,
-  ShopRoute: ShopRoute,
+  ShopRoute: ShopRouteWithChildren,
   SizeGuideRoute: SizeGuideRoute,
   SolRoute: SolRoute,
   TermeniSiConditiiRoute: TermeniSiConditiiRoute,
@@ -586,3 +615,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
