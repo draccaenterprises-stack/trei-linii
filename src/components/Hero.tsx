@@ -21,8 +21,7 @@ export function Hero({ products = [] }: { products?: Product[] }) {
       {
         src: heroImg,
         alt: "Model purtand un tricou oversized Trei Linii intr-un cadru urban",
-        eyebrow: "Drop principal / 240gsm",
-        title: "Tricoul main intra direct in cos.",
+        title: ["Tricoul ", "main", " intra direct in cos."],
         text: "Prima piesa Trei Linii: fata curata, spate construit pe linii.",
         cta: "Adauga tricoul main",
         action: "cart" as const,
@@ -32,8 +31,7 @@ export function Hero({ products = [] }: { products?: Product[] }) {
       {
         src: lookbookOne,
         alt: "Cadru lookbook Trei Linii cu tricou oversized",
-        eyebrow: "Lookbook / oras",
-        title: "Vezi cum cade tricoul in miscare.",
+        title: ["Vezi cum cade tricoul in ", "miscare", "."],
         text: "Cadre editoriale, fit oversized si spatele in prim-plan.",
         cta: "Vezi shop",
         action: "shop" as const,
@@ -43,8 +41,7 @@ export function Hero({ products = [] }: { products?: Product[] }) {
       {
         src: lookbookTwo,
         alt: "Styling urban Trei Linii pentru tricou cu design pe spate",
-        eyebrow: "Colectie / selectie",
-        title: "Alege printul care ramane in spate.",
+        title: ["Alege printul care ramane in ", "spate", "."],
         text: "Modele compacte, bumbac dens si grafica gandita pentru rotatia zilnica.",
         cta: "Alege modelul",
         action: "shop" as const,
@@ -54,8 +51,7 @@ export function Hero({ products = [] }: { products?: Product[] }) {
       {
         src: productDetail,
         alt: "Detaliu tricou Trei Linii cu print pe spate",
-        eyebrow: "Detaliu / material",
-        title: "240gsm, contur clar, fara zgomot.",
+        title: ["", "240gsm", ", contur clar, fara zgomot."],
         text: "Materialul tine forma, iar printul pastreaza ritmul simplu al brandului.",
         cta: "Exploreaza shop",
         action: "shop" as const,
@@ -121,9 +117,10 @@ export function Hero({ products = [] }: { products?: Product[] }) {
         className={`relative mx-auto flex min-h-[90vh] max-w-[1600px] px-5 pb-[8vh] pr-12 md:px-10 ${active.align}`}
       >
         <div className={active.copy}>
-          <p className="font-mono-xs text-[#ff006f]">{active.eyebrow}</p>
-          <h1 className="mt-4 font-display text-[15vw] font-medium leading-[1.02] md:text-[7vw] whitespace-pre-line [text-wrap:balance]">
-            {active.title}
+          <h1 className="font-display text-[15vw] font-medium leading-[1.02] md:text-[7vw] whitespace-pre-line [text-wrap:balance]">
+            {active.title[0]}
+            <span className="text-[#ff006f] italic">{active.title[1]}</span>
+            {active.title[2]}
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-cream/78 md:text-lg">
             {active.text}

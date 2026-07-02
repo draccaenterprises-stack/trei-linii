@@ -90,6 +90,39 @@ export function ThreeLineDivider() {
   );
 }
 
+const marqueePhrases = [
+  "Editii limitate",
+  "Bumbac pieptanat 240gsm",
+  "Design pe spate",
+  "Croiala oversized",
+  "Fara reeditare",
+  "Fata curata",
+] as const;
+
+export function MarqueeDivider() {
+  const strip = (
+    <>
+      {marqueePhrases.map((phrase) => (
+        <span key={phrase} className="flex items-center gap-10">
+          <span className="font-mono-xs text-cream">{phrase}</span>
+          <span className="h-px w-10 bg-[#ff006f]" aria-hidden="true" />
+        </span>
+      ))}
+    </>
+  );
+
+  return (
+    <div className="overflow-hidden border-y border-charcoal bg-charcoal py-5 text-cream">
+      <div className="marquee-track flex w-max items-center gap-10">
+        <div className="flex items-center gap-10">{strip}</div>
+        <div className="flex items-center gap-10" aria-hidden="true">
+          {strip}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function BundleBanner() {
   const {
     siteMode,

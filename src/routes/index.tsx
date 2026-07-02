@@ -3,6 +3,7 @@ import { Hero } from "@/components/Hero";
 import { ProductGrid } from "@/components/ProductCard";
 import {
   BundlePreview,
+  MarqueeDivider,
   Newsletter,
   Reviews,
   ThreeLineDivider,
@@ -52,7 +53,7 @@ function Index() {
       {sectionEnabled(sections, "hero") && <Hero products={products} />}
 
       <TrustStrip />
-      <ThreeLineDivider />
+      <MarqueeDivider />
 
       <section className="px-5 md:px-10 py-16 md:py-24 border-b border-border">
         <div className="mx-auto max-w-[1600px] grid md:grid-cols-12 gap-10">

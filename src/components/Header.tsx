@@ -31,17 +31,15 @@ function useCountdown(target: string): number | null {
 }
 
 const preLaunchNav = [
-  { to: "/shop", label: "SHOP" },
-  { to: "/about", label: "Despre noi" },
+  { to: "/shop", label: "Shop" },
   { to: "/lookbook", label: "Lookbook" },
-  { to: "/journal", label: "Jurnal" },
+  { to: "/manifest", label: "Manifest" },
 ] as const;
 
 const liveShopNav = [
-  { to: "/shop", label: "SHOP" },
-  { to: "/about", label: "Despre noi" },
+  { to: "/shop", label: "Shop" },
   { to: "/lookbook", label: "Lookbook" },
-  { to: "/journal", label: "Jurnal" },
+  { to: "/manifest", label: "Manifest" },
 ] as const;
 
 function NavLink({ to, label, accentColor }: { to: string; label: string; accentColor: string }) {

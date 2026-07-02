@@ -18,6 +18,7 @@ import { Route as SchimbMarimeRouteImport } from './routes/schimb-marime'
 import { Route as ReturnsRouteImport } from './routes/returns'
 import { Route as ReturRouteImport } from './routes/retur'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as ManifestRouteImport } from './routes/manifest'
 import { Route as LookbookRouteImport } from './routes/lookbook'
 import { Route as LivrareRouteImport } from './routes/livrare'
 import { Route as JournalRouteImport } from './routes/journal'
@@ -78,6 +79,11 @@ const ReturRoute = ReturRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ManifestRoute = ManifestRouteImport.update({
+  id: '/manifest',
+  path: '/manifest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LookbookRoute = LookbookRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/journal': typeof JournalRoute
   '/livrare': typeof LivrareRoute
   '/lookbook': typeof LookbookRoute
+  '/manifest': typeof ManifestRoute
   '/privacy': typeof PrivacyRoute
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
@@ -204,6 +211,7 @@ export interface FileRoutesByTo {
   '/journal': typeof JournalRoute
   '/livrare': typeof LivrareRoute
   '/lookbook': typeof LookbookRoute
+  '/manifest': typeof ManifestRoute
   '/privacy': typeof PrivacyRoute
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
@@ -232,6 +240,7 @@ export interface FileRoutesById {
   '/journal': typeof JournalRoute
   '/livrare': typeof LivrareRoute
   '/lookbook': typeof LookbookRoute
+  '/manifest': typeof ManifestRoute
   '/privacy': typeof PrivacyRoute
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/livrare'
     | '/lookbook'
+    | '/manifest'
     | '/privacy'
     | '/retur'
     | '/returns'
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/livrare'
     | '/lookbook'
+    | '/manifest'
     | '/privacy'
     | '/retur'
     | '/returns'
@@ -315,6 +326,7 @@ export interface FileRouteTypes {
     | '/journal'
     | '/livrare'
     | '/lookbook'
+    | '/manifest'
     | '/privacy'
     | '/retur'
     | '/returns'
@@ -343,6 +355,7 @@ export interface RootRouteChildren {
   JournalRoute: typeof JournalRoute
   LivrareRoute: typeof LivrareRoute
   LookbookRoute: typeof LookbookRoute
+  ManifestRoute: typeof ManifestRoute
   PrivacyRoute: typeof PrivacyRoute
   ReturRoute: typeof ReturRoute
   ReturnsRoute: typeof ReturnsRoute
@@ -418,6 +431,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/manifest': {
+      id: '/manifest'
+      path: '/manifest'
+      fullPath: '/manifest'
+      preLoaderRoute: typeof ManifestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lookbook': {
@@ -551,6 +571,7 @@ const rootRouteChildren: RootRouteChildren = {
   JournalRoute: JournalRoute,
   LivrareRoute: LivrareRoute,
   LookbookRoute: LookbookRoute,
+  ManifestRoute: ManifestRoute,
   PrivacyRoute: PrivacyRoute,
   ReturRoute: ReturRoute,
   ReturnsRoute: ReturnsRoute,
