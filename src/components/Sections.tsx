@@ -34,26 +34,44 @@ export function TrustStrip() {
     const cards = Array.from(root.querySelectorAll<HTMLElement>(".trust-card"));
     if (!cards.length) return undefined;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion || !("IntersectionObserver" in window)) {
-      cards.forEach((card) => card.classList.add("is-visible"));
-      return undefined;
-    }
+    const isMobile = () => window.matchMedia("(max-width: 767px)").matches;
+
+    const updateMobileDepth = () => {
+      if (!isMobile()) {
+        cards.forEach((card) => {
+          card.style.removeProperty("box-shadow");
+          card.style.removeProperty("transform");
+        });
+        return;
+      }
+
+      cards.forEach((card, index) => {
+        const rect = card.getBoundingClientRect();
+        const progress = Math.min(
+          1,
+          Math.max(0, (window.innerHeight * 0.92 - rect.top) / (window.innerHeight * 0.44)),
+        );
+        const lift = Math.round((1 - progress) * 10);
+        const blur = 22 + Math.round(progress * 28);
+        const alpha = 0.14 + progress * 0.1;
+        card.style.boxShadow = `0 ${10 + Math.round(progress * 10)}px ${blur}px rgb(26 26 24 / ${alpha})`;
+        card.style.transform = `translateY(${lift}px) scale(${0.985 + progress * 0.015})`;
+        card.style.transitionDelay = `${index * 55}ms`;
+      });
+    };
+
+    cards.forEach((card) => card.classList.add("is-visible"));
+    updateMobileDepth();
+    window.addEventListener("scroll", updateMobileDepth, { passive: true });
+    window.addEventListener("touchmove", updateMobileDepth, { passive: true });
+    window.addEventListener("resize", updateMobileDepth);
 
     document.documentElement.classList.add("motion-ready");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight * 0.2) {
-            entry.target.classList.add("is-visible");
-          }
-        });
-      },
-      { rootMargin: "0px 0px -12% 0px", threshold: [0.05, 0.35] },
-    );
-
-    cards.forEach((card) => observer.observe(card));
-    return () => observer.disconnect();
+    return () => {
+      window.removeEventListener("scroll", updateMobileDepth);
+      window.removeEventListener("touchmove", updateMobileDepth);
+      window.removeEventListener("resize", updateMobileDepth);
+    };
   }, [items.length]);
 
   return (
@@ -64,7 +82,7 @@ export function TrustStrip() {
           return (
             <div
               key={item.id}
-              className="trust-card flex min-h-36 flex-col justify-between rounded-xl border border-border bg-card p-4 md:min-h-0 md:flex-row md:justify-start md:gap-4 md:rounded-none md:border-0 md:bg-transparent md:px-10 md:py-6"
+              className="trust-card flex min-h-36 flex-col justify-between border border-border bg-card p-4 md:min-h-0 md:flex-row md:justify-start md:gap-4 md:border-0 md:bg-transparent md:px-10 md:py-6"
             >
               <Icon
                 className="h-5 w-5 shrink-0 text-[#ff006f] md:text-current"
@@ -135,6 +153,30 @@ const marqueePhrases = [
 ] as const;
 
 export function MarqueeDivider() {
+  const trackRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return undefined;
+
+    let frame = 0;
+    let offset = 0;
+    let lastTime = performance.now();
+
+    const tick = (time: number) => {
+      const delta = Math.min(40, time - lastTime);
+      lastTime = time;
+      const firstStrip = track.firstElementChild as HTMLElement | null;
+      const loopWidth = firstStrip ? firstStrip.offsetWidth + 40 : track.scrollWidth / 3;
+      offset = (offset + delta * 0.055) % Math.max(1, loopWidth);
+      track.style.transform = `translate3d(${-offset}px, 0, 0)`;
+      frame = window.requestAnimationFrame(tick);
+    };
+
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
   const strip = (
     <>
       {marqueePhrases.map((phrase) => (
@@ -148,7 +190,7 @@ export function MarqueeDivider() {
 
   return (
     <div className="overflow-hidden border-y border-charcoal bg-charcoal py-5 text-cream">
-      <div className="marquee-divider-track flex w-max items-center gap-10">
+      <div ref={trackRef} className="marquee-divider-track flex w-max items-center gap-10">
         <div className="flex items-center gap-10">{strip}</div>
         <div className="flex items-center gap-10" aria-hidden="true">
           {strip}

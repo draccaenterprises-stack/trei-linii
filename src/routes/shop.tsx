@@ -69,26 +69,56 @@ function Shop() {
     );
     if (!nodes.length) return undefined;
 
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reducedMotion || !("IntersectionObserver" in window)) {
-      nodes.forEach((node) => node.classList.add("is-visible"));
-      return undefined;
-    }
-
     document.documentElement.classList.add("motion-ready");
+    const animatedNodes = new Set<Element>();
+
+    const revealNode = (node: Element) => {
+      if (animatedNodes.has(node)) return;
+      animatedNodes.add(node);
+      node.classList.add("is-visible");
+    };
+
+    const updateImageMotion = () => {
+      const stages = Array.from(
+        document.querySelectorAll<HTMLElement>(".shop-image-stage, .shop-context-image"),
+      );
+
+      stages.forEach((stage) => {
+        const rect = stage.getBoundingClientRect();
+        const progress = Math.min(
+          1,
+          Math.max(0, (window.innerHeight * 0.96 - rect.top) / (window.innerHeight * 0.72)),
+        );
+        const shift = Math.round((1 - progress) * 34);
+        const scale = 1.12 - progress * 0.12;
+        stage.style.setProperty("--shop-stage-shift", `${shift}px`);
+        stage.style.setProperty("--shop-media-scale", scale.toFixed(3));
+      });
+    };
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight * 0.18) {
-            entry.target.classList.add("is-visible");
+            revealNode(entry.target);
           }
         });
       },
-      { rootMargin: "0px 0px -10% 0px", threshold: [0.05, 0.25] },
+      { rootMargin: "0px 0px -8% 0px", threshold: [0.01, 0.16] },
     );
 
     nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+    updateImageMotion();
+    window.addEventListener("scroll", updateImageMotion, { passive: true });
+    window.addEventListener("touchmove", updateImageMotion, { passive: true });
+    window.addEventListener("resize", updateImageMotion);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", updateImageMotion);
+      window.removeEventListener("touchmove", updateImageMotion);
+      window.removeEventListener("resize", updateImageMotion);
+    };
   }, [chapters.length]);
 
   return (
