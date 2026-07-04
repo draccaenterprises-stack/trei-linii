@@ -382,7 +382,8 @@
     background: var(--charcoal);
     transform-origin: left;
     transform: scaleX(0);
-    transition: transform 80ms linear;
+    transition: none;
+    will-change: transform;
   }
 
   .tl-divider span:nth-child(2) {

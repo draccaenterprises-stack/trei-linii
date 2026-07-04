@@ -142,6 +142,10 @@ export function Header() {
   const { accentColor, logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const nav = siteMode === "pre-launch" ? preLaunchNav : liveShopNav;
+  const detailsRef = React.useRef<HTMLDetailsElement>(null);
+  const closeMobileMenu = () => {
+    if (detailsRef.current) detailsRef.current.open = false;
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur">
@@ -175,7 +179,7 @@ export function Header() {
               Vezi shop
             </a>
           )}
-          <details className="md:hidden">
+          <details ref={detailsRef} className="md:hidden">
             <summary
               className="list-none cursor-pointer [&::-webkit-details-marker]:hidden"
               aria-label="Deschide meniul"
@@ -186,7 +190,12 @@ export function Header() {
               <nav className="flex flex-col px-5 py-6 gap-5">
                 {nav.map((n) =>
                   n.to.includes("#") ? (
-                    <a key={n.to} href={n.to} className="font-display text-3xl">
+                    <a
+                      key={n.to}
+                      href={n.to}
+                      className="font-display text-3xl"
+                      onClick={closeMobileMenu}
+                    >
                       {n.label}
                     </a>
                   ) : (
@@ -197,6 +206,7 @@ export function Header() {
                         n.to === "/shop" ? "font-display text-4xl" : "font-display text-3xl"
                       }
                       style={n.to === "/shop" ? { color: accentColor } : undefined}
+                      onClick={closeMobileMenu}
                     >
                       {n.label}
                     </Link>
