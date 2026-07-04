@@ -113,13 +113,17 @@ export function ThreeLineDivider() {
     const root = rootRef.current;
     if (!root) return undefined;
     const lines = Array.from(root.querySelectorAll("span"));
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    const update = () => {
+    const computeTarget = () => {
       const rect = root.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || 1;
-      const start = viewportHeight * 0.92;
-      const end = viewportHeight * 0.3;
-      const progress = clamp((start - rect.top) / Math.max(1, start - end));
+      const vh = window.innerHeight || 1;
+      const start = vh * 0.92;
+      const end = vh * 0.3;
+      return clamp((start - rect.top) / Math.max(1, start - end));
+    };
+
+    const applyProgress = (progress: number) => {
       root.style.setProperty("--tl-divider-progress", String(progress));
       lines.forEach((line, index) => {
         const offset = index * 0.08;
@@ -128,19 +132,56 @@ export function ThreeLineDivider() {
       });
     };
 
-    const scheduler = createFrameScheduler(update);
-    const scheduleUpdate = () => scheduler.schedule();
+    if (reduced) {
+      applyProgress(computeTarget());
+      return undefined;
+    }
 
-    scheduler.runNow();
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("touchmove", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
+    let current = computeTarget();
+    let target = current;
+    applyProgress(current);
+
+    let rafId = 0;
+    let inView = false;
+
+    const tick = () => {
+      target = computeTarget();
+      const diff = target - current;
+      if (Math.abs(diff) < 0.0005) {
+        current = target;
+        applyProgress(current);
+        rafId = 0;
+        if (inView) rafId = window.requestAnimationFrame(tick);
+        return;
+      }
+      current += diff * 0.18;
+      applyProgress(current);
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    const start = () => {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(tick);
+    };
+    const stop = () => {
+      if (!rafId) return;
+      window.cancelAnimationFrame(rafId);
+      rafId = 0;
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        inView = !!entry?.isIntersecting;
+        if (inView) start();
+        else stop();
+      },
+      { rootMargin: "200px 0px" },
+    );
+    io.observe(root);
 
     return () => {
-      scheduler.cancel();
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("touchmove", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
+      io.disconnect();
+      stop();
     };
   }, []);
 
