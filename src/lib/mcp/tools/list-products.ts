@@ -1,5 +1,4 @@
 import { defineTool } from "@lovable.dev/mcp-js";
-import { z } from "zod";
 import { fetchProducts } from "@/lib/shopify";
 
 export default defineTool({
@@ -14,7 +13,6 @@ export default defineTool({
       handle: p.handle,
       title: p.title,
       price: p.price,
-      availableForSale: p.availableForSale,
     }));
     return {
       content: [{ type: "text", text: JSON.stringify(summary, null, 2) }],
