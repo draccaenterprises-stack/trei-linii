@@ -403,30 +403,33 @@ export function ProductCard({ product, showQuickView = true }: { product: Produc
           )}
 
           {/* "Vezi produs" floating button — hover on desktop, always visible on mobile */}
-          <button
-            ref={viewBtnRef}
-            type="button"
-            onClick={openQuickView}
-            aria-label={`Vezi produs ${product.title}`}
-            className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
-            style={{
-              padding: "13px 28px",
-              background: "rgba(232,229,221,0.62)",
-              backdropFilter: "blur(10px)",
-              border: "none",
-              borderRadius: 14,
-              fontFamily: "var(--font-display)",
-              fontSize: 16,
-              fontWeight: 500,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "#1a1a18",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Vezi produs
-          </button>
+          {showQuickView && (
+            <button
+              ref={viewBtnRef}
+              type="button"
+              onClick={openQuickView}
+              aria-label={`Vezi produs ${product.title}`}
+              className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
+              style={{
+                padding: "13px 28px",
+                background: "rgba(232,229,221,0.62)",
+                backdropFilter: "blur(10px)",
+                border: "none",
+                borderRadius: 14,
+                fontFamily: "var(--font-display)",
+                fontSize: 16,
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#1a1a18",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Vezi produs
+            </button>
+          )}
+
         </div>
       </Link>
 
