@@ -297,7 +297,7 @@ export function QuickViewOverlay({
           top: 0,
           width: 5,
           height: "100vh",
-          background: "#1a1a18",
+          background: "#000000",
           transformOrigin: `center ${originY}`,
           transform: "scaleY(0.012)",
           opacity: 0,
@@ -321,7 +321,7 @@ export function QuickViewOverlay({
           willChange: "opacity",
         }}
       >
-        {["#1a1a18", "#1a1a18", "#ff006f"].map((color, i) => (
+        {["#000000", "#000000", "#ff006f"].map((color, i) => (
           <div
             key={i}
             ref={(node) => {
