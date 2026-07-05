@@ -44,7 +44,7 @@ function Index() {
     siteMode,
   } = site;
   const configuredFeatured = featuredProductIds
-    .map((id) => products.find((p) => p.id === id || p.handle === id))
+    .map((id) => products.find((p: (typeof products)[number]) => p.id === id || p.handle === id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p));
   const featured = configuredFeatured.length ? configuredFeatured : products.slice(0, 4);
 

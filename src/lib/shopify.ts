@@ -321,7 +321,7 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
       size,
       color,
       availableForSale: variant.availableForSale,
-      quantityAvailable: variant.quantityAvailable,
+      quantityAvailable: variant.quantityAvailable ?? null,
     };
   });
 
