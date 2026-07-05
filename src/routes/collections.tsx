@@ -34,7 +34,7 @@ function CollectionsPage() {
         </header>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {collections.map((c) => (
+          {collections.map((c: (typeof collections)[number]) => (
             <CollectionCard key={c.handle} collection={c} />
           ))}
         </div>
