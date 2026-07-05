@@ -329,6 +329,14 @@ function Chapter({
         </div>
       </div>
     </section>
+    {overlay && (
+      <QuickViewOverlay
+        product={product}
+        origin={overlay}
+        onClose={() => setOverlay(null)}
+      />
+    )}
+    </>
   );
 }
 
