@@ -66,7 +66,7 @@ function Shop() {
   useEffect(() => {
     const nodes = Array.from(
       document.querySelectorAll<HTMLElement>(
-        ".shop-image-stage, .shop-image-pop, .shop-image-note, .shop-context-image",
+        ".shop-image-stage, .shop-image-pop, .shop-image-note, .shop-context-image, .shop-collage-item",
       ),
     );
     if (!nodes.length) return undefined;
