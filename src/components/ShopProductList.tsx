@@ -74,7 +74,7 @@ export function ShopProductList({
               <FilterChip
                 key={item.label}
                 active={color === item.value || (!color && !item.value)}
-                onClick={() => navigate({ search: item.value ? { color: item.value } : {} })}
+                onClick={() => navigate({ search: () => (item.value ? { color: item.value } : {}) })}
               >
                 {item.label}
               </FilterChip>
