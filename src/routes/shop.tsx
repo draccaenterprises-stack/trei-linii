@@ -323,33 +323,9 @@ function Chapter({
           }`}
         >
           <div className="chapter-media lg:col-span-6">
-            {/* Mobile: vertical stack with staggered reveal */}
-            <div className="group/collage flex flex-col gap-4 md:hidden">
-              {slots.map(({ slot, src }, i) => (
-                <div
-                  key={i}
-                  className="shop-collage-item relative bg-warm-grey"
-                  style={{
-                    aspectRatio: slot.aspect.replace("/", " / "),
-                    transitionDelay: `${i * 90}ms`,
-                  }}
-                >
-                  <img
-                    src={src}
-                    alt={`${product.title} - imagine ${i + 1}`}
-                    className="absolute inset-0 h-full w-full object-cover"
-                    decoding="async"
-                    loading={index === 0 && i === 0 ? "eager" : "lazy"}
-                  />
-                  {i === 0 && badgeEl}
-                  {i === 1 && viewBtnEl}
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop: absolute-positioned collage */}
+            {/* Absolute-positioned collage — same layout for mobile and desktop */}
             <div
-              className="group/collage relative hidden w-full md:block"
+              className="group/collage relative w-full"
               style={{ aspectRatio: "4 / 5" }}
             >
               {slots.map(({ slot, src }, i) => (
@@ -378,6 +354,7 @@ function Chapter({
               ))}
             </div>
           </div>
+
 
           <div
             className={`chapter-copy lg:col-span-4 ${reverse ? "lg:row-start-1" : "lg:col-start-9"}`}

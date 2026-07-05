@@ -80,24 +80,38 @@ export function QuickViewOverlay({
   const originX = `${origin.x + origin.width / 2}px`;
   const originY = `${origin.y + origin.height / 2}px`;
 
-  // Overlay background becomes paper once bands appear; before that keep transparent
-  const overlayBg = reduced || showBands ? "#faf8f2" : "transparent";
+  // Background paper layer fades in as its own layer — avoids animating the
+  // root overlay's background (which would repaint the full screen every frame).
+  const paperVisible = reduced || showBands;
 
   return (
     <div
       className="fixed inset-0 z-[100]"
       style={{
-        background: overlayBg,
-        transition: `background 200ms ${EASING}`,
+        background: "transparent",
         opacity: closing && (phase === "gallery" || reduced) ? 0 : 1,
-        // fade whole thing on close for a graceful exit
-        ...(closing ? { transition: `opacity 200ms ${EASING}, background 200ms ${EASING}` } : {}),
+        transition: closing ? `opacity 200ms ${EASING}` : undefined,
       }}
       role="dialog"
       aria-modal="true"
       aria-label={`Galerie ${product.title}`}
     >
-      {/* Shrinking clone of the button */}
+      {/* Paper background (own layer, only opacity animates) */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "#faf8f2",
+          opacity: paperVisible ? 1 : 0,
+          transition: `opacity 200ms ${EASING}`,
+          pointerEvents: "none",
+          willChange: "opacity",
+        }}
+      />
+
+      {/* Shrinking clone of the button — only transform + opacity animate.
+          No border-radius transition, no backdrop-filter during animation. */}
       {showShrink && (
         <div
           aria-hidden="true"
@@ -107,19 +121,21 @@ export function QuickViewOverlay({
             top: origin.y,
             width: origin.width,
             height: origin.height,
-            background: "rgba(232,229,221,0.62)",
-            backdropFilter: "blur(10px)",
-            borderRadius: shrinkToEllipse ? "50%" : "14px",
+            // Opaque approximation of the translucent button — avoids backdrop-filter repaints on mobile.
+            background: "#e8e5dd",
+            borderRadius: 14,
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             transformOrigin: "center center",
             transform: shrinkToEllipse
-              ? `translate(${origin.width / 2 - 26}px, ${origin.height / 2 - 8}px) scale(${52 / origin.width}, ${16 / origin.height})`
-              : "none",
-            transition: `transform 420ms ${EASING}, border-radius 420ms ${EASING}, opacity 150ms ${EASING}`,
+              ? `translate3d(${origin.width / 2 - 26}px, ${origin.height / 2 - 8}px, 0) scale(${52 / origin.width}, ${16 / origin.height})`
+              : "translate3d(0, 0, 0)",
+            transition: `transform 420ms ${EASING}, opacity 150ms ${EASING}`,
             opacity: phase === "line" ? 0 : 1,
             pointerEvents: "none",
+            willChange: "transform, opacity",
+            backfaceVisibility: "hidden",
           }}
         >
           <span
@@ -139,7 +155,7 @@ export function QuickViewOverlay({
         </div>
       )}
 
-      {/* Vertical line */}
+      {/* Vertical line — transform scaleY only */}
       {showLine && (
         <div
           aria-hidden="true"
@@ -150,16 +166,17 @@ export function QuickViewOverlay({
             width: 5,
             height: "100vh",
             background: "#1a1a18",
-            borderRadius: 3,
             transformOrigin: `center ${originY}`,
             transform: phase === "line" ? "scaleY(1)" : "scaleY(0.012)",
-            transition: `transform 580ms ${EASING}`,
+            transition: `transform 580ms ${EASING}, opacity 150ms ${EASING}`,
             opacity: phase === "bands" ? 0 : 1,
+            willChange: "transform, opacity",
+            backfaceVisibility: "hidden",
           }}
         />
       )}
 
-      {/* Three stacked bands */}
+      {/* Three stacked bands — transform scaleX only */}
       {showBands && (
         <div
           aria-hidden="true"
@@ -184,15 +201,18 @@ export function QuickViewOverlay({
                     : phase === "bands" || phase === "gallery"
                       ? "scaleX(1)"
                       : "scaleX(0.0045)",
-                transition: `transform 640ms ${EASING}`,
                 opacity: closing ? 0 : 1,
                 transitionProperty: closing ? "opacity" : "transform",
                 transitionDuration: closing ? "160ms" : "640ms",
+                transitionTimingFunction: EASING.replace("cubic-bezier", "cubic-bezier"),
+                willChange: "transform, opacity",
+                backfaceVisibility: "hidden",
               }}
             />
           ))}
         </div>
       )}
+
 
       {/* Gallery */}
       <GalleryLayer
@@ -317,7 +337,7 @@ function GalleryLayer({
   );
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, showQuickView = true }: { product: Product; showQuickView?: boolean }) {
   const { addItem } = useCart();
   const {
     siteMode,
@@ -403,30 +423,33 @@ export function ProductCard({ product }: { product: Product }) {
           )}
 
           {/* "Vezi produs" floating button — hover on desktop, always visible on mobile */}
-          <button
-            ref={viewBtnRef}
-            type="button"
-            onClick={openQuickView}
-            aria-label={`Vezi produs ${product.title}`}
-            className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
-            style={{
-              padding: "13px 28px",
-              background: "rgba(232,229,221,0.62)",
-              backdropFilter: "blur(10px)",
-              border: "none",
-              borderRadius: 14,
-              fontFamily: "var(--font-display)",
-              fontSize: 16,
-              fontWeight: 500,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "#1a1a18",
-              cursor: "pointer",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Vezi produs
-          </button>
+          {showQuickView && (
+            <button
+              ref={viewBtnRef}
+              type="button"
+              onClick={openQuickView}
+              aria-label={`Vezi produs ${product.title}`}
+              className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
+              style={{
+                padding: "13px 28px",
+                background: "rgba(232,229,221,0.62)",
+                backdropFilter: "blur(10px)",
+                border: "none",
+                borderRadius: 14,
+                fontFamily: "var(--font-display)",
+                fontSize: 16,
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#1a1a18",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Vezi produs
+            </button>
+          )}
+
         </div>
       </Link>
 
@@ -501,16 +524,18 @@ export function ProductCard({ product }: { product: Product }) {
 export function ProductGrid({
   products,
   carousel = false,
+  showQuickView = true,
 }: {
   products: Product[];
   carousel?: boolean;
+  showQuickView?: boolean;
 }) {
   if (carousel) {
     return (
       <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden">
         {products.map((p) => (
           <div key={p.id} className="w-[74%] shrink-0 snap-start md:w-[300px]">
-            <ProductCard product={p} />
+            <ProductCard product={p} showQuickView={showQuickView} />
           </div>
         ))}
       </div>
@@ -520,8 +545,9 @@ export function ProductGrid({
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 md:gap-y-16">
       {products.map((p) => (
-        <ProductCard key={p.id} product={p} />
+        <ProductCard key={p.id} product={p} showQuickView={showQuickView} />
       ))}
     </div>
   );
 }
+
