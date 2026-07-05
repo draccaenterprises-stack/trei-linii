@@ -219,6 +219,7 @@ function Chapter({
   };
 
   return (
+    <>
     <section
       id={`capitol-${number}`}
       ref={refCallback}
