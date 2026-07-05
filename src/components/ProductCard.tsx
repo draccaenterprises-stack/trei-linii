@@ -16,7 +16,7 @@ const badgeStyles: Record<string, string> = {
 const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 /** Full-screen animated quick-view overlay. */
-function QuickViewOverlay({
+export function QuickViewOverlay({
   product,
   origin,
   onClose,

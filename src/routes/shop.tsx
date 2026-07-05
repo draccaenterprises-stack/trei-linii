@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
 import type { Product, Size } from "@/lib/mock-data";
 import { fetchProducts, getStockForColor } from "@/lib/shopify";
@@ -203,7 +204,22 @@ function Chapter({
   const secondaryImage = product.images[1] ?? product.images[0];
   const contextImage = product.images[2] ?? product.images[1] ?? product.images[0];
 
+  const viewBtnRef = useRef<HTMLButtonElement>(null);
+  const [overlay, setOverlay] = useState<null | {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>(null);
+
+  const openQuickView = () => {
+    const rect = viewBtnRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setOverlay({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+  };
+
   return (
+    <>
     <section
       id={`capitol-${number}`}
       ref={refCallback}
@@ -240,7 +256,7 @@ function Chapter({
             </span>
           </div>
           <div
-            className={`shop-image-pop mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
+            className={`shop-image-pop group/pop relative mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
               reverse ? "md:ml-0" : "md:ml-[54%]"
             }`}
           >
@@ -251,6 +267,30 @@ function Chapter({
               decoding="async"
               loading="lazy"
             />
+            <button
+              ref={viewBtnRef}
+              type="button"
+              onClick={openQuickView}
+              aria-label={`Vezi produs ${product.title}`}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/pop:opacity-100"
+              style={{
+                padding: "13px 28px",
+                background: "rgba(232,229,221,0.62)",
+                backdropFilter: "blur(10px)",
+                border: "none",
+                borderRadius: 14,
+                fontFamily: "var(--font-display)",
+                fontSize: 16,
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#1a1a18",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Vezi produs
+            </button>
           </div>
         </div>
 
@@ -290,6 +330,14 @@ function Chapter({
         </div>
       </div>
     </section>
+    {overlay && (
+      <QuickViewOverlay
+        product={product}
+        origin={overlay}
+        onClose={() => setOverlay(null)}
+      />
+    )}
+    </>
   );
 }
 
