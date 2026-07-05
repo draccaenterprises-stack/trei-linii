@@ -78,7 +78,7 @@ function Index() {
                 </h2>
               </div>
             </div>
-            <ProductGrid products={featured} carousel />
+            <ProductGrid products={featured} carousel showQuickView={false} />
             <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <p className="font-mono-xs opacity-45">← Gliseaza pentru mai multe modele</p>
               <Link
