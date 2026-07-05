@@ -156,7 +156,7 @@ function Shop() {
         </div>
       </section>
 
-      {chapters.map((product, index) => (
+      {chapters.map((product: (typeof chapters)[number], index: number) => (
         <Chapter
           key={product.id}
           product={product}
