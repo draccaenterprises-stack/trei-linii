@@ -261,7 +261,7 @@ function Chapter({
     height: number;
   }>(null);
 
-  const openQuickView = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const openQuickView = (e: MouseEvent<HTMLButtonElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     setOverlay({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
   };
