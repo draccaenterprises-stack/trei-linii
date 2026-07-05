@@ -255,7 +255,7 @@ function Chapter({
             </span>
           </div>
           <div
-            className={`shop-image-pop mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
+            className={`shop-image-pop group/pop relative mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
               reverse ? "md:ml-0" : "md:ml-[54%]"
             }`}
           >
@@ -266,6 +266,30 @@ function Chapter({
               decoding="async"
               loading="lazy"
             />
+            <button
+              ref={viewBtnRef}
+              type="button"
+              onClick={openQuickView}
+              aria-label={`Vezi produs ${product.title}`}
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/pop:opacity-100"
+              style={{
+                padding: "13px 28px",
+                background: "rgba(232,229,221,0.62)",
+                backdropFilter: "blur(10px)",
+                border: "none",
+                borderRadius: 14,
+                fontFamily: "var(--font-display)",
+                fontSize: 16,
+                fontWeight: 500,
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                color: "#1a1a18",
+                cursor: "pointer",
+                whiteSpace: "nowrap",
+              }}
+            >
+              Vezi produs
+            </button>
           </div>
         </div>
 
