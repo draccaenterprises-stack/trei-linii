@@ -204,6 +204,20 @@ function Chapter({
   const secondaryImage = product.images[1] ?? product.images[0];
   const contextImage = product.images[2] ?? product.images[1] ?? product.images[0];
 
+  const viewBtnRef = useRef<HTMLButtonElement>(null);
+  const [overlay, setOverlay] = useState<null | {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  }>(null);
+
+  const openQuickView = () => {
+    const rect = viewBtnRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    setOverlay({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+  };
+
   return (
     <section
       id={`capitol-${number}`}
