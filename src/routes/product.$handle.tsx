@@ -265,7 +265,7 @@ function ProductPage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-            {related.map((item) => (
+            {related.map((item: (typeof related)[number]) => (
               <Link key={item.id} to="/product/$handle" params={{ handle: item.handle }}>
                 <img
                   src={item.images[0]}
