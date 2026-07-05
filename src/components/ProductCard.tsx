@@ -25,9 +25,8 @@ export function QuickViewOverlay({
   origin: { x: number; y: number; width: number; height: number };
   onClose: () => void;
 }) {
-  const reduced =
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Animation runs on every device — mobile is the primary sales channel.
+  const reduced = false;
 
   const [phase, setPhase] = React.useState<
     "shrink" | "line" | "bands" | "gallery" | "closing"
