@@ -317,7 +317,7 @@ function GalleryLayer({
   );
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, showQuickView = true }: { product: Product; showQuickView?: boolean }) {
   const { addItem } = useCart();
   const {
     siteMode,
