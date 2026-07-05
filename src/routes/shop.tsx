@@ -188,6 +188,53 @@ function Shop() {
   );
 }
 
+type CollageSlot = {
+  top: number;
+  left: number;
+  width: number;
+  aspect: string;
+  z: number;
+};
+
+const COLLAGE_PATTERNS: CollageSlot[][] = [
+  // 1: big left tall + two staggered right (small overlap on inner edges)
+  [
+    { top: 0, left: 0, width: 60, aspect: "3/4", z: 1 },
+    { top: 6, left: 54, width: 44, aspect: "1/1", z: 2 },
+    { top: 60, left: 58, width: 40, aspect: "4/5", z: 2 },
+  ],
+  // 2: wide bottom + two small tops
+  [
+    { top: 0, left: 4, width: 42, aspect: "3/4", z: 2 },
+    { top: 6, left: 52, width: 46, aspect: "1/1", z: 2 },
+    { top: 52, left: 0, width: 82, aspect: "16/10", z: 1 },
+  ],
+  // 3: diagonal descending squares
+  [
+    { top: 0, left: 0, width: 46, aspect: "3/4", z: 1 },
+    { top: 26, left: 40, width: 42, aspect: "1/1", z: 2 },
+    { top: 56, left: 58, width: 42, aspect: "3/4", z: 3 },
+  ],
+  // 4: tall right + two stepped left
+  [
+    { top: 0, left: 54, width: 46, aspect: "3/5", z: 1 },
+    { top: 4, left: 0, width: 48, aspect: "1/1", z: 2 },
+    { top: 56, left: 8, width: 44, aspect: "3/4", z: 2 },
+  ],
+  // 5: centered square with two flanks
+  [
+    { top: 12, left: 22, width: 56, aspect: "1/1", z: 1 },
+    { top: 0, left: 0, width: 36, aspect: "3/4", z: 2 },
+    { top: 62, left: 62, width: 38, aspect: "3/4", z: 2 },
+  ],
+  // 6: wide top + wide bottom cascade
+  [
+    { top: 0, left: 0, width: 68, aspect: "16/10", z: 1 },
+    { top: 30, left: 46, width: 54, aspect: "3/4", z: 2 },
+    { top: 74, left: 4, width: 50, aspect: "16/10", z: 2 },
+  ],
+];
+
 function Chapter({
   product,
   index,
@@ -200,11 +247,13 @@ function Chapter({
   const isDark = index === 2;
   const reverse = index % 2 === 1;
   const number = String(index + 1).padStart(2, "0");
-  const mainImage = product.images[0];
-  const secondaryImage = product.images[1] ?? product.images[0];
   const contextImage = product.images[2] ?? product.images[1] ?? product.images[0];
 
-  const viewBtnRef = useRef<HTMLButtonElement>(null);
+  const pattern = COLLAGE_PATTERNS[index % COLLAGE_PATTERNS.length];
+  const slots = pattern
+    .map((slot, i) => ({ slot, src: product.images[i] }))
+    .filter((entry): entry is { slot: CollageSlot; src: string } => Boolean(entry.src));
+
   const [overlay, setOverlay] = useState<null | {
     x: number;
     y: number;
@@ -212,131 +261,167 @@ function Chapter({
     height: number;
   }>(null);
 
-  const openQuickView = () => {
-    const rect = viewBtnRef.current?.getBoundingClientRect();
-    if (!rect) return;
+  const openQuickView = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
     setOverlay({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
   };
 
+  const badgeEl = (
+    <span className="absolute left-3 top-3 z-10 bg-charcoal px-3 py-2 font-mono-xs text-cream md:left-4 md:top-4">
+      capitol {number}
+    </span>
+  );
+
+  const viewBtnEl = (
+    <button
+      type="button"
+      onClick={openQuickView}
+      aria-label={`Vezi produs ${product.title}`}
+      className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/collage:opacity-100"
+      style={{
+        padding: "13px 28px",
+        background: "rgba(232,229,221,0.62)",
+        backdropFilter: "blur(10px)",
+        border: "none",
+        borderRadius: 14,
+        fontFamily: "var(--font-display)",
+        fontSize: 16,
+        fontWeight: 500,
+        textTransform: "uppercase",
+        letterSpacing: "0.12em",
+        color: "#1a1a18",
+        cursor: "pointer",
+        whiteSpace: "nowrap",
+      }}
+    >
+      Vezi produs
+    </button>
+  );
+
   return (
     <>
-    <section
-      id={`capitol-${number}`}
-      ref={refCallback}
-      data-chapter-index={index}
-      className={`shop-reveal relative overflow-hidden px-5 py-16 md:px-10 md:py-28 ${
-        isDark ? "bg-charcoal text-cream" : "bg-background text-charcoal"
-      }`}
-    >
-      <span
-        className={`pointer-events-none absolute top-8 font-display text-[11rem] italic leading-none opacity-[0.05] md:text-[19rem] ${
-          reverse ? "right-4 md:right-20" : "left-4 md:left-20"
-        }`}
-        aria-hidden="true"
-      >
-        {number}
-      </span>
-
-      <div
-        className={`relative mx-auto grid max-w-[1600px] gap-12 lg:grid-cols-12 lg:items-center ${
-          reverse ? "lg:[&_.chapter-media]:col-start-7 lg:[&_.chapter-copy]:col-start-2" : ""
+      <section
+        id={`capitol-${number}`}
+        ref={refCallback}
+        data-chapter-index={index}
+        className={`shop-reveal relative overflow-hidden px-5 py-16 md:px-10 md:py-28 ${
+          isDark ? "bg-charcoal text-cream" : "bg-background text-charcoal"
         }`}
       >
-        <div className="chapter-media lg:col-span-6">
-          <div className="shop-image-stage img-zoom relative bg-warm-grey">
-            <img
-              src={mainImage}
-              alt={`${product.title} - imagine principala`}
-              className="shop-image-main aspect-[5/6] w-full object-cover"
-              decoding="async"
-              loading={index === 0 ? "eager" : "lazy"}
-            />
-            <span className="shop-image-note absolute left-4 top-4 bg-charcoal px-3 py-2 font-mono-xs text-cream md:left-6 md:top-6">
-              capitol {number}
-            </span>
-          </div>
-          <div
-            className={`shop-image-pop group/pop relative mt-4 w-[72%] bg-background shadow-2xl md:-mt-[18%] md:w-[46%] ${
-              reverse ? "md:ml-0" : "md:ml-[54%]"
-            }`}
-          >
-            <img
-              src={secondaryImage}
-              alt={`${product.title} - detaliu secundar`}
-              className="aspect-[3/4] w-full object-cover"
-              decoding="async"
-              loading="lazy"
-            />
-            <button
-              ref={viewBtnRef}
-              type="button"
-              onClick={openQuickView}
-              aria-label={`Vezi produs ${product.title}`}
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/pop:opacity-100"
-              style={{
-                padding: "13px 28px",
-                background: "rgba(232,229,221,0.62)",
-                backdropFilter: "blur(10px)",
-                border: "none",
-                borderRadius: 14,
-                fontFamily: "var(--font-display)",
-                fontSize: 16,
-                fontWeight: 500,
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                color: "#1a1a18",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Vezi produs
-            </button>
-          </div>
-        </div>
+        <span
+          className={`pointer-events-none absolute top-8 font-display text-[11rem] italic leading-none opacity-[0.05] md:text-[19rem] ${
+            reverse ? "right-4 md:right-20" : "left-4 md:left-20"
+          }`}
+          aria-hidden="true"
+        >
+          {number}
+        </span>
 
         <div
-          className={`chapter-copy lg:col-span-4 ${reverse ? "lg:row-start-1" : "lg:col-start-9"}`}
+          className={`relative mx-auto grid max-w-[1600px] gap-12 lg:grid-cols-12 lg:items-center ${
+            reverse ? "lg:[&_.chapter-media]:col-start-7 lg:[&_.chapter-copy]:col-start-2" : ""
+          }`}
         >
-          <p className={isDark ? "font-mono-xs text-cream/60" : "font-mono-xs opacity-60"}>
-            Nr. {number} - <span className="text-[#ff006f]">editie limitata</span>
-          </p>
-          <h2 className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">{product.title}</h2>
-          <blockquote className="mt-7 border-l border-[#ff006f] pl-5 font-display text-2xl italic leading-snug">
-            {chapterQuotes[index] ?? product.vibe}
-          </blockquote>
-          <p
-            className={`mt-6 leading-relaxed ${isDark ? "text-cream/70" : "text-muted-foreground"}`}
-          >
-            {product.description}
-          </p>
-          <p className="mt-7 font-display text-4xl">{formatRON(product.price)}</p>
-
-          <ChapterQuickAdd product={product} isDark={isDark} />
-
-          <div className="mt-12 hidden md:block">
-            <div className="shop-context-image overflow-hidden">
-              <img
-                src={contextImage}
-                alt=""
-                className="aspect-[16/10] w-full object-cover"
-                decoding="async"
-                loading="lazy"
-              />
+          <div className="chapter-media lg:col-span-6">
+            {/* Mobile: vertical stack with staggered reveal */}
+            <div className="group/collage flex flex-col gap-4 md:hidden">
+              {slots.map(({ slot, src }, i) => (
+                <div
+                  key={i}
+                  className="shop-collage-item relative bg-warm-grey"
+                  style={{
+                    aspectRatio: slot.aspect.replace("/", " / "),
+                    transitionDelay: `${i * 90}ms`,
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={`${product.title} - imagine ${i + 1}`}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    decoding="async"
+                    loading={index === 0 && i === 0 ? "eager" : "lazy"}
+                  />
+                  {i === 0 && badgeEl}
+                  {i === 1 && viewBtnEl}
+                </div>
+              ))}
             </div>
-            <p className={`mt-3 font-mono-xs ${isDark ? "text-cream/45" : "opacity-45"}`}>
-              {contextCaptions[index]}
+
+            {/* Desktop: absolute-positioned collage */}
+            <div
+              className="group/collage relative hidden w-full md:block"
+              style={{ aspectRatio: "4 / 5" }}
+            >
+              {slots.map(({ slot, src }, i) => (
+                <div
+                  key={i}
+                  className="shop-collage-item absolute bg-warm-grey"
+                  style={{
+                    top: `${slot.top}%`,
+                    left: `${slot.left}%`,
+                    width: `${slot.width}%`,
+                    aspectRatio: slot.aspect.replace("/", " / "),
+                    zIndex: slot.z,
+                    transitionDelay: `${i * 110}ms`,
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={`${product.title} - imagine ${i + 1}`}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    decoding="async"
+                    loading={index === 0 && i === 0 ? "eager" : "lazy"}
+                  />
+                  {i === 0 && badgeEl}
+                  {i === 1 && viewBtnEl}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div
+            className={`chapter-copy lg:col-span-4 ${reverse ? "lg:row-start-1" : "lg:col-start-9"}`}
+          >
+            <p className={isDark ? "font-mono-xs text-cream/60" : "font-mono-xs opacity-60"}>
+              Nr. {number} - <span className="text-[#ff006f]">editie limitata</span>
             </p>
+            <h2 className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">{product.title}</h2>
+            <blockquote className="mt-7 border-l border-[#ff006f] pl-5 font-display text-2xl italic leading-snug">
+              {chapterQuotes[index] ?? product.vibe}
+            </blockquote>
+            <p
+              className={`mt-6 leading-relaxed ${isDark ? "text-cream/70" : "text-muted-foreground"}`}
+            >
+              {product.description}
+            </p>
+            <p className="mt-7 font-display text-4xl">{formatRON(product.price)}</p>
+
+            <ChapterQuickAdd product={product} isDark={isDark} />
+
+            <div className="mt-12 hidden md:block">
+              <div className="shop-context-image overflow-hidden">
+                <img
+                  src={contextImage}
+                  alt=""
+                  className="aspect-[16/10] w-full object-cover"
+                  decoding="async"
+                  loading="lazy"
+                />
+              </div>
+              <p className={`mt-3 font-mono-xs ${isDark ? "text-cream/45" : "opacity-45"}`}>
+                {contextCaptions[index]}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-    {overlay && (
-      <QuickViewOverlay
-        product={product}
-        origin={overlay}
-        onClose={() => setOverlay(null)}
-      />
-    )}
+      </section>
+      {overlay && (
+        <QuickViewOverlay
+          product={product}
+          origin={overlay}
+          onClose={() => setOverlay(null)}
+        />
+      )}
     </>
   );
 }
