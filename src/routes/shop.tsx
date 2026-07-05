@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
 import type { Product, Size } from "@/lib/mock-data";
 import { fetchProducts, getStockForColor } from "@/lib/shopify";
