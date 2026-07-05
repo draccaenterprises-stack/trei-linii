@@ -25,22 +25,17 @@ export function QuickViewOverlay({
   origin: { x: number; y: number; width: number; height: number };
   onClose: () => void;
 }) {
-  // Animation runs on every device — mobile is the primary sales channel.
-  const reduced = false;
-
-  const [phase, setPhase] = React.useState<
-    "shrink" | "line" | "bands" | "gallery" | "closing"
-  >(reduced ? "gallery" : "shrink");
-  const [closing, setClosing] = React.useState(false);
-
-  React.useEffect(() => {
-    if (reduced) return undefined;
-    const timers: number[] = [];
-    timers.push(window.setTimeout(() => setPhase("line"), 420));
-    timers.push(window.setTimeout(() => setPhase("bands"), 1020));
-    timers.push(window.setTimeout(() => setPhase("gallery"), 1700));
-    return () => timers.forEach((t) => window.clearTimeout(t));
-  }, [reduced]);
+  const [open, setOpen] = React.useState(false);
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const paperRef = React.useRef<HTMLDivElement>(null);
+  const cloneRef = React.useRef<HTMLDivElement>(null);
+  const cloneTextRef = React.useRef<HTMLSpanElement>(null);
+  const lineRef = React.useRef<HTMLDivElement>(null);
+  const bandsRef = React.useRef<HTMLDivElement>(null);
+  const bandRefs = React.useRef<Array<HTMLDivElement | null>>([]);
+  const galleryRef = React.useRef<HTMLDivElement>(null);
+  const animationsRef = React.useRef<Animation[]>([]);
+  const closingRef = React.useRef(false);
 
   // body scroll lock
   React.useEffect(() => {
@@ -51,15 +46,165 @@ export function QuickViewOverlay({
     };
   }, []);
 
+  React.useEffect(() => {
+    product.images.forEach((src) => {
+      const img = new Image();
+      img.src = src;
+      if (typeof img.decode === "function") {
+        void img.decode().catch(() => undefined);
+      }
+    });
+
+    const cloneFinal = `translate3d(${origin.width / 2 - 26}px, ${origin.height / 2 - 8}px, 0) scale(${52 / origin.width}, ${16 / origin.height})`;
+    const baseOptions: KeyframeAnimationOptions = { fill: "forwards", easing: EASING };
+    const animations: Animation[] = [];
+
+    const clone = cloneRef.current;
+    const cloneText = cloneTextRef.current;
+    const line = lineRef.current;
+    const paper = paperRef.current;
+    const gallery = galleryRef.current;
+    const bands = bandRefs.current.filter(Boolean) as HTMLDivElement[];
+
+    if (clone) {
+      animations.push(
+        clone.animate(
+          [{ transform: "translate3d(0, 0, 0)" }, { transform: cloneFinal }],
+          { ...baseOptions, duration: 420 },
+        ),
+        clone.animate([{ opacity: 1 }, { opacity: 0 }], {
+          ...baseOptions,
+          duration: 150,
+          delay: 420,
+        }),
+      );
+    }
+
+    if (cloneText) {
+      animations.push(
+        cloneText.animate([{ opacity: 1 }, { opacity: 0 }], {
+          ...baseOptions,
+          duration: 150,
+        }),
+      );
+    }
+
+    if (line) {
+      animations.push(
+        line.animate(
+          [
+            { opacity: 1, transform: "scaleY(0.012)" },
+            { opacity: 1, transform: "scaleY(1)" },
+          ],
+          { ...baseOptions, duration: 580, delay: 420 },
+        ),
+        line.animate([{ opacity: 1 }, { opacity: 0 }], {
+          ...baseOptions,
+          duration: 150,
+          delay: 1020,
+        }),
+      );
+    }
+
+    bands.forEach((band, index) => {
+      animations.push(
+        band.animate(
+          [
+            { opacity: 1, transform: "scaleX(0.0045)" },
+            { opacity: 1, transform: "scaleX(1)" },
+          ],
+          { ...baseOptions, duration: 640, delay: 1020 + index * 100 },
+        ),
+      );
+    });
+
+    if (paper) {
+      animations.push(
+        paper.animate([{ opacity: 0 }, { opacity: 1 }], {
+          ...baseOptions,
+          duration: 200,
+          delay: 1020,
+        }),
+      );
+    }
+
+    if (gallery) {
+      animations.push(
+        gallery.animate([{ opacity: 0 }, { opacity: 1 }], {
+          ...baseOptions,
+          duration: 460,
+          delay: 1700,
+        }),
+        gallery.animate([{ transform: "scale(0.94)" }, { transform: "scale(1)" }], {
+          ...baseOptions,
+          duration: 620,
+          delay: 1700,
+        }),
+      );
+    }
+
+    animationsRef.current = animations;
+    let cancelled = false;
+    void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
+      if (!cancelled && !closingRef.current) setOpen(true);
+    });
+
+    return () => {
+      cancelled = true;
+      animations.forEach((animation) => animation.cancel());
+    };
+  }, [origin.height, origin.width, product.images]);
+
   const handleClose = React.useCallback(() => {
-    if (closing) return;
-    setClosing(true);
-    if (reduced) {
-      window.setTimeout(onClose, 0);
+    if (closingRef.current) return;
+    closingRef.current = true;
+
+    animationsRef.current.forEach((animation) => {
+      try {
+        animation.commitStyles();
+      } catch {
+        // Ignore browsers that cannot commit styles for a cancelled animation.
+      }
+      animation.cancel();
+    });
+
+    const closeOptions: KeyframeAnimationOptions = { fill: "forwards", easing: EASING };
+    const closeAnimations: Animation[] = [];
+
+    if (galleryRef.current) {
+      closeAnimations.push(
+        galleryRef.current.animate([{ opacity: getComputedStyle(galleryRef.current).opacity }, { opacity: 0 }], {
+          ...closeOptions,
+          duration: 160,
+        }),
+      );
+    }
+
+    if (bandsRef.current) {
+      closeAnimations.push(
+        bandsRef.current.animate([{ opacity: getComputedStyle(bandsRef.current).opacity }, { opacity: 0 }], {
+          ...closeOptions,
+          duration: 160,
+        }),
+      );
+    }
+
+    if (rootRef.current) {
+      closeAnimations.push(
+        rootRef.current.animate([{ opacity: getComputedStyle(rootRef.current).opacity }, { opacity: 0 }], {
+          ...closeOptions,
+          duration: 200,
+        }),
+      );
+    }
+
+    if (closeAnimations.length === 0) {
+      onClose();
       return;
     }
-    window.setTimeout(onClose, 320);
-  }, [closing, onClose, reduced]);
+
+    void Promise.allSettled(closeAnimations.map((animation) => animation.finished)).then(onClose);
+  }, [onClose]);
 
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -69,28 +214,18 @@ export function QuickViewOverlay({
     return () => window.removeEventListener("keydown", onKey);
   }, [handleClose]);
 
-  // Derived visibility
-  const showShrink = !reduced && !closing && (phase === "shrink" || phase === "line");
-  const shrinkToEllipse = !reduced && (phase === "line" || phase === "bands" || phase === "gallery");
-  const showLine = !reduced && !closing && (phase === "line" || phase === "bands");
-  const showBands = !reduced && (phase === "bands" || phase === "gallery" || closing);
-  const showGallery = phase === "gallery";
-
   // origin coordinates (viewport) – for transform origins
   const originX = `${origin.x + origin.width / 2}px`;
   const originY = `${origin.y + origin.height / 2}px`;
 
-  // Background paper layer fades in as its own layer — avoids animating the
-  // root overlay's background (which would repaint the full screen every frame).
-  const paperVisible = reduced || showBands;
-
   return (
     <div
+      ref={rootRef}
       className="fixed inset-0 z-[100]"
       style={{
         background: "transparent",
-        opacity: closing && (phase === "gallery" || reduced) ? 0 : 1,
-        transition: closing ? `opacity 200ms ${EASING}` : undefined,
+        opacity: 1,
+        willChange: "opacity",
       }}
       role="dialog"
       aria-modal="true"
@@ -98,13 +233,13 @@ export function QuickViewOverlay({
     >
       {/* Paper background (own layer, only opacity animates) */}
       <div
+        ref={paperRef}
         aria-hidden="true"
         style={{
           position: "fixed",
           inset: 0,
           background: "#faf8f2",
-          opacity: paperVisible ? 1 : 0,
-          transition: `opacity 200ms ${EASING}`,
+          opacity: 0,
           pointerEvents: "none",
           willChange: "opacity",
         }}
@@ -112,115 +247,105 @@ export function QuickViewOverlay({
 
       {/* Shrinking clone of the button — only transform + opacity animate.
           No border-radius transition, no backdrop-filter during animation. */}
-      {showShrink && (
-        <div
-          aria-hidden="true"
+      <div
+        ref={cloneRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: origin.x,
+          top: origin.y,
+          width: origin.width,
+          height: origin.height,
+          // Opaque approximation of the translucent button — avoids backdrop-filter repaints on mobile.
+          background: "#e8e5dd",
+          borderRadius: 14,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transformOrigin: "center center",
+          transform: "translate3d(0, 0, 0)",
+          opacity: 1,
+          pointerEvents: "none",
+          willChange: "transform, opacity",
+          backfaceVisibility: "hidden",
+        }}
+      >
+        <span
+          ref={cloneTextRef}
           style={{
-            position: "fixed",
-            left: origin.x,
-            top: origin.y,
-            width: origin.width,
-            height: origin.height,
-            // Opaque approximation of the translucent button — avoids backdrop-filter repaints on mobile.
-            background: "#e8e5dd",
-            borderRadius: 14,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transformOrigin: "center center",
-            transform: shrinkToEllipse
-              ? `translate3d(${origin.width / 2 - 26}px, ${origin.height / 2 - 8}px, 0) scale(${52 / origin.width}, ${16 / origin.height})`
-              : "translate3d(0, 0, 0)",
-            transition: `transform 420ms ${EASING}, opacity 150ms ${EASING}`,
-            opacity: phase === "line" ? 0 : 1,
-            pointerEvents: "none",
-            willChange: "transform, opacity",
-            backfaceVisibility: "hidden",
+            fontFamily: "var(--font-display)",
+            fontSize: 16,
+            fontWeight: 500,
+            textTransform: "uppercase",
+            letterSpacing: "0.12em",
+            color: "#1a1a18",
+            opacity: 1,
+            willChange: "opacity",
           }}
         >
-          <span
-            style={{
-              fontFamily: "var(--font-display)",
-              fontSize: 16,
-              fontWeight: 500,
-              textTransform: "uppercase",
-              letterSpacing: "0.12em",
-              color: "#1a1a18",
-              opacity: phase === "shrink" ? 1 : 0,
-              transition: `opacity 150ms ${EASING}`,
-            }}
-          >
-            Vezi produs
-          </span>
-        </div>
-      )}
+          Vezi produs
+        </span>
+      </div>
 
       {/* Vertical line — transform scaleY only */}
-      {showLine && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "fixed",
-            left: origin.x + origin.width / 2 - 2.5,
-            top: 0,
-            width: 5,
-            height: "100vh",
-            background: "#1a1a18",
-            transformOrigin: `center ${originY}`,
-            transform: phase === "line" ? "scaleY(1)" : "scaleY(0.012)",
-            transition: `transform 580ms ${EASING}, opacity 150ms ${EASING}`,
-            opacity: phase === "bands" ? 0 : 1,
-            willChange: "transform, opacity",
-            backfaceVisibility: "hidden",
-          }}
-        />
-      )}
+      <div
+        ref={lineRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: origin.x + origin.width / 2 - 2.5,
+          top: 0,
+          width: 5,
+          height: "100vh",
+          background: "#1a1a18",
+          transformOrigin: `center ${originY}`,
+          transform: "scaleY(0.012)",
+          opacity: 0,
+          willChange: "transform, opacity",
+          backfaceVisibility: "hidden",
+        }}
+      />
 
       {/* Three stacked bands — transform scaleX only */}
-      {showBands && (
-        <div
-          aria-hidden="true"
-          style={{
-            position: "fixed",
-            inset: 0,
-            display: "grid",
-            gridTemplateRows: "1fr 1.2fr 1.3fr",
-            gap: 10,
-            pointerEvents: "none",
-          }}
-        >
-          {["#1a1a18", "#1a1a18", "#ff006f"].map((color, i) => (
-            <div
-              key={i}
-              style={{
-                background: color,
-                transformOrigin: `${originX} center`,
-                transform:
-                  closing
-                    ? "scaleX(1)"
-                    : phase === "bands" || phase === "gallery"
-                      ? "scaleX(1)"
-                      : "scaleX(0.0045)",
-                opacity: closing ? 0 : 1,
-                transitionProperty: closing ? "opacity" : "transform",
-                transitionDuration: closing ? "160ms" : "640ms",
-                transitionTimingFunction: EASING.replace("cubic-bezier", "cubic-bezier"),
-                willChange: "transform, opacity",
-                backfaceVisibility: "hidden",
-              }}
-            />
-          ))}
-        </div>
-      )}
+      <div
+        ref={bandsRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          inset: 0,
+          display: "grid",
+          gridTemplateRows: "1fr 1.2fr 1.3fr",
+          gap: 10,
+          pointerEvents: "none",
+          opacity: 1,
+          willChange: "opacity",
+        }}
+      >
+        {["#1a1a18", "#1a1a18", "#ff006f"].map((color, i) => (
+          <div
+            key={i}
+            ref={(node) => {
+              bandRefs.current[i] = node;
+            }}
+            style={{
+              background: color,
+              transformOrigin: `${originX} center`,
+              transform: "scaleX(0.0045)",
+              opacity: 0,
+              willChange: "transform, opacity",
+              backfaceVisibility: "hidden",
+            }}
+          />
+        ))}
+      </div>
 
 
       {/* Gallery */}
       <GalleryLayer
         product={product}
-        visible={showGallery && !closing}
-        closing={closing}
+        layerRef={galleryRef}
+        interactive={open}
         onClose={handleClose}
-        reduced={reduced}
       />
     </div>
   );
@@ -228,31 +353,27 @@ export function QuickViewOverlay({
 
 function GalleryLayer({
   product,
-  visible,
-  closing,
+  layerRef,
+  interactive,
   onClose,
-  reduced,
 }: {
   product: Product;
-  visible: boolean;
-  closing: boolean;
+  layerRef: React.RefObject<HTMLDivElement | null>;
+  interactive: boolean;
   onClose: () => void;
-  reduced: boolean;
 }) {
-  const active = visible || reduced;
-
   return (
     <div
+      ref={layerRef}
       className="fixed inset-0 flex flex-col"
       style={{
         background: "#faf8f2",
-        opacity: closing ? 0 : active ? 1 : 0,
-        transform: closing ? "scale(1)" : active ? "scale(1)" : "scale(0.94)",
-        transition: closing
-          ? `opacity 160ms ${EASING}`
-          : `opacity 460ms ${EASING}, transform 620ms ${EASING}`,
-        pointerEvents: active && !closing ? "auto" : "none",
+        opacity: 0,
+        transform: "scale(0.94)",
+        pointerEvents: interactive ? "auto" : "none",
         zIndex: 2,
+        willChange: "transform, opacity",
+        backfaceVisibility: "hidden",
       }}
     >
       {/* Top bar */}
