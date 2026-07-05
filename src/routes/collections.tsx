@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { CollectionCard } from "@/components/CollectionCard";
-import { fetchCollections, type Collection } from "@/lib/shopify";
+import { fetchCollections } from "@/lib/shopify";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/collections")({
