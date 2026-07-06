@@ -1,49 +1,49 @@
 # Trei Linii - raport final de verificare
 
-Generat: 2026-06-04T18:44:56.213Z
-Commit: dcb84fb
-Branch: main
+Generat: 2026-07-06T17:38:19.554Z
+Commit: 381bc7b
+Branch: edit/edt-72c91914-2355-440e-85b0-05d2e9207382
 URL public verificat: https://blank-atelier-canvas.lovable.app
 
 ## Rezultat
 
-Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje externe inainte de lansare completa.
+Status: NU TRECE. Exista verificari locale esuate.
 
 ## Verificari automate
 
-[x] lint
+[!] lint
     Comanda: npm run lint
-    Status: passed, exit 0
+    Status: failed, exit 2
     Output relevant:
-    C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\components\ui\navigation-menu.tsx
-      111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-    C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\components\ui\sidebar.tsx
-      743:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-    C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\components\ui\toggle.tsx
-      42:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-    C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\lib\cart-context.tsx
-      108:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-    C:\Users\cuzac\OneDrive\Documents\blank-atelier-canvas\src\lib\site-context.tsx
-      353:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-      359:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
-    ? 9 problems (0 errors, 9 warnings)
+        at doMatch (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:422:13)
+        at match (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:756:11)
+        at /dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:772:10
+        at Array.some (<anonymous>)
+        at pathMatches (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:767:44)
+        at /dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:1368:8
+        at FlatConfigArray.forEach (<anonymous>)
+    npm notice
+    npm notice New major version of npm available! 10.9.4 -> 11.18.0
+    npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.18.0
+    npm notice To update run: npm install -g npm@11.18.0
+    npm notice
 
 [x] build
     Comanda: npm run build
     Status: passed, exit 0
     Output relevant:
-    dist/server/assets/contact-C4U9FR__.js                               4.04 kB
-    dist/server/assets/_tanstack-start-manifest_v-Tgwh4eBl.js            4.09 kB
-    dist/server/assets/privacy-CFxMUZ6-.js                               4.61 kB
-    dist/server/assets/terms-Dt8FjMWX.js                                 5.14 kB
-    dist/server/assets/ProductCard-D4lut6dJ.js                           5.66 kB
-    dist/server/assets/cart-LH0VxSvS.js                                  5.79 kB
-    dist/server/assets/product._handle-Dkx3DK_c.js                      14.46 kB
-    dist/server/assets/worker-entry-oU0rzWVw.js                         21.31 kB
-    dist/server/assets/index-ClxRgBRR.js                                24.36 kB
-    dist/server/assets/router-Ds6A7TeK.js                              341.91 kB
-    dist/server/assets/server-Bglo4I2j.js                              735.14 kB
-    ? built in 5.78s
+    node_modules/@tanstack/react-query/build/modern/useMutationState.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useMutationState.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useInfiniteQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useInfiniteQuery.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useMutation.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useMutation.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useSuspenseInfiniteQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseInfiniteQuery.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useSuspenseQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseQuery.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useSuspenseQueries.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseQueries.js" was ignored.
+    node_modules/@tanstack/react-router/dist/esm/matchContext.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-router/dist/esm/matchContext.js" was ignored.
+    node_modules/@tanstack/react-router/dist/esm/Transitioner.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-router/dist/esm/Transitioner.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/errorBoundaryUtils.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/errorBoundaryUtils.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useBaseQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useBaseQuery.js" was ignored.
+    [nitro]  WARN  [cloudflare] Wrangler config main is overridden and will be ignored.
 
 [ ] public storefront
     Comanda: npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
@@ -53,18 +53,16 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     > verify:storefront
     > node scripts/verify-storefront.mjs https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
     Storefront verification failed for https://blank-atelier-canvas.lovable.app
-    - /terms: text interzis gasit: /trebuie schimbat/i
-    - /privacy: text interzis gasit: /trebuie schimbat/i
+    - /shop: produse vizibile insuficiente (0/8); probabil ruleaza o versiune Lovable nepublicata
 
-[ ] public SEO/static assets
+[x] public SEO/static assets
     Comanda: npm run verify:seo -- https://blank-atelier-canvas.lovable.app
-    Status: blocked, exit 1
+    Status: passed, exit 0
     Nota: Poate ramane blocat pana cand Lovable publica ultima versiune de robots/sitemap.
     Output relevant:
     > verify:seo
     > node scripts/verify-public-seo.mjs https://blank-atelier-canvas.lovable.app
-    Public SEO verification failed for https://blank-atelier-canvas.lovable.app
-    - robots.txt: text interzis gasit: /trebuie schimbat/i
+    Public SEO verification passed for https://blank-atelier-canvas.lovable.app
 
 [x] source secret/demo scan
     Comanda: rg -n "<forbidden patterns>" src public .env.example --glob "!routeTree.gen.ts"
@@ -75,16 +73,22 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     Comanda: npm install --package-lock-only --ignore-scripts
     Status: passed, exit 0
     Output relevant:
-    up to date, audited 524 packages in 3s
-    120 packages are looking for funding
+    up to date in 2s
+    145 packages are looking for funding
       run `npm fund` for details
-    found 0 vulnerabilities
+    npm notice operation is not supported.
+    npm notice operation is not supported.
 
-[x] dependency audit
+[!] dependency audit
     Comanda: npm audit --audit-level=moderate
-    Status: passed, exit 0
+    Status: failed, exit 1
     Output relevant:
-    found 0 vulnerabilities
+    { error: 'operation is not supported.' }
+    npm notice operation is not supported.
+    npm notice operation is not supported.
+    npm warn audit 404 Not Found - POST https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/-/npm/v1/security/audits/quick - operation is not supported.
+    npm error audit endpoint returned an error
+    npm error A complete log of this run can be found in: /root/.npm/_logs/2026-07-06T17_38_18_316Z-debug-0.log
 
 [ ] Shopify readiness
     Comanda: npm run verify:shopify
@@ -94,6 +98,7 @@ Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje exte
     > verify:shopify
     > node scripts/verify-shopify-readiness.mjs
     Shopify readiness failed:
+    - Lipseste VITE_SHOPIFY_STORE_DOMAIN.
     - Lipseste VITE_SHOPIFY_STOREFRONT_TOKEN.
 
 ## Blocaje inainte de comenzi reale
