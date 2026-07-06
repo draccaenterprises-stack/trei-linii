@@ -137,7 +137,36 @@ export function Announcement() {
   );
 }
 
+function useHideOnScroll() {
+  const [hidden, setHidden] = React.useState(false);
+  React.useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const THRESHOLD = 5;
+    const TOP_ZONE = 80;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+        if (y < TOP_ZONE) {
+          setHidden(false);
+        } else if (Math.abs(delta) > THRESHOLD) {
+          setHidden(delta > 0);
+        }
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return hidden;
+}
+
 export function Header() {
+  const hidden = useHideOnScroll();
   const { count, open } = useCart();
   const { accentColor, logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
