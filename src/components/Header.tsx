@@ -191,7 +191,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur will-change-transform"
+      className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur will-change-transform relative"
       style={{
         transform: hidden ? "translateY(-100%)" : "translateY(0)",
         transition: "transform 450ms cubic-bezier(0.16, 1, 0.3, 1)",
@@ -234,7 +234,7 @@ export function Header() {
             >
               <Menu className="h-5 w-5" strokeWidth={1.25} />
             </summary>
-            <div className="fixed left-0 right-0 top-[96px] z-50 bg-background border-b border-border shadow-sm">
+            <div className="absolute inset-x-0 top-full z-50 bg-charcoal text-cream border-b border-border shadow-sm">
               <nav className="flex flex-col px-5 py-6 gap-5">
                 {nav.map((n) =>
                   n.to.includes("#") ? (
