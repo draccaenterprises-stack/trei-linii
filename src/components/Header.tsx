@@ -191,7 +191,7 @@ export function Header() {
 
   return (
     <header
-      className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur will-change-transform"
+      className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur will-change-transform relative"
       style={{
         transform: hidden ? "translateY(-100%)" : "translateY(0)",
         transition: "transform 450ms cubic-bezier(0.16, 1, 0.3, 1)",
