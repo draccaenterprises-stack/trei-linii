@@ -234,7 +234,7 @@ export function Header() {
             >
               <Menu className="h-5 w-5" strokeWidth={1.25} />
             </summary>
-            <div className="fixed left-0 right-0 top-[96px] z-50 bg-background border-b border-border shadow-sm">
+            <div className="absolute inset-x-0 top-full z-50 bg-charcoal text-cream border-b border-border shadow-sm">
               <nav className="flex flex-col px-5 py-6 gap-5">
                 {nav.map((n) =>
                   n.to.includes("#") ? (
