@@ -1,7 +1,7 @@
 # Trei Linii - raport final de verificare
 
-Generat: 2026-07-06T17:38:19.554Z
-Commit: 381bc7b
+Generat: 2026-07-06T17:38:51.311Z
+Commit: caf9284
 Branch: edit/edt-72c91914-2355-440e-85b0-05d2e9207382
 URL public verificat: https://blank-atelier-canvas.lovable.app
 
@@ -15,6 +15,11 @@ Status: NU TRECE. Exista verificari locale esuate.
     Comanda: npm run lint
     Status: failed, exit 2
     Output relevant:
+    ESLint: 9.39.4
+    TypeError: expand is not a function
+        at Minimatch.braceExpand (/dev-server/node_modules/minimatch/minimatch.js:271:10)
+        at Minimatch.make (/dev-server/node_modules/minimatch/minimatch.js:180:33)
+        at new Minimatch (/dev-server/node_modules/minimatch/minimatch.js:156:8)
         at doMatch (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:422:13)
         at match (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:756:11)
         at /dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:772:10
@@ -22,25 +27,20 @@ Status: NU TRECE. Exista verificari locale esuate.
         at pathMatches (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:767:44)
         at /dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:1368:8
         at FlatConfigArray.forEach (<anonymous>)
-    npm notice
-    npm notice New major version of npm available! 10.9.4 -> 11.18.0
-    npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.18.0
-    npm notice To update run: npm install -g npm@11.18.0
-    npm notice
 
 [x] build
     Comanda: npm run build
     Status: passed, exit 0
     Output relevant:
+    node_modules/@tanstack/react-query/build/modern/HydrationBoundary.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/HydrationBoundary.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/useIsFetching.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useIsFetching.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useMutationState.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useMutationState.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useInfiniteQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useInfiniteQuery.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useMutation.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useMutation.js" was ignored.
+    node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useSuspenseInfiniteQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseInfiniteQuery.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useSuspenseQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseQuery.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useSuspenseQueries.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseQueries.js" was ignored.
-    node_modules/@tanstack/react-router/dist/esm/matchContext.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-router/dist/esm/matchContext.js" was ignored.
-    node_modules/@tanstack/react-router/dist/esm/Transitioner.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-router/dist/esm/Transitioner.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/errorBoundaryUtils.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/errorBoundaryUtils.js" was ignored.
     node_modules/@tanstack/react-query/build/modern/useBaseQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useBaseQuery.js" was ignored.
     [nitro]  WARN  [cloudflare] Wrangler config main is overridden and will be ignored.
@@ -88,7 +88,7 @@ Status: NU TRECE. Exista verificari locale esuate.
     npm notice operation is not supported.
     npm warn audit 404 Not Found - POST https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/-/npm/v1/security/audits/quick - operation is not supported.
     npm error audit endpoint returned an error
-    npm error A complete log of this run can be found in: /root/.npm/_logs/2026-07-06T17_38_18_316Z-debug-0.log
+    npm error A complete log of this run can be found in: /root/.npm/_logs/2026-07-06T17_38_50_065Z-debug-0.log
 
 [ ] Shopify readiness
     Comanda: npm run verify:shopify
