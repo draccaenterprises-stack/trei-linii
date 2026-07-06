@@ -137,7 +137,36 @@ export function Announcement() {
   );
 }
 
+function useHideOnScroll() {
+  const [hidden, setHidden] = React.useState(false);
+  React.useEffect(() => {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const THRESHOLD = 5;
+    const TOP_ZONE = 80;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastY;
+        if (y < TOP_ZONE) {
+          setHidden(false);
+        } else if (Math.abs(delta) > THRESHOLD) {
+          setHidden(delta > 0);
+        }
+        lastY = y;
+        ticking = false;
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return hidden;
+}
+
 export function Header() {
+  const hidden = useHideOnScroll();
   const { count, open } = useCart();
   const { accentColor, logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
@@ -148,7 +177,13 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur">
+    <header
+      className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur will-change-transform"
+      style={{
+        transform: hidden ? "translateY(-100%)" : "translateY(0)",
+        transition: "transform 450ms cubic-bezier(0.16, 1, 0.3, 1)",
+      }}
+    >
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 h-16 flex items-center justify-between gap-6">
         <Link to="/" className="inline-flex items-center gap-3" aria-label={logoText}>
           <img src={logoFull} alt={logoText} className="h-8 md:h-10 w-auto object-contain" />
