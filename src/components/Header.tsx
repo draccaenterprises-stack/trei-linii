@@ -141,8 +141,9 @@ function useHideOnScroll() {
   const [hidden, setHidden] = React.useState(false);
   React.useEffect(() => {
     let lastY = window.scrollY;
+    let acc = 0;
     let ticking = false;
-    const THRESHOLD = 5;
+    const THRESHOLD = 8;
     const TOP_ZONE = 80;
     const onScroll = () => {
       if (ticking) return;
@@ -150,12 +151,23 @@ function useHideOnScroll() {
       window.requestAnimationFrame(() => {
         const y = window.scrollY;
         const delta = y - lastY;
-        if (y < TOP_ZONE) {
-          setHidden(false);
-        } else if (Math.abs(delta) > THRESHOLD) {
-          setHidden(delta > 0);
-        }
         lastY = y;
+        if (y < TOP_ZONE) {
+          acc = 0;
+          setHidden(false);
+        } else if (delta !== 0) {
+          if (Math.sign(delta) !== Math.sign(acc)) {
+            acc = 0;
+          }
+          acc += delta;
+          if (acc > THRESHOLD) {
+            setHidden(true);
+            acc = 0;
+          } else if (acc < -THRESHOLD) {
+            setHidden(false);
+            acc = 0;
+          }
+        }
         ticking = false;
       });
     };
@@ -164,6 +176,7 @@ function useHideOnScroll() {
   }, []);
   return hidden;
 }
+
 
 export function Header() {
   const hidden = useHideOnScroll();
