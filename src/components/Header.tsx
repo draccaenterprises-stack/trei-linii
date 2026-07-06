@@ -177,7 +177,13 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur">
+    <header
+      className="sticky top-0 z-40 border-b border-border bg-background/95 md:bg-background/85 md:backdrop-blur will-change-transform"
+      style={{
+        transform: hidden ? "translateY(-100%)" : "translateY(0)",
+        transition: "transform 450ms cubic-bezier(0.16, 1, 0.3, 1)",
+      }}
+    >
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 h-16 flex items-center justify-between gap-6">
         <Link to="/" className="inline-flex items-center gap-3" aria-label={logoText}>
           <img src={logoFull} alt={logoText} className="h-8 md:h-10 w-auto object-contain" />
