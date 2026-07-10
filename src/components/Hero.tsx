@@ -103,23 +103,30 @@ export function Hero({ products = [] }: { products?: Product[] }) {
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-charcoal/90 via-charcoal/35 to-transparent" />
       </div>
-      <div className="absolute right-4 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-3 md:right-5">
+      <div className="absolute right-4 top-1/2 z-10 flex -translate-y-1/2 flex-col gap-2.5 md:right-6">
         {slides.map((slide, index) => (
           <button
             key={slide.src}
             type="button"
             onClick={() => setActiveSlide(index)}
-            className={`h-12 w-1.5 transition-colors ${
-              index === activeSlide ? "bg-[#ff006f]" : "bg-cream/45 hover:bg-cream"
-            }`}
+            className="group flex h-12 w-6 items-center justify-end"
             aria-label={`Schimba imaginea hero ${index + 1}`}
-          />
+            aria-current={index === activeSlide ? "true" : undefined}
+          >
+            <span
+              className={`block h-px transition-[width,background-color] duration-500 ${
+                index === activeSlide
+                  ? "w-6 bg-[#ff006f]"
+                  : "w-3 bg-cream/65 group-hover:w-5 group-hover:bg-cream"
+              }`}
+            />
+          </button>
         ))}
       </div>
       <div
         className={`relative mx-auto flex min-h-[90vh] max-w-[1600px] px-5 pb-[8vh] pr-12 md:px-10 ${active.align}`}
       >
-        <div className={active.copy}>
+        <div className={`w-full ${active.copy}`}>
           <h1 className="font-display text-[15vw] font-medium leading-[1.02] md:text-[7vw] whitespace-pre-line [text-wrap:balance]">
             {active.title[0]}
             <span className="text-[#ff006f] italic">{active.title[1]}</span>

@@ -7,7 +7,6 @@ import p4a from "@/assets/product-4a.jpg";
 import p4b from "@/assets/product-4b.jpg";
 import colEss from "@/assets/collection-essentials.jpg";
 import colWashed from "@/assets/collection-washed.jpg";
-import colGraphics from "@/assets/collection-graphics.jpg";
 import lb1 from "@/assets/lookbook-1.jpg";
 import lb2 from "@/assets/lookbook-2.jpg";
 import lb3 from "@/assets/lookbook-3.jpg";
@@ -34,6 +33,7 @@ export interface Product {
   title: string;
   price: number;
   collection: string;
+  collections?: string[];
   badge?: Badge;
   images: string[];
   description: string;
@@ -51,7 +51,7 @@ export const products: Product[] = [
     handle: "tricou-oversized-linie-01",
     title: "Tricou Oversized Linie 01",
     price: 189,
-    collection: "fit",
+    collection: "editia-unu",
     badge: "noutate",
     images: [p1a, p2a],
     description:
@@ -70,7 +70,7 @@ export const products: Product[] = [
     handle: "tricou-backprint-cadru-02",
     title: "Tricou Backprint Cadru 02",
     price: 219,
-    collection: "spate",
+    collection: "editia-unu",
     badge: "limitat",
     images: [p2b, p2a],
     description:
@@ -89,7 +89,7 @@ export const products: Product[] = [
     handle: "tricou-graphic-grid-03",
     title: "Tricou Graphic Grid 03",
     price: 239,
-    collection: "grafica",
+    collection: "editia-unu",
     badge: "stoc limitat",
     images: [p3b, p3a],
     description:
@@ -108,7 +108,7 @@ export const products: Product[] = [
     handle: "tricou-washed-olive-04",
     title: "Tricou Washed Olive 04",
     price: 199,
-    collection: "material",
+    collection: "editia-unu",
     images: [p4b, p4a],
     description:
       "Baza olive cu aspect spalat, potrivita pentru tinute simple. Designul ramane concentrat pe silueta si spate.",
@@ -126,7 +126,7 @@ export const products: Product[] = [
     handle: "tricou-off-white-mark-05",
     title: "Tricou Off White Mark 05",
     price: 209,
-    collection: "fit",
+    collection: "editia-doi",
     images: [p1a, p3a],
     description:
       "Tricou off-white cu semn frontal mic si grafica aerisita pe spate. Creat pentru o estetica urbana, curata.",
@@ -144,7 +144,7 @@ export const products: Product[] = [
     handle: "tricou-charcoal-type-06",
     title: "Tricou Charcoal Type 06",
     price: 229,
-    collection: "grafica",
+    collection: "editia-doi",
     badge: "noutate",
     images: [p3a, p4a],
     description:
@@ -163,7 +163,7 @@ export const products: Product[] = [
     handle: "tricou-washed-blue-07",
     title: "Tricou Washed Blue 07",
     price: 219,
-    collection: "material",
+    collection: "editia-doi",
     images: [p2a, p1a],
     description:
       "Albastru spalat, croiala relaxata si print discret pe spate. O varianta mai deschisa pentru sezonul cald.",
@@ -181,7 +181,7 @@ export const products: Product[] = [
     handle: "tricou-accent-line-08",
     title: "Tricou Accent Line 08",
     price: 239,
-    collection: "spate",
+    collection: "editia-doi",
     badge: "limitat",
     images: [p4a, p2b],
     description:
@@ -203,36 +203,25 @@ export interface Collection {
   description: string;
   image: string;
   count: number;
+  productIds?: string[];
 }
 
 export const collections: Collection[] = [
   {
-    handle: "fit",
-    title: "Fit oversized",
-    description: "Croiala relaxata, umeri cazuti si proportii curate.",
+    handle: "editia-unu",
+    title: "Editia I",
+    description:
+      "Prima serie Trei Linii. Patru interpretari ale aceleiasi reguli: fata linistita, constructie grafica pe spate.",
     image: colEss,
-    count: 3,
+    count: 4,
   },
   {
-    handle: "material",
-    title: "Material dens",
-    description: "Textura stabila si senzatie premium la purtare.",
+    handle: "editia-doi",
+    title: "Editia II",
+    description:
+      "O continuare mai tactila, cu tonuri spalate si compozitii mai ferme. Aceeasi croiala, un alt ritm.",
     image: colWashed,
-    count: 2,
-  },
-  {
-    handle: "spate",
-    title: "Design pe spate",
-    description: "Fata curata, grafica minimalista plasata pe spate.",
-    image: colGraphics,
-    count: 2,
-  },
-  {
-    handle: "grafica",
-    title: "Grafica curata",
-    description: "Printuri mai puternice, dar pastrate intr-un limbaj simplu.",
-    image: colGraphics,
-    count: 2,
+    count: 4,
   },
 ];
 

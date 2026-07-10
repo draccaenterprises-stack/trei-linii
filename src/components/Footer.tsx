@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { useSite } from "@/lib/site-context";
+import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
 
 export function Footer() {
   const {
@@ -27,7 +28,16 @@ export function Footer() {
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 py-16 md:py-24">
         <div className="grid md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
-            <div className="font-display text-3xl md:text-5xl leading-[0.95]">
+            <Link to="/" className="inline-flex" aria-label={`${logoText} - pagina principala`}>
+              <img
+                src={logoFull}
+                alt={logoText}
+                className="h-12 w-auto max-w-full object-contain brightness-0 invert md:h-16"
+                loading="lazy"
+                decoding="async"
+              />
+            </Link>
+            <div className="mt-10 font-display text-3xl leading-[0.95] md:text-5xl">
               {taglineLines.map((line) => (
                 <span key={line} className="block">
                   {line}
@@ -38,6 +48,11 @@ export function Footer() {
               {logoText}
               {footerLocation ? ` · ${footerLocation}` : ""}
             </p>
+            <div className="mt-8 grid max-w-44 gap-2" aria-hidden="true">
+              <span className="h-px w-full bg-cream/75" />
+              <span className="h-px w-[76%] bg-cream/75" />
+              <span className="h-px w-[88%] bg-[#ff006f]" />
+            </div>
           </div>
 
           <div className="md:col-span-2">

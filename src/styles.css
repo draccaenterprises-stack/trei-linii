@@ -72,8 +72,8 @@
   --washed-blue: #7e9eb2;
   --acid: #ff006f;
 
-  --font-display: "Cormorant Garamond", "Times New Roman", Georgia, serif;
-  --font-sans: "Hanken Grotesk", system-ui, sans-serif;
+  --font-display: "Bodoni Moda", "Times New Roman", Georgia, serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 
@@ -116,8 +116,8 @@
   }
   .font-mono-xs {
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: 0.14em;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
   }
 
@@ -189,6 +189,24 @@
     contain-intrinsic-size: 920px;
     opacity: 1;
     transform: none;
+  }
+
+  .manifest-reveal {
+    opacity: 1;
+    transform: none;
+  }
+
+  .motion-ready .manifest-reveal {
+    opacity: 0;
+    transform: translate3d(0, 26px, 0);
+    transition:
+      opacity 760ms cubic-bezier(0.16, 1, 0.3, 1),
+      transform 760ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .motion-ready .manifest-reveal.is-visible {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 
   .shop-image-stage,
@@ -345,6 +363,12 @@
     will-change: transform;
   }
 
+  .manifest-hero-image {
+    animation: hero-kenburns 26s cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+    transform-origin: 58% 42%;
+    will-change: transform;
+  }
+
   /* Staggered entrance for hero content (pairs with .fade-up) */
   .reveal-delay-1 {
     animation-delay: 90ms;
@@ -441,12 +465,15 @@
 @media (prefers-reduced-motion: reduce) {
   .fade-up,
   .hero-media img,
+  .manifest-hero-image,
   .marquee-track,
-  .shop-reveal {
+  .shop-reveal,
+  .manifest-reveal {
     animation: none !important;
   }
   .fade-up,
-  .shop-reveal {
+  .shop-reveal,
+  .manifest-reveal {
     opacity: 1 !important;
     transform: none !important;
   }

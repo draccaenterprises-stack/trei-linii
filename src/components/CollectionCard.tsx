@@ -3,7 +3,7 @@ import type { Collection } from "@/lib/mock-data";
 
 export function CollectionCard({ collection }: { collection: Collection }) {
   return (
-    <Link to="/shop" search={{ collection: collection.handle }} className="group block">
+    <Link to="/shop" search={{ colectie: collection.handle }} className="group block">
       <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
         <img
           src={collection.image}

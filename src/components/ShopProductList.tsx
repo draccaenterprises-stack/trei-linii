@@ -2,7 +2,7 @@ import { Link, type NavigateFn } from "@tanstack/react-router";
 import { useState, type ReactNode } from "react";
 import { PackageCheck, RotateCcw, ShieldCheck, Truck } from "lucide-react";
 import { ProductGrid } from "@/components/ProductCard";
-import type { Product } from "@/lib/mock-data";
+import type { Collection, Product } from "@/lib/mock-data";
 import { useSite } from "@/lib/site-context";
 
 export const colorFilters = [
@@ -18,28 +18,50 @@ type ShopNavigate = NavigateFn;
 
 export function ShopProductList({
   products,
+  collections = [],
   color,
+  collectionHandle,
   navigate,
   backToPresentation = false,
 }: {
   products: Product[];
+  collections?: Collection[];
   color?: string;
+  collectionHandle?: string;
   navigate: ShopNavigate;
   backToPresentation?: boolean;
 }) {
   const { siteMode } = useSite();
-  const [sort, setSort] = useState<"featured" | "price-asc" | "price-desc">("featured");
+  const [sort, setSort] = useState<"popular" | "price-asc" | "price-desc" | "title-asc">("popular");
 
-  let filtered = color
-    ? products.filter((product) =>
+  let filtered = collectionHandle
+    ? products.filter((product) => {
+        const collection = collections.find((item) => item.handle === collectionHandle);
+        if (collection?.productIds?.includes(product.id)) return true;
+        if (product.collections?.includes(collectionHandle)) return true;
+        return product.collection === collectionHandle;
+      })
+    : products;
+  filtered = color
+    ? filtered.filter((product) =>
         product.colors.some((item) => normalizeColor(item.name) === color),
       )
-    : products;
+    : filtered;
   filtered = [...filtered].sort((a, b) => {
     if (sort === "price-asc") return a.price - b.price;
     if (sort === "price-desc") return b.price - a.price;
+    if (sort === "title-asc") return a.title.localeCompare(b.title, "ro");
     return 0;
   });
+
+  const visibleCollections = collections.filter((collection) =>
+    products.some(
+      (product) =>
+        collection.productIds?.includes(product.id) ||
+        product.collections?.includes(collection.handle) ||
+        product.collection === collection.handle,
+    ),
+  );
 
   return (
     <div className="px-5 py-12 md:px-10 md:py-20">
@@ -69,16 +91,51 @@ export function ShopProductList({
         </header>
 
         <div className="mb-8 flex flex-col gap-5 border-b border-border pb-8 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap gap-2">
-            {colorFilters.map((item) => (
-              <FilterChip
-                key={item.label}
-                active={color === item.value || (!color && !item.value)}
-                onClick={() => navigate({ search: (item.value ? { color: item.value } : {}) as never })}
-              >
-                {item.label}
-              </FilterChip>
-            ))}
+          <div className="space-y-4">
+            {visibleCollections.length > 1 && (
+              <div className="flex flex-wrap gap-2">
+                <FilterChip
+                  active={!collectionHandle}
+                  onClick={() => navigate({ search: (color ? { color } : {}) as never })}
+                >
+                  Toate colectiile
+                </FilterChip>
+                {visibleCollections.map((collection) => (
+                  <FilterChip
+                    key={collection.handle}
+                    active={collectionHandle === collection.handle}
+                    onClick={() =>
+                      navigate({
+                        search: {
+                          colectie: collection.handle,
+                          ...(color ? { color } : {}),
+                        } as never,
+                      })
+                    }
+                  >
+                    {collection.title}
+                  </FilterChip>
+                ))}
+              </div>
+            )}
+            <div className="flex flex-wrap gap-2">
+              {colorFilters.map((item) => (
+                <FilterChip
+                  key={item.label}
+                  active={color === item.value || (!color && !item.value)}
+                  onClick={() =>
+                    navigate({
+                      search: {
+                        ...(item.value ? { color: item.value } : {}),
+                        ...(collectionHandle ? { colectie: collectionHandle } : {}),
+                      } as never,
+                    })
+                  }
+                >
+                  {item.label}
+                </FilterChip>
+              ))}
+            </div>
           </div>
           {siteMode === "live-shop" && (
             <select
@@ -87,9 +144,10 @@ export function ShopProductList({
               aria-label="Sorteaza produsele"
               className="w-full border border-border bg-transparent px-3 py-3 font-mono-xs outline-none md:w-auto"
             >
-              <option value="featured">Sortare: recomandate</option>
+              <option value="popular">Sortare: popularitate</option>
               <option value="price-asc">Pret: mic spre mare</option>
               <option value="price-desc">Pret: mare spre mic</option>
+              <option value="title-asc">Nume: A-Z</option>
             </select>
           )}
         </div>

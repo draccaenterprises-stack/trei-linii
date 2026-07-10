@@ -17,6 +17,8 @@ const forbiddenPublicSecrets = [
 const routes = [
   "/",
   "/shop",
+  "/shop/lista",
+  "/manifest",
   "/collections",
   "/lookbook",
   "/about",
@@ -49,7 +51,9 @@ const forbiddenPatterns = [
 
 const requiredByRoute = {
   "/": [/Trei Linii/i, /Fata curata/i, /Spate/i],
-  "/shop": [/Modele|Magazin/i, /Previzualizare design spate|tricou/i],
+  "/shop": [/Colectii|Mai multe directii/i, /Previzualizare design spate|tricou/i],
+  "/shop/lista": [/Toate modelele/i, /Previzualizare design spate|tricou/i],
+  "/manifest": [/De ce Trei Linii/i, /Fata nu cere atentia/i],
   "/cart": [/cos/i],
   "/terms": [/Termeni/i],
   "/privacy": [/Confidentialitate/i],
@@ -122,7 +126,7 @@ for (const route of routes) {
       }
     }
 
-    if (route === "/shop" && Number.isFinite(minProducts) && minProducts > 0) {
+    if (route === "/shop/lista" && Number.isFinite(minProducts) && minProducts > 0) {
       const productCards = html.match(/<article\b/gi)?.length ?? 0;
 
       if (productCards < minProducts) {

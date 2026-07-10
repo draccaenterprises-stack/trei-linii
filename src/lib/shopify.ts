@@ -200,6 +200,29 @@ function isInternalTestLabel(value: string) {
   );
 }
 
+function isSystemCollection(handle: string, title: string) {
+  const normalizedHandle = normalizeText(handle);
+  const normalizedTitle = normalizeText(title);
+  return (
+    normalizedHandle === "frontpage" ||
+    normalizedHandle === "home-page" ||
+    normalizedTitle === "home page" ||
+    normalizedTitle === "homepage"
+  );
+}
+
+function toRoman(value: number) {
+  const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
+  return numerals[value - 1] ?? String(value).padStart(2, "0");
+}
+
+function publicCollectionTitle(title: string, index: number) {
+  const match = normalizeText(title).match(/^(?:colectie|collection)[\s-]*(\d+)/);
+  if (match) return `Editia ${toRoman(Number(match[1]))}`;
+  if (isInternalTestLabel(title)) return `Editia ${toRoman(index + 1)}`;
+  return title;
+}
+
 function publicProductTitle(title: string, index = 0) {
   if (isInternalTestLabel(title))
     return `Previzualizare design spate ${String(index + 1).padStart(2, "0")}`;
@@ -343,12 +366,12 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
   const images = product.images.nodes.map((image) => image.url);
   if (!images.length && product.featuredImage?.url) images.push(product.featuredImage.url);
 
-  const firstCollection = product.collections.nodes[0];
-  const publicCollection = firstCollection
-    ? isInternalTestLabel(firstCollection.title) || isInternalTestLabel(firstCollection.handle)
-      ? "spate"
-      : firstCollection.handle
-    : "tricouri";
+  const publicCollectionNodes = product.collections.nodes.filter(
+    (collection) => !isSystemCollection(collection.handle, collection.title),
+  );
+  const firstCollection = publicCollectionNodes[0];
+  const publicCollections = unique(publicCollectionNodes.map((collection) => collection.handle));
+  const publicCollection = firstCollection?.handle ?? "selectia-deschisa";
   const firstMockImage = mockProducts[0]?.images[0] ?? "";
 
   return {
@@ -357,6 +380,7 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
     title: publicProductTitle(product.title, index),
     price: Number(product.priceRange.minVariantPrice.amount),
     collection: publicCollection,
+    collections: publicCollections.length ? publicCollections : [publicCollection],
     badge: badgeFromProduct(product, variants),
     images: images.length ? images : [firstMockImage],
     description: publicProductDescription(product),
@@ -378,24 +402,15 @@ function mapShopifyCollection(collection: ShopifyCollectionNode, index: number):
     isInternalTestLabel(collection.title) || isInternalTestLabel(collection.handle);
 
   return {
-    handle: looksInternal ? fallback.handle : collection.handle,
-    title: looksInternal ? fallback.title : collection.title,
+    handle: collection.handle,
+    title: publicCollectionTitle(collection.title, index),
     description: looksInternal
       ? fallback.description
       : collection.description?.trim() || fallback.description,
     image: collection.image?.url ?? fallback.image,
     count: collection.products.nodes.length,
+    productIds: collection.products.nodes.map((product) => product.id),
   };
-}
-
-function mergeCollections(collections: Collection[]) {
-  const byHandle = new Map(collections.map((collection) => [collection.handle, collection]));
-
-  for (const collection of mockCollections) {
-    if (!byHandle.has(collection.handle)) byHandle.set(collection.handle, collection);
-  }
-
-  return [...byHandle.values()];
 }
 
 export function findSelectedVariant(
@@ -521,8 +536,10 @@ export async function fetchCollections(): Promise<Collection[]> {
       }
     `);
 
-    const collections = data.collections.nodes.map(mapShopifyCollection);
-    return collections.length ? mergeCollections(collections) : mockCollections;
+    const collections = data.collections.nodes
+      .filter((collection) => !isSystemCollection(collection.handle, collection.title))
+      .map(mapShopifyCollection);
+    return collections.length ? collections : mockCollections;
   } catch (error) {
     console.error("Nu am putut citi colectiile din Shopify.", error);
     return mockCollections;

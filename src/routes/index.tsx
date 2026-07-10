@@ -55,14 +55,31 @@ function Index() {
       <TrustStrip />
       <MarqueeDivider />
 
-      <section className="px-5 md:px-10 py-16 md:py-24 border-b border-border">
-        <div className="mx-auto max-w-[1600px] grid md:grid-cols-12 gap-10">
-          <p className="md:col-span-3 font-mono-xs opacity-60">{conceptEyebrow}</p>
-          <div className="md:col-span-8">
-            <h2 className="font-display text-3xl md:text-6xl leading-tight">{conceptTitle}</h2>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              {conceptBody}
-            </p>
+      <section className="px-5 py-20 md:px-10 md:py-32">
+        <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-12 md:gap-14">
+          <div className="flex flex-col justify-between md:col-span-3">
+            <p className="font-mono-xs opacity-60">{conceptEyebrow}</p>
+            <Link
+              to="/manifest"
+              className="mt-10 inline-flex w-fit items-center gap-3 font-mono-xs text-[#ff006f] underline underline-offset-4 transition-opacity hover:opacity-65 md:mt-0"
+            >
+              Citeste manifestul <span aria-hidden="true">&#8599;</span>
+            </Link>
+          </div>
+          <div className="md:col-span-8 md:col-start-5">
+            <h2 className="max-w-5xl font-display text-5xl leading-[0.98] md:text-7xl">
+              {conceptTitle}
+            </h2>
+            <div className="mt-8 grid gap-8 border-t border-border pt-7 md:grid-cols-[minmax(0,1fr)_13rem]">
+              <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                {conceptBody}
+              </p>
+              <div className="space-y-3 font-mono-xs text-charcoal/65">
+                <p>01 / 240gsm</p>
+                <p>02 / oversized fit</p>
+                <p>03 / design pe spate</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

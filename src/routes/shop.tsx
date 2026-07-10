@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { z } from "zod";
 import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
-import type { Product, Size } from "@/lib/mock-data";
-import { fetchProducts, getStockForColor } from "@/lib/shopify";
+import type { Collection, Product, Size } from "@/lib/mock-data";
+import { fetchCollections, fetchProducts, getStockForColor } from "@/lib/shopify";
 import { useCart } from "@/lib/cart-context";
 import { clamp, createFrameScheduler } from "@/lib/motion";
 import { pageMeta } from "@/lib/seo";
@@ -22,12 +23,80 @@ const contextCaptions = [
   "Detaliu cromatic, editie limitata",
 ] as const;
 
+const shopSearchSchema = z.object({
+  colectie: z.string().optional(),
+});
+
+type CollectionGroup = {
+  collection: Collection;
+  products: Product[];
+};
+
+function buildCollectionGroups(products: Product[], collections: Collection[]): CollectionGroup[] {
+  const groups = collections
+    .map((collection) => ({
+      collection,
+      products: products.filter((product) => {
+        if (collection.productIds?.includes(product.id)) return true;
+        if (product.collections?.includes(collection.handle)) return true;
+        return product.collection === collection.handle;
+      }),
+    }))
+    .filter((group) => group.products.length > 0);
+
+  const assignedProductIds = new Set(
+    groups.flatMap((group) => group.products.map((product) => product.id)),
+  );
+  const unassignedProducts = products.filter((product) => !assignedProductIds.has(product.id));
+
+  if (unassignedProducts.length) {
+    groups.push({
+      collection: {
+        handle: "selectia-deschisa",
+        title: "Selectia deschisa",
+        description:
+          "Piese disponibile separat, in afara unei colectii numerotate. Aceeasi constructie, lasata sa stea singura.",
+        image: unassignedProducts[0]?.images[0] ?? "",
+        count: unassignedProducts.length,
+        productIds: unassignedProducts.map((product) => product.id),
+      },
+      products: unassignedProducts,
+    });
+  }
+
+  if (groups.length) return groups;
+
+  return [
+    {
+      collection: {
+        handle: "editia-curenta",
+        title: "Editia curenta",
+        description:
+          "Piese oversized construite pe aceeasi regula: fata curata, material dens si design pe spate.",
+        image: products[0]?.images[0] ?? "",
+        count: products.length,
+        productIds: products.map((product) => product.id),
+      },
+      products,
+    },
+  ];
+}
+
+function conciseDescription(value: string) {
+  return value
+    .trim()
+    .split(/(?<=[.!?])\s+/)
+    .slice(0, 2)
+    .join(" ");
+}
+
 export const Route = createFileRoute("/shop")({
+  validateSearch: shopSearchSchema,
   loader: async () => {
-    const products = await fetchProducts();
-    return { products };
+    const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
+    return { products, collections };
   },
-  component: Shop,
+  component: ShopRouteComponent,
   head: () =>
     pageMeta({
       path: "/shop",
@@ -37,11 +106,30 @@ export const Route = createFileRoute("/shop")({
     }),
 });
 
+function ShopRouteComponent() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  return pathname.startsWith("/shop/lista") ? <Outlet /> : <Shop />;
+}
+
 function Shop() {
-  const { products } = Route.useLoaderData();
-  const chapters = products.slice(0, 4);
+  const { products, collections } = Route.useLoaderData();
+  const { colectie } = Route.useSearch();
+  const navigate = Route.useNavigate();
+  const collectionGroups = useMemo(
+    () => buildCollectionGroups(products, collections),
+    [collections, products],
+  );
+  const activeGroup =
+    collectionGroups.find((group) => group.collection.handle === colectie) ?? collectionGroups[0];
+  const chapters = activeGroup?.products ?? [];
   const [activeChapter, setActiveChapter] = useState(0);
   const chapterRefs = useRef<Array<HTMLElement | null>>([]);
+  const collectionIntroRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    setActiveChapter(0);
+    chapterRefs.current = [];
+  }, [activeGroup?.collection.handle]);
 
   useEffect(() => {
     const nodes = chapterRefs.current.filter(Boolean) as HTMLElement[];
@@ -61,7 +149,7 @@ function Shop() {
 
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [chapters.length]);
+  }, [activeGroup?.collection.handle, chapters.length]);
 
   useEffect(() => {
     const nodes = Array.from(
@@ -125,40 +213,113 @@ function Shop() {
       window.removeEventListener("touchmove", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
     };
-  }, [chapters.length]);
+  }, [activeGroup?.collection.handle, chapters.length]);
+
+  if (!activeGroup) return null;
+
+  const selectCollection = (handle: string) => {
+    void navigate({ search: { colectie: handle }, replace: true });
+    window.requestAnimationFrame(() => {
+      collectionIntroRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   return (
     <div>
       <ChapterIndex products={chapters} activeChapter={activeChapter} />
 
       <section className="px-5 py-16 md:px-10 md:py-24">
-        <div className="mx-auto grid max-w-[1600px] gap-10 border-b border-border pb-14 md:grid-cols-12 md:items-end">
+        <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-12 md:items-end">
           <div className="md:col-span-7">
-            <p className="font-mono-xs opacity-60">Editia I - patru capitole</p>
-            <h1 className="mt-4 font-display text-5xl leading-[0.98] md:text-8xl">
-              Fiecare piesa,
+            <p className="font-mono-xs text-[#ff006f]">Colectii / Trei Linii</p>
+            <h1 className="mt-5 font-display text-5xl leading-[0.94] md:text-8xl">
+              Mai multe directii.
               <br />
-              <span className="italic text-muted-foreground">o pagina.</span>
+              <span className="italic text-muted-foreground">Aceeasi semnatura.</span>
             </h1>
           </div>
           <div className="md:col-span-4 md:col-start-9">
             <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-              Patru modele din prima editie, privite ca pagini de atelier: material, cadere, spate,
-              semnatura.
+              Fiecare colectie schimba ritmul, nu regula: croiala oversized, fata curata si grafica
+              asezata pe spate.
             </p>
             <Link
               to="/shop/lista"
               className="mt-6 inline-flex font-mono-xs text-[#ff006f] underline underline-offset-4"
             >
-              Vezi lista completa
+              Vezi toate produsele
             </Link>
           </div>
         </div>
       </section>
 
+      <nav className="border-y border-border bg-cream/35" aria-label="Alege colectia">
+        <div
+          className="mx-auto flex max-w-[1600px] snap-x snap-mandatory overflow-x-auto px-5 [scrollbar-width:none] md:px-10 [&::-webkit-scrollbar]:hidden"
+          role="tablist"
+        >
+          {collectionGroups.map((group, index) => {
+            const selected = group.collection.handle === activeGroup.collection.handle;
+            return (
+              <button
+                key={group.collection.handle}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => selectCollection(group.collection.handle)}
+                className={`relative min-h-32 min-w-[76vw] snap-start border-r border-border px-5 py-7 text-left transition-colors sm:min-w-72 md:min-h-36 md:px-8 ${
+                  selected ? "bg-charcoal text-cream" : "bg-transparent hover:bg-cream"
+                }`}
+              >
+                <span className={`font-mono-xs ${selected ? "text-[#ff006f]" : "opacity-45"}`}>
+                  {String(index + 1).padStart(2, "0")} / {group.products.length} piese
+                </span>
+                <span className="mt-4 block font-display text-2xl leading-none md:text-3xl">
+                  {group.collection.title}
+                </span>
+                <span
+                  className={`absolute inset-x-0 bottom-0 h-0.5 origin-left bg-[#ff006f] transition-transform duration-500 ${
+                    selected ? "scale-x-100" : "scale-x-0"
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      <section
+        ref={collectionIntroRef}
+        className="scroll-mt-20 border-b border-border bg-background px-5 py-14 md:px-10 md:py-20"
+      >
+        <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-12 md:items-center">
+          <div className="md:col-span-7">
+            <p className="font-mono-xs opacity-55">Colectia selectata</p>
+            <h2 className="mt-4 font-display text-5xl leading-[0.95] md:text-7xl">
+              {activeGroup.collection.title}
+            </h2>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+              {activeGroup.collection.description}
+            </p>
+          </div>
+          {activeGroup.collection.image && (
+            <figure className="overflow-hidden bg-warm-grey md:col-span-4 md:col-start-9">
+              <img
+                src={activeGroup.collection.image}
+                alt={`Colectia ${activeGroup.collection.title}`}
+                className="aspect-[16/10] w-full object-cover transition-transform duration-[1200ms] hover:scale-[1.025]"
+                decoding="async"
+                loading="eager"
+              />
+            </figure>
+          )}
+        </div>
+      </section>
+
       {chapters.map((product: (typeof chapters)[number], index: number) => (
         <Chapter
-          key={product.id}
+          key={`${activeGroup.collection.handle}-${product.id}`}
           product={product}
           index={index}
           refCallback={(node) => {
@@ -169,17 +330,17 @@ function Shop() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[900px] border-t border-border pt-14 text-center">
-          <p className="font-mono-xs opacity-60">Restul editiei</p>
+          <p className="font-mono-xs opacity-60">Ai vazut intreaga colectie</p>
           <h2 className="mt-5 font-display text-5xl leading-[1.02] md:text-7xl">
-            Opt piese numerotate.
+            {activeGroup.collection.title}.
             <br />
-            <span className="italic text-muted-foreground">Le-ai vazut patru.</span>
+            <span className="italic text-muted-foreground">Continua cu toate piesele.</span>
           </h2>
           <Link
             to="/shop/lista"
             className="group mt-10 inline-flex items-center gap-4 bg-charcoal px-8 py-4 font-mono-xs text-cream"
           >
-            Vezi lista completa
+            Vezi toate produsele
             <span className="h-px w-12 origin-left scale-x-[0.58] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
           </Link>
         </div>
@@ -324,10 +485,7 @@ function Chapter({
         >
           <div className="chapter-media lg:col-span-6">
             {/* Absolute-positioned collage — same layout for mobile and desktop */}
-            <div
-              className="group/collage relative w-full"
-              style={{ aspectRatio: "4 / 5" }}
-            >
+            <div className="group/collage relative w-full" style={{ aspectRatio: "4 / 5" }}>
               {slots.map(({ slot, src }, i) => (
                 <div
                   key={i}
@@ -355,21 +513,22 @@ function Chapter({
             </div>
           </div>
 
-
           <div
             className={`chapter-copy lg:col-span-4 ${reverse ? "lg:row-start-1" : "lg:col-start-9"}`}
           >
             <p className={isDark ? "font-mono-xs text-cream/60" : "font-mono-xs opacity-60"}>
               Nr. {number} - <span className="text-[#ff006f]">editie limitata</span>
             </p>
-            <h2 className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">{product.title}</h2>
+            <h2 className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">
+              {product.title}
+            </h2>
             <blockquote className="mt-7 border-l border-[#ff006f] pl-5 font-display text-2xl italic leading-snug">
               {chapterQuotes[index] ?? product.vibe}
             </blockquote>
             <p
               className={`mt-6 leading-relaxed ${isDark ? "text-cream/70" : "text-muted-foreground"}`}
             >
-              {product.description}
+              {conciseDescription(product.description)}
             </p>
             <p className="mt-7 font-display text-4xl">{formatRON(product.price)}</p>
 
@@ -393,11 +552,7 @@ function Chapter({
         </div>
       </section>
       {overlay && (
-        <QuickViewOverlay
-          product={product}
-          origin={overlay}
-          onClose={() => setOverlay(null)}
-        />
+        <QuickViewOverlay product={product} origin={overlay} onClose={() => setOverlay(null)} />
       )}
     </>
   );
