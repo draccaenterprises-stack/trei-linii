@@ -3,7 +3,12 @@ import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
-import type { Collection, Product, Size } from "@/lib/mock-data";
+import {
+  products as previewTemplates,
+  type Collection,
+  type Product,
+  type Size,
+} from "@/lib/mock-data";
 import { fetchCollections, fetchProducts, getStockForColor } from "@/lib/shopify";
 import { useCart } from "@/lib/cart-context";
 import { clamp, createFrameScheduler } from "@/lib/motion";
@@ -31,6 +36,90 @@ type CollectionGroup = {
   collection: Collection;
   products: Product[];
 };
+
+const previewCopy = [
+  {
+    title: "Linie de atelier",
+    description:
+      "O compozitie liniara simpla, asezata vertical pe spate. Fata ramane complet curata.",
+    vibe: "Un studiu despre ritm, distanta si spatiu liber.",
+  },
+  {
+    title: "Cadru tipografic",
+    description:
+      "Un cadru subtire si un semn tipografic discret construiesc spatele. Gandit pentru o baza neutra.",
+    vibe: "Tipografie redusa la forma si proportie.",
+  },
+  {
+    title: "Semn modular",
+    description:
+      "Forme repetate, lasate sa respire pe materialul dens. Un model grafic fara aglomerare.",
+    vibe: "Repetitie controlata, cu o singura ruptura de ritm.",
+  },
+  {
+    title: "Ritm vertical",
+    description:
+      "Linii lungi si contrast redus pentru un spate mai calm. Constructia ramane vizibila de aproape.",
+    vibe: "Miscare verticala pastrata intr-un cadru simplu.",
+  },
+  {
+    title: "Contur nocturn",
+    description:
+      "O directie charcoal cu grafica luminoasa si contur fin. Potrivita pentru o paleta inchisa.",
+    vibe: "Contrast scurt, desenat pentru lumina de seara.",
+  },
+  {
+    title: "Material spalat",
+    description:
+      "Culoarea spalata devine fundal pentru un print aerisit. Croiala pastreaza aceeasi cadere oversized.",
+    vibe: "Textura intai, semnatura grafica dupa.",
+  },
+  {
+    title: "Linie cromatica",
+    description:
+      "Un singur accent de culoare traverseaza compozitia de pe spate. Restul ramane intentionat retinut.",
+    vibe: "Culoare folosita ca semn, nu ca decor.",
+  },
+  {
+    title: "Arhiva urbana",
+    description:
+      "Referinte de atelier si notatii mici reunite intr-un print compact. Fata ramane fara mesaj.",
+    vibe: "O pagina de arhiva mutata pe material.",
+  },
+] as const;
+
+function addPreviewProducts(groups: CollectionGroup[]) {
+  return groups.map((group, groupIndex) => {
+    const missingCount = Math.max(0, 4 - group.products.length);
+    const previews = Array.from({ length: missingCount }, (_, offset) => {
+      const pieceIndex = group.products.length + offset;
+      const templateIndex = (groupIndex * 4 + pieceIndex) % previewTemplates.length;
+      const template = previewTemplates[templateIndex];
+      const copy = previewCopy[templateIndex % previewCopy.length];
+      const number = String(pieceIndex + 1).padStart(2, "0");
+
+      return {
+        ...template,
+        id: `preview-${group.collection.handle}-${number}`,
+        handle: `preview-${group.collection.handle}-${number}`,
+        title: `Tricou ${copy.title} ${number}`,
+        description: copy.description,
+        vibe: copy.vibe,
+        fitNote: "Pozitie demonstrativa pentru colectie.",
+        collection: group.collection.handle,
+        collections: [group.collection.handle],
+        badge: undefined,
+        variants: undefined,
+        isPreview: true,
+      } satisfies Product;
+    });
+
+    return {
+      collection: { ...group.collection, count: group.products.length + previews.length },
+      products: [...group.products, ...previews],
+    };
+  });
+}
 
 function buildCollectionGroups(products: Product[], collections: Collection[]): CollectionGroup[] {
   const groups = collections
@@ -64,10 +153,8 @@ function buildCollectionGroups(products: Product[], collections: Collection[]): 
     });
   }
 
-  if (groups.length) return groups;
-
-  return [
-    {
+  if (!groups.length) {
+    groups.push({
       collection: {
         handle: "editia-curenta",
         title: "Editia curenta",
@@ -78,8 +165,10 @@ function buildCollectionGroups(products: Product[], collections: Collection[]): 
         productIds: products.map((product) => product.id),
       },
       products,
-    },
-  ];
+    });
+  }
+
+  return addPreviewProducts(groups);
 }
 
 function conciseDescription(value: string) {
@@ -517,20 +606,25 @@ function Chapter({
             className={`chapter-copy lg:col-span-4 ${reverse ? "lg:row-start-1" : "lg:col-start-9"}`}
           >
             <p className={isDark ? "font-mono-xs text-cream/60" : "font-mono-xs opacity-60"}>
-              Nr. {number} - <span className="text-[#ff006f]">editie limitata</span>
+              Nr. {number} -{" "}
+              <span className="text-[#ff006f]">
+                {product.isPreview ? "pozitie demonstrativa" : "editie limitata"}
+              </span>
             </p>
             <h2 className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">
               {product.title}
             </h2>
             <blockquote className="mt-7 border-l border-[#ff006f] pl-5 font-display text-2xl italic leading-snug">
-              {chapterQuotes[index] ?? product.vibe}
+              {product.isPreview ? product.vibe : (chapterQuotes[index] ?? product.vibe)}
             </blockquote>
             <p
               className={`mt-6 leading-relaxed ${isDark ? "text-cream/70" : "text-muted-foreground"}`}
             >
               {conciseDescription(product.description)}
             </p>
-            <p className="mt-7 font-display text-4xl">{formatRON(product.price)}</p>
+            <p className="mt-7 font-display text-4xl">
+              {product.isPreview ? "In pregatire" : formatRON(product.price)}
+            </p>
 
             <ChapterQuickAdd product={product} isDark={isDark} />
 
@@ -545,7 +639,7 @@ function Chapter({
                 />
               </div>
               <p className={`mt-3 font-mono-xs ${isDark ? "text-cream/45" : "opacity-45"}`}>
-                {contextCaptions[index]}
+                {contextCaptions[index % contextCaptions.length]}
               </p>
             </div>
           </div>
@@ -565,6 +659,19 @@ function ChapterQuickAdd({ product, isDark }: { product: Product; isDark: boolea
   const [selectedSize, setSelectedSize] = useState<Size | null>(null);
   const [message, setMessage] = useState("");
   const selectedStock = selectedSize ? (stock[selectedSize] ?? 0) : 0;
+
+  if (product.isPreview) {
+    return (
+      <div className="mt-8 max-w-md border border-current/20 px-5 py-5">
+        <p className="font-mono-xs text-[#ff006f]">Preview de colectie</p>
+        <p
+          className={`mt-3 text-sm leading-relaxed ${isDark ? "text-cream/65" : "text-muted-foreground"}`}
+        >
+          Loc rezervat pentru produsul final. Va fi inlocuit automat dupa publicarea lui in Shopify.
+        </p>
+      </div>
+    );
+  }
 
   const addToCart = () => {
     if (!selectedSize) {

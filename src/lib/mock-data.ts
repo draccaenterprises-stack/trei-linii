@@ -32,6 +32,7 @@ export interface Product {
   handle: string;
   title: string;
   price: number;
+  isPreview?: boolean;
   collection: string;
   collections?: string[];
   badge?: Badge;

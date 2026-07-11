@@ -329,7 +329,7 @@ function GalleryLayer({
   return (
     <div
       ref={layerRef}
-      className="fixed inset-0 flex flex-col"
+      className="fixed inset-0 flex flex-col overflow-y-auto overscroll-y-contain"
       style={{
         background: "#faf8f2",
         opacity: 0,
@@ -341,7 +341,7 @@ function GalleryLayer({
       }}
     >
       {/* Top bar */}
-      <div className="flex items-center gap-4 px-5 md:px-10 pt-5 md:pt-8">
+      <div className="sticky top-0 z-10 flex items-center gap-4 border-b border-charcoal/10 bg-[#faf8f2]/95 px-5 py-4 backdrop-blur md:px-10 md:py-6">
         <button
           type="button"
           onClick={onClose}
@@ -351,27 +351,27 @@ function GalleryLayer({
         >
           <ArrowLeft strokeWidth={1.5} className="h-5 w-5" />
         </button>
-        <div className="flex items-baseline gap-4 min-w-0">
-          <h2 className="font-display whitespace-nowrap" style={{ fontSize: 32, lineHeight: 1 }}>
+        <div className="flex min-w-0 flex-1 items-baseline justify-between gap-4">
+          <h2 className="min-w-0 flex-1 truncate font-display text-2xl leading-none md:text-[32px]">
             {product.title}
           </h2>
           <span className="font-mono-xs whitespace-nowrap" style={{ color: "#ff006f" }}>
-            {formatRON(product.price)}
+            {product.isPreview ? "In pregatire" : formatRON(product.price)}
           </span>
         </div>
       </div>
 
       {/* Slider */}
       <div
-        className="flex-1 flex items-center overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex shrink-0 items-start overflow-x-auto overflow-y-hidden py-6 [scrollbar-width:none] md:py-8 [&::-webkit-scrollbar]:hidden"
         style={{
           scrollSnapType: "x mandatory",
           scrollBehavior: "smooth",
           overscrollBehaviorX: "contain",
           // @ts-expect-error CSS custom prop
-          "--gh": "min(66vh, 720px)",
-          "--gw": "calc(min(66vh, 720px) * 3 / 4)",
-          paddingInline: "calc(50% - (min(66vh, 720px) * 3 / 4) / 2)",
+          "--gh": "min(62svh, 680px)",
+          "--gw": "calc(min(62svh, 680px) * 3 / 4)",
+          paddingInline: "max(20px, calc(50% - (min(62svh, 680px) * 3 / 4) / 2))",
           gap: "24px",
         }}
       >
@@ -381,7 +381,7 @@ function GalleryLayer({
             className="shrink-0 flex flex-col items-center"
             style={{
               scrollSnapAlign: "center",
-              width: "calc(min(66vh, 720px) * 3 / 4)",
+              width: "calc(min(62svh, 680px) * 3 / 4)",
             }}
           >
             <img
@@ -389,7 +389,7 @@ function GalleryLayer({
               alt={`${product.title} - ${i + 1}`}
               style={{
                 width: "100%",
-                height: "min(66vh, 720px)",
+                height: "min(62svh, 680px)",
                 objectFit: "cover",
                 display: "block",
               }}
@@ -404,15 +404,151 @@ function GalleryLayer({
         ))}
       </div>
 
-      {/* Bottom CTA to real product page */}
-      <div className="px-5 md:px-10 pb-6 md:pb-8 flex justify-center">
-        <Link
-          to="/product/$handle"
-          params={{ handle: product.handle }}
-          className="inline-flex border border-charcoal px-6 py-3 font-mono-xs hover:bg-charcoal hover:text-cream transition-colors"
-        >
-          Vezi pagina produsului
-        </Link>
+      <QuickViewPurchaseControls product={product} onAdded={onClose} />
+    </div>
+  );
+}
+
+function QuickViewPurchaseControls({
+  product,
+  onAdded,
+}: {
+  product: Product;
+  onAdded: () => void;
+}) {
+  const { addItem } = useCart();
+  const [selectedColor, setSelectedColor] = React.useState(product.colors[0]?.name ?? "");
+  const [selectedSize, setSelectedSize] = React.useState<string | null>(null);
+  const [message, setMessage] = React.useState("");
+  const stock = React.useMemo(
+    () => getStockForColor(product, selectedColor),
+    [product, selectedColor],
+  );
+  const hasStock = product.sizes.some((size) => (stock[size] ?? 0) > 0);
+  const selectedStock = selectedSize ? (stock[selectedSize] ?? 0) : 0;
+
+  if (product.isPreview) {
+    return (
+      <div className="border-t border-charcoal/15 px-5 py-8 md:px-10 md:py-10">
+        <div className="mx-auto max-w-4xl border border-charcoal/20 px-5 py-5 md:px-7">
+          <p className="font-mono-xs text-[#ff006f]">Pozitie demonstrativa</p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+            Aceasta piesa arata ritmul colectiei pana la publicarea produsului final in Shopify. Nu
+            poate fi adaugata in cos.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const addToCart = () => {
+    if (!selectedSize) {
+      setMessage("Alege o marime pentru a continua.");
+      return;
+    }
+
+    addItem(product, selectedSize, selectedColor);
+    setMessage("");
+    onAdded();
+  };
+
+  return (
+    <div className="border-t border-charcoal/15 px-5 py-8 md:px-10 md:py-10">
+      <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-12 md:items-start">
+        <div className="md:col-span-5">
+          <p className="font-mono-xs text-[#ff006f]">Adauga direct in cos</p>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
+            {product.description}
+          </p>
+          <p className="mt-5 font-display text-3xl">{formatRON(product.price)}</p>
+        </div>
+
+        <div className="md:col-span-6 md:col-start-7">
+          <div>
+            <div className="flex items-center justify-between gap-4">
+              <p className="font-mono-xs">Culoare</p>
+              <p className="text-sm text-muted-foreground">{selectedColor}</p>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {product.colors.map((color) => {
+                const active = selectedColor === color.name;
+                return (
+                  <button
+                    key={color.name}
+                    type="button"
+                    aria-label={`Alege culoarea ${color.name}`}
+                    aria-pressed={active}
+                    onClick={() => {
+                      setSelectedColor(color.name);
+                      setSelectedSize(null);
+                      setMessage("");
+                    }}
+                    className={`h-11 w-11 border p-1 transition-colors ${
+                      active ? "border-charcoal" : "border-charcoal/20 hover:border-charcoal/55"
+                    }`}
+                  >
+                    <span className="block h-full w-full" style={{ backgroundColor: color.hex }} />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6">
+            <p className="font-mono-xs">Marime</p>
+            <div className="mt-3 grid grid-cols-4 border border-charcoal/25">
+              {product.sizes.map((size) => {
+                const disabled = (stock[size] ?? 0) <= 0;
+                const active = selectedSize === size;
+                return (
+                  <button
+                    key={size}
+                    type="button"
+                    disabled={disabled}
+                    aria-pressed={active}
+                    onClick={() => {
+                      setSelectedSize(size);
+                      setMessage("");
+                    }}
+                    className={`h-12 border-r border-charcoal/25 font-mono-xs transition-colors last:border-r-0 ${
+                      active ? "bg-charcoal text-cream" : "hover:bg-charcoal/5"
+                    } disabled:cursor-not-allowed disabled:opacity-30 disabled:line-through`}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {selectedSize && selectedStock > 0 && selectedStock <= 4 && (
+            <p className="mt-3 font-mono-xs text-[#ff006f]">
+              Ultimele {selectedStock} piese pe marimea {selectedSize}
+            </p>
+          )}
+          {message && <p className="mt-3 font-mono-xs text-[#ff006f]">{message}</p>}
+
+          <div className="mt-6 flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={addToCart}
+              disabled={!hasStock}
+              className="group inline-flex min-h-12 items-center gap-4 bg-charcoal px-6 font-mono-xs text-cream disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {hasStock ? "Adauga in cos" : "Stoc epuizat"}
+              {hasStock && (
+                <span className="h-px w-10 origin-left scale-x-[0.6] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
+              )}
+            </button>
+            <Link
+              to="/product/$handle"
+              params={{ handle: product.handle }}
+              className="inline-flex min-h-12 items-center border border-charcoal px-5 font-mono-xs transition-colors hover:bg-charcoal hover:text-cream"
+            >
+              Vezi pagina produsului
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
