@@ -416,6 +416,187 @@
     animation-delay: 500ms;
   }
 
+  @keyframes quick-view-button-collapse {
+    0% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+    58% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 0.055, 1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale3d(1, 0.055, 1);
+    }
+  }
+
+  @keyframes quick-view-text-exit {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes quick-view-band-sweep {
+    0% {
+      transform: translate3d(-104%, 0, 0);
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    46% {
+      transform: translate3d(0, 0, 0);
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    58% {
+      transform: translate3d(0, 0, 0);
+      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    100% {
+      transform: translate3d(104%, 0, 0);
+    }
+  }
+
+  @keyframes quick-view-gallery-enter {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes quick-view-root-exit {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes quick-view-gallery-exit {
+    from {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0);
+    }
+  }
+
+  @keyframes quick-view-reduced-accent {
+    0% {
+      opacity: 0;
+      transform: scale3d(0.72, 1, 1);
+    }
+    45% {
+      opacity: 0.68;
+    }
+    100% {
+      opacity: 0;
+      transform: scale3d(1, 1, 1);
+    }
+  }
+
+  .quick-view-root {
+    background: transparent;
+    isolation: isolate;
+    opacity: 1;
+  }
+
+  .quick-view-clone {
+    backface-visibility: hidden;
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    will-change: transform, opacity;
+  }
+
+  .quick-view-clone-text {
+    opacity: 1;
+    will-change: opacity;
+  }
+
+  .quick-view-bands {
+    opacity: 1;
+    will-change: opacity;
+  }
+
+  .quick-view-band {
+    backface-visibility: hidden;
+    opacity: 1;
+    transform: translate3d(-104%, 0, 0);
+    will-change: transform, opacity;
+  }
+
+  .quick-view-band:nth-child(1) {
+    --quick-view-band-delay: 20ms;
+  }
+
+  .quick-view-band:nth-child(2) {
+    --quick-view-band-delay: 80ms;
+  }
+
+  .quick-view-band:nth-child(3) {
+    --quick-view-band-delay: 140ms;
+  }
+
+  .quick-view-gallery {
+    backface-visibility: hidden;
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    will-change: transform, opacity;
+  }
+
+  .quick-view-opening .quick-view-clone {
+    animation: quick-view-button-collapse 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .quick-view-opening .quick-view-clone-text {
+    animation: quick-view-text-exit 100ms ease-out both;
+  }
+
+  .quick-view-opening .quick-view-band {
+    animation: quick-view-band-sweep 760ms linear var(--quick-view-band-delay) both;
+  }
+
+  .quick-view-opening .quick-view-gallery {
+    animation: quick-view-gallery-enter 480ms cubic-bezier(0.16, 1, 0.3, 1) 330ms both;
+  }
+
+  .quick-view-open .quick-view-clone,
+  .quick-view-open .quick-view-bands,
+  .quick-view-open .quick-view-band {
+    opacity: 0;
+    visibility: hidden;
+    will-change: auto;
+  }
+
+  .quick-view-open .quick-view-gallery {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    will-change: auto;
+  }
+
+  .quick-view-closing {
+    animation: quick-view-root-exit 230ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .quick-view-closing .quick-view-clone,
+  .quick-view-closing .quick-view-bands {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .quick-view-closing .quick-view-gallery {
+    animation: quick-view-gallery-exit 230ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    pointer-events: none !important;
+  }
+
   .product-card {
     content-visibility: auto;
     contain-intrinsic-size: 520px 340px;
@@ -496,6 +677,36 @@
 
 /* Accessibility: honor reduced-motion. Content stays fully visible. */
 @media (prefers-reduced-motion: reduce) {
+  .quick-view-opening .quick-view-clone {
+    animation: quick-view-text-exit 140ms ease-out both;
+  }
+
+  .quick-view-opening .quick-view-clone-text {
+    animation: quick-view-text-exit 90ms ease-out both;
+  }
+
+  .quick-view-opening .quick-view-band {
+    animation: none;
+    opacity: 0;
+  }
+
+  .quick-view-opening .quick-view-band:last-child {
+    animation: quick-view-reduced-accent 300ms ease-out 20ms both;
+    transform-origin: center;
+  }
+
+  .quick-view-opening .quick-view-gallery {
+    animation: quick-view-gallery-enter 300ms ease-out 60ms both;
+  }
+
+  .quick-view-closing {
+    animation-duration: 170ms;
+  }
+
+  .quick-view-closing .quick-view-gallery {
+    animation-duration: 170ms;
+  }
+
   .fade-up,
   .hero-media img,
   .manifest-hero-image,

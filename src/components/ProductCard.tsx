@@ -5,6 +5,7 @@ import type { Product } from "@/lib/mock-data";
 import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
+import { preloadQuickViewImages } from "@/lib/quick-view";
 import { getStockForColor } from "@/lib/shopify";
 
 const badgeStyles: Record<string, string> = {
@@ -13,30 +14,14 @@ const badgeStyles: Record<string, string> = {
   "stoc limitat": "bg-olive text-cream",
 };
 
-const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
-const quickViewImageCache = new Set<string>();
+type QuickViewPhase = "preparing" | "opening" | "open" | "closing";
 
-export function preloadQuickViewImages(product: Pick<Product, "images">) {
-  if (typeof window === "undefined") return;
+const QUICK_VIEW_OPEN_MS = 930;
+const QUICK_VIEW_REDUCED_OPEN_MS = 390;
+const QUICK_VIEW_CLOSE_MS = 230;
+const QUICK_VIEW_REDUCED_CLOSE_MS = 170;
 
-  const sources = window.matchMedia("(hover: hover)").matches
-    ? product.images
-    : product.images.slice(0, 1);
-
-  sources.forEach((src) => {
-    if (quickViewImageCache.has(src)) return;
-    quickViewImageCache.add(src);
-
-    const image = new Image();
-    image.decoding = "async";
-    image.src = src;
-    if (typeof image.decode === "function") {
-      void image.decode().catch(() => undefined);
-    }
-  });
-}
-
-/** Full-screen animated quick-view overlay. */
+/** Full-screen quick view with a CSS-driven transition that remains reliable on iOS. */
 export function QuickViewOverlay({
   product,
   origin,
@@ -47,14 +32,10 @@ export function QuickViewOverlay({
   onClose: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
-  const rootRef = React.useRef<HTMLDivElement>(null);
-  const cloneRef = React.useRef<HTMLDivElement>(null);
-  const cloneTextRef = React.useRef<HTMLSpanElement>(null);
-  const bandsRef = React.useRef<HTMLDivElement>(null);
-  const bandRefs = React.useRef<Array<HTMLDivElement | null>>([]);
-  const galleryRef = React.useRef<HTMLDivElement>(null);
-  const animationsRef = React.useRef<Animation[]>([]);
+  const [phase, setPhase] = React.useState<QuickViewPhase>("preparing");
   const closingRef = React.useRef(false);
+  const reducedMotionRef = React.useRef(false);
+  const closeTimerRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     const prev = document.body.style.overflow;
@@ -65,219 +46,52 @@ export function QuickViewOverlay({
   }, []);
 
   React.useEffect(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const mobile = window.matchMedia("(max-width: 767px)").matches;
-    const baseOptions: KeyframeAnimationOptions = { fill: "forwards", easing: EASING };
-    const animations: Animation[] = [];
+    reducedMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
 
-    const clone = cloneRef.current;
-    const cloneText = cloneTextRef.current;
-    const gallery = galleryRef.current;
-    const bands = bandRefs.current.filter(Boolean) as HTMLDivElement[];
+  React.useEffect(() => {
+    if (phase !== "preparing") return undefined;
 
-    if (reducedMotion) {
-      if (clone) clone.style.opacity = "0";
-      if (bandsRef.current) bandsRef.current.style.opacity = "0";
-      if (gallery) {
-        gallery.style.opacity = "1";
-        gallery.style.transform = "translate3d(0, 0, 0)";
-      }
-      setOpen(true);
-      return undefined;
-    }
+    // Give Safari one painted frame before adding the animation class.
+    const timer = window.setTimeout(() => {
+      if (!closingRef.current) setPhase("opening");
+    }, 34);
 
-    if (clone) {
-      animations.push(
-        clone.animate(
-          [
-            { transform: "translate3d(0, 0, 0) scale3d(1, 1, 1)" },
-            { transform: "translate3d(0, 0, 0) scale3d(1, 0.055, 1)" },
-          ],
-          { ...baseOptions, duration: mobile ? 180 : 165 },
-        ),
-        clone.animate([{ opacity: 1 }, { opacity: 0 }], {
-          ...baseOptions,
-          duration: 150,
-          delay: mobile ? 145 : 130,
-        }),
-      );
-    }
+    return () => window.clearTimeout(timer);
+  }, [phase]);
 
-    if (cloneText) {
-      animations.push(
-        cloneText.animate([{ opacity: 1 }, { opacity: 0 }], {
-          ...baseOptions,
-          duration: 90,
-        }),
-      );
-    }
+  React.useEffect(() => {
+    if (phase !== "opening") return undefined;
 
-    bands.forEach((band, index) => {
-      animations.push(
-        band.animate(
-          [
-            {
-              opacity: 1,
-              transform: "translate3d(-104%, 0, 0)",
-              offset: 0,
-              easing: EASING,
-            },
-            {
-              opacity: 1,
-              transform: "translate3d(0, 0, 0)",
-              offset: 0.46,
-              easing: EASING,
-            },
-            {
-              opacity: 1,
-              transform: "translate3d(0, 0, 0)",
-              offset: 0.58,
-              easing: EASING,
-            },
-            { opacity: 1, transform: "translate3d(104%, 0, 0)", offset: 1 },
-          ],
-          {
-            ...baseOptions,
-            easing: "linear",
-            duration: mobile ? 720 : 660,
-            delay: (mobile ? 20 : 10) + index * (mobile ? 58 : 46),
-          },
-        ),
-      );
-    });
+    const timer = window.setTimeout(
+      () => {
+        if (closingRef.current) return;
+        setOpen(true);
+        setPhase("open");
+      },
+      reducedMotionRef.current ? QUICK_VIEW_REDUCED_OPEN_MS : QUICK_VIEW_OPEN_MS,
+    );
 
-    if (gallery) {
-      animations.push(
-        gallery.animate([{ opacity: 0 }, { opacity: 1 }], {
-          ...baseOptions,
-          duration: mobile ? 420 : 360,
-          delay: mobile ? 330 : 280,
-        }),
-        gallery.animate(
-          [
-            { transform: `translate3d(0, ${mobile ? 18 : 12}px, 0)` },
-            { transform: "translate3d(0, 0, 0)" },
-          ],
-          {
-            ...baseOptions,
-            duration: mobile ? 500 : 420,
-            delay: mobile ? 300 : 250,
-          },
-        ),
-      );
-    }
+    return () => window.clearTimeout(timer);
+  }, [phase]);
 
-    animationsRef.current = animations;
-    let cancelled = false;
-    void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
-      if (cancelled || closingRef.current) return;
-
-      animations.forEach((animation) => {
-        try {
-          animation.commitStyles();
-        } catch {
-          // Safari can omit commitStyles for some completed animations.
-        }
-        animation.cancel();
-      });
-
-      if (clone) {
-        clone.style.opacity = "0";
-        clone.style.willChange = "auto";
-      }
-      if (bandsRef.current) {
-        bandsRef.current.style.opacity = "0";
-        bandsRef.current.style.willChange = "auto";
-      }
-      bands.forEach((band) => {
-        band.style.opacity = "0";
-        band.style.willChange = "auto";
-      });
-      if (gallery) {
-        gallery.style.opacity = "1";
-        gallery.style.transform = "translate3d(0, 0, 0)";
-        gallery.style.willChange = "auto";
-      }
-      if (rootRef.current) rootRef.current.style.willChange = "auto";
-      animationsRef.current = [];
-      setOpen(true);
-    });
-
-    return () => {
-      cancelled = true;
-      animations.forEach((animation) => animation.cancel());
-    };
-  }, [origin.height, origin.width, origin.x, origin.y, product.images]);
+  React.useEffect(
+    () => () => {
+      if (closeTimerRef.current !== null) window.clearTimeout(closeTimerRef.current);
+    },
+    [],
+  );
 
   const handleClose = React.useCallback(() => {
     if (closingRef.current) return;
     closingRef.current = true;
+    setOpen(false);
+    setPhase("closing");
 
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      onClose();
-      return;
-    }
-
-    animationsRef.current.forEach((animation) => {
-      try {
-        animation.commitStyles();
-      } catch {
-        // Ignore browsers that cannot commit styles for a cancelled animation.
-      }
-      animation.cancel();
-    });
-
-    const closeOptions: KeyframeAnimationOptions = { fill: "forwards", easing: EASING };
-    const closeAnimations: Animation[] = [];
-
-    if (galleryRef.current) {
-      closeAnimations.push(
-        galleryRef.current.animate(
-          [
-            {
-              opacity: getComputedStyle(galleryRef.current).opacity,
-              transform: getComputedStyle(galleryRef.current).transform,
-            },
-            { opacity: 0, transform: "translate3d(0, 10px, 0)" },
-          ],
-          {
-            ...closeOptions,
-            duration: 210,
-          },
-        ),
-      );
-    }
-
-    if (bandsRef.current) {
-      closeAnimations.push(
-        bandsRef.current.animate(
-          [{ opacity: getComputedStyle(bandsRef.current).opacity }, { opacity: 0 }],
-          {
-            ...closeOptions,
-            duration: 180,
-          },
-        ),
-      );
-    }
-
-    if (rootRef.current) {
-      closeAnimations.push(
-        rootRef.current.animate(
-          [{ opacity: getComputedStyle(rootRef.current).opacity }, { opacity: 0 }],
-          {
-            ...closeOptions,
-            duration: 210,
-          },
-        ),
-      );
-    }
-
-    if (closeAnimations.length === 0) {
-      onClose();
-      return;
-    }
-
-    void Promise.allSettled(closeAnimations.map((animation) => animation.finished)).then(onClose);
+    closeTimerRef.current = window.setTimeout(
+      onClose,
+      reducedMotionRef.current ? QUICK_VIEW_REDUCED_CLOSE_MS : QUICK_VIEW_CLOSE_MS,
+    );
   }, [onClose]);
 
   React.useEffect(() => {
@@ -290,20 +104,16 @@ export function QuickViewOverlay({
 
   return (
     <div
-      ref={rootRef}
       data-quick-view-root
-      className="fixed inset-0 z-[100]"
-      style={{
-        background: "transparent",
-        opacity: 1,
-        willChange: "opacity",
-      }}
+      data-quick-view-phase={phase}
+      className={`quick-view-root quick-view-${phase} fixed inset-0 z-[100]`}
       role="dialog"
       aria-modal="true"
+      aria-busy={phase !== "open"}
       aria-label={`Galerie ${product.title}`}
     >
       <div
-        ref={cloneRef}
+        className="quick-view-clone"
         aria-hidden="true"
         style={{
           position: "fixed",
@@ -318,16 +128,12 @@ export function QuickViewOverlay({
           alignItems: "center",
           justifyContent: "center",
           transformOrigin: "center center",
-          transform: "translate3d(0, 0, 0)",
-          opacity: 1,
           pointerEvents: "none",
           zIndex: 4,
-          willChange: "transform, opacity",
-          backfaceVisibility: "hidden",
         }}
       >
         <span
-          ref={cloneTextRef}
+          className="quick-view-clone-text"
           style={{
             fontFamily: "var(--font-display)",
             fontSize: 16,
@@ -335,8 +141,6 @@ export function QuickViewOverlay({
             textTransform: "uppercase",
             letterSpacing: "0.12em",
             color: "#1a1a18",
-            opacity: 1,
-            willChange: "opacity",
           }}
         >
           Vezi produs
@@ -344,7 +148,7 @@ export function QuickViewOverlay({
       </div>
 
       <div
-        ref={bandsRef}
+        className="quick-view-bands"
         data-quick-view-bands
         aria-hidden="true"
         style={{
@@ -354,64 +158,44 @@ export function QuickViewOverlay({
           gridTemplateRows: "1fr 1.2fr 1.3fr",
           gap: 10,
           pointerEvents: "none",
-          opacity: 1,
           zIndex: 3,
-          willChange: "opacity",
         }}
       >
         {["#000000", "#000000", "#ff006f"].map((color, i) => (
           <div
             key={i}
-            ref={(node) => {
-              bandRefs.current[i] = node;
-            }}
+            className="quick-view-band"
             data-quick-view-band={i + 1}
             style={{
               background: color,
-              transform: "translate3d(-104%, 0, 0)",
-              opacity: 1,
-              willChange: "transform, opacity",
-              backfaceVisibility: "hidden",
             }}
           />
         ))}
       </div>
 
       {/* Gallery */}
-      <GalleryLayer
-        product={product}
-        layerRef={galleryRef}
-        interactive={open}
-        onClose={handleClose}
-      />
+      <GalleryLayer product={product} interactive={open} onClose={handleClose} />
     </div>
   );
 }
 
 function GalleryLayer({
   product,
-  layerRef,
   interactive,
   onClose,
 }: {
   product: Product;
-  layerRef: React.RefObject<HTMLDivElement | null>;
   interactive: boolean;
   onClose: () => void;
 }) {
   return (
     <div
-      ref={layerRef}
       data-quick-view-gallery
-      className="fixed inset-0 flex flex-col overflow-y-auto overscroll-y-contain"
+      className="quick-view-gallery fixed inset-0 flex flex-col overflow-y-auto overscroll-y-contain"
       style={{
         background: "#faf8f2",
-        opacity: 0,
-        transform: "translate3d(0, 18px, 0)",
         pointerEvents: interactive ? "auto" : "none",
         zIndex: 2,
-        willChange: "transform, opacity",
-        backfaceVisibility: "hidden",
       }}
     >
       {/* Top bar */}

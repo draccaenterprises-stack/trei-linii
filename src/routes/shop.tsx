@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { preloadQuickViewImages, QuickViewOverlay } from "@/components/ProductCard";
+import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
 import {
   products as previewTemplates,
@@ -13,6 +13,7 @@ import { fetchCollections, fetchProducts, getStockForColor } from "@/lib/shopify
 import { useCart } from "@/lib/cart-context";
 import { clamp, createFrameScheduler } from "@/lib/motion";
 import { pageMeta } from "@/lib/seo";
+import { preloadQuickViewImages } from "@/lib/quick-view";
 
 const chapterQuotes = [
   "O piesa care nu cere atentie. O pastreaza.",
@@ -530,7 +531,7 @@ function Chapter({
       onPointerDown={() => preloadQuickViewImages(product)}
       onFocus={() => preloadQuickViewImages(product)}
       aria-label={`Vezi produs ${product.title}`}
-      className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/collage:opacity-100"
+      className="pc-view-btn absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/collage:opacity-100"
       style={{
         padding: "13px 28px",
         background: "rgba(232,229,221,0.94)",
