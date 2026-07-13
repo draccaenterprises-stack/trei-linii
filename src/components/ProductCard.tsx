@@ -16,7 +16,7 @@ const badgeStyles: Record<string, string> = {
 
 type QuickViewPhase = "preparing" | "opening" | "open" | "closing";
 
-const QUICK_VIEW_OPEN_MS = 930;
+const QUICK_VIEW_OPEN_MS = 1180;
 const QUICK_VIEW_CLOSE_MS = 230;
 
 /** Full-screen quick view with a CSS-driven transition that remains reliable on iOS. */
@@ -116,7 +116,7 @@ export function QuickViewOverlay({
           justifyContent: "center",
           transformOrigin: "center center",
           pointerEvents: "none",
-          zIndex: 4,
+          zIndex: 5,
         }}
       >
         <span
@@ -133,6 +133,22 @@ export function QuickViewOverlay({
           Vezi produs
         </span>
       </div>
+
+      <div
+        className="quick-view-spine"
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: origin.x + origin.width / 2 - 1,
+          top: 0,
+          bottom: 0,
+          width: 2,
+          background: "#14120e",
+          transformOrigin: `center ${origin.y + origin.height / 2}px`,
+          pointerEvents: "none",
+          zIndex: 4,
+        }}
+      />
 
       <div
         className="quick-view-bands"
@@ -154,6 +170,7 @@ export function QuickViewOverlay({
             data-quick-view-band={i + 1}
             style={{
               background: color,
+              transformOrigin: `${origin.x + origin.width / 2}px center`,
             }}
           />
         ))}
@@ -517,6 +534,7 @@ export function ProductCard({
                 color: "#1a1a18",
                 cursor: "pointer",
                 whiteSpace: "nowrap",
+                visibility: overlay ? "hidden" : undefined,
               }}
             >
               Vezi produs

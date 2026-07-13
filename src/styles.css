@@ -418,16 +418,23 @@
 
   @keyframes quick-view-button-collapse {
     0% {
+      border-radius: 14px;
       opacity: 1;
       transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
     }
-    58% {
+    45% {
       opacity: 1;
-      transform: translate3d(0, 0, 0) scale3d(1, 0.055, 1);
+      transform: translate3d(0, 0, 0) scale3d(0.18, 1, 1);
+    }
+    75% {
+      border-radius: 0;
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(0.014, 1, 1);
     }
     100% {
+      border-radius: 0;
       opacity: 0;
-      transform: translate3d(0, 0, 0) scale3d(1, 0.055, 1);
+      transform: translate3d(0, 0, 0) scale3d(0.014, 1, 1);
     }
   }
 
@@ -440,21 +447,43 @@
     }
   }
 
-  @keyframes quick-view-band-sweep {
+  @keyframes quick-view-spine-grow {
     0% {
-      transform: translate3d(-104%, 0, 0);
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale3d(1, 0, 1);
     }
-    46% {
-      transform: translate3d(0, 0, 0);
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    10% {
+      opacity: 1;
     }
-    58% {
-      transform: translate3d(0, 0, 0);
-      animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    70% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
     }
     100% {
-      transform: translate3d(104%, 0, 0);
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+  }
+
+  @keyframes quick-view-band-expand {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale3d(0, 1, 1);
+    }
+    8% {
+      opacity: 1;
+    }
+    58% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+    74% {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
     }
   }
 
@@ -507,6 +536,13 @@
     will-change: opacity;
   }
 
+  .quick-view-spine {
+    backface-visibility: hidden;
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(1, 0, 1);
+    will-change: transform, opacity;
+  }
+
   .quick-view-bands {
     contain: strict;
     display: grid;
@@ -518,21 +554,21 @@
 
   .quick-view-band {
     backface-visibility: hidden;
-    opacity: 1;
-    transform: translate3d(-104%, 0, 0);
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale3d(0, 1, 1);
     will-change: transform, opacity;
   }
 
   .quick-view-band:nth-child(1) {
-    --quick-view-band-delay: 20ms;
+    --quick-view-band-delay: 330ms;
   }
 
   .quick-view-band:nth-child(2) {
-    --quick-view-band-delay: 80ms;
+    --quick-view-band-delay: 390ms;
   }
 
   .quick-view-band:nth-child(3) {
-    --quick-view-band-delay: 140ms;
+    --quick-view-band-delay: 450ms;
   }
 
   .quick-view-gallery {
@@ -543,22 +579,29 @@
   }
 
   .quick-view-opening .quick-view-clone {
-    animation: quick-view-button-collapse 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    background: #14120e !important;
+    animation: quick-view-button-collapse 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   .quick-view-opening .quick-view-clone-text {
-    animation: quick-view-text-exit 100ms ease-out both;
+    animation: quick-view-text-exit 110ms ease-out both;
+  }
+
+  .quick-view-opening .quick-view-spine {
+    animation: quick-view-spine-grow 620ms cubic-bezier(0.16, 1, 0.3, 1) 150ms both;
   }
 
   .quick-view-opening .quick-view-band {
-    animation: quick-view-band-sweep 760ms linear var(--quick-view-band-delay) both;
+    animation: quick-view-band-expand 680ms cubic-bezier(0.16, 1, 0.3, 1)
+      var(--quick-view-band-delay) both;
   }
 
   .quick-view-opening .quick-view-gallery {
-    animation: quick-view-gallery-enter 480ms cubic-bezier(0.16, 1, 0.3, 1) 330ms both;
+    animation: quick-view-gallery-enter 500ms cubic-bezier(0.16, 1, 0.3, 1) 700ms both;
   }
 
   .quick-view-open .quick-view-clone,
+  .quick-view-open .quick-view-spine,
   .quick-view-open .quick-view-bands,
   .quick-view-open .quick-view-band {
     opacity: 0;
@@ -574,6 +617,10 @@
     display: none;
   }
 
+  .quick-view-open .quick-view-spine {
+    display: none;
+  }
+
   .quick-view-open .quick-view-gallery {
     opacity: 1;
     transform: translate3d(0, 0, 0);
@@ -585,6 +632,7 @@
   }
 
   .quick-view-closing .quick-view-clone,
+  .quick-view-closing .quick-view-spine,
   .quick-view-closing .quick-view-bands {
     opacity: 0;
     visibility: hidden;

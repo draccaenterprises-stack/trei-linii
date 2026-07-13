@@ -546,6 +546,7 @@ function Chapter({
         color: "#1a1a18",
         cursor: "pointer",
         whiteSpace: "nowrap",
+        visibility: overlay ? "hidden" : undefined,
       }}
     >
       Vezi produs
