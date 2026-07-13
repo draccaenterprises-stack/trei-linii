@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft, Flame, PackageCheck, Percent } from "lucide-react";
 import * as React from "react";
+import { createPortal } from "react-dom";
 import type { Product } from "@/lib/mock-data";
 import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
@@ -45,12 +46,27 @@ export function QuickViewOverlay({
   React.useEffect(() => {
     if (phase !== "preparing") return undefined;
 
-    // Give Safari one painted frame before adding the animation class.
-    const timer = window.setTimeout(() => {
-      if (!closingRef.current) setPhase("opening");
-    }, 34);
+    let secondFrame = 0;
+    let started = false;
 
-    return () => window.clearTimeout(timer);
+    const startOpening = () => {
+      if (started || closingRef.current) return;
+      started = true;
+      window.clearTimeout(fallbackTimer);
+      setPhase("opening");
+    };
+
+    // Two painted frames keep iOS Safari from coalescing the mounted and animated states.
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(startOpening);
+    });
+    const fallbackTimer = window.setTimeout(startOpening, 160);
+
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+      window.clearTimeout(fallbackTimer);
+    };
   }, [phase]);
 
   React.useEffect(() => {
@@ -89,7 +105,9 @@ export function QuickViewOverlay({
     return () => window.removeEventListener("keydown", onKey);
   }, [handleClose]);
 
-  return (
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
     <div
       data-quick-view-root
       data-quick-view-phase={phase}
@@ -178,7 +196,8 @@ export function QuickViewOverlay({
 
       {/* Gallery */}
       <GalleryLayer product={product} interactive={open} onClose={handleClose} />
-    </div>
+    </div>,
+    document.body,
   );
 }
 
