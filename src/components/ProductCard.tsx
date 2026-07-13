@@ -17,9 +17,7 @@ const badgeStyles: Record<string, string> = {
 type QuickViewPhase = "preparing" | "opening" | "open" | "closing";
 
 const QUICK_VIEW_OPEN_MS = 930;
-const QUICK_VIEW_REDUCED_OPEN_MS = 390;
 const QUICK_VIEW_CLOSE_MS = 230;
-const QUICK_VIEW_REDUCED_CLOSE_MS = 170;
 
 /** Full-screen quick view with a CSS-driven transition that remains reliable on iOS. */
 export function QuickViewOverlay({
@@ -34,7 +32,6 @@ export function QuickViewOverlay({
   const [open, setOpen] = React.useState(false);
   const [phase, setPhase] = React.useState<QuickViewPhase>("preparing");
   const closingRef = React.useRef(false);
-  const reducedMotionRef = React.useRef(false);
   const closeTimerRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
@@ -43,10 +40,6 @@ export function QuickViewOverlay({
     return () => {
       document.body.style.overflow = prev;
     };
-  }, []);
-
-  React.useEffect(() => {
-    reducedMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }, []);
 
   React.useEffect(() => {
@@ -63,14 +56,11 @@ export function QuickViewOverlay({
   React.useEffect(() => {
     if (phase !== "opening") return undefined;
 
-    const timer = window.setTimeout(
-      () => {
-        if (closingRef.current) return;
-        setOpen(true);
-        setPhase("open");
-      },
-      reducedMotionRef.current ? QUICK_VIEW_REDUCED_OPEN_MS : QUICK_VIEW_OPEN_MS,
-    );
+    const timer = window.setTimeout(() => {
+      if (closingRef.current) return;
+      setOpen(true);
+      setPhase("open");
+    }, QUICK_VIEW_OPEN_MS);
 
     return () => window.clearTimeout(timer);
   }, [phase]);
@@ -88,10 +78,7 @@ export function QuickViewOverlay({
     setOpen(false);
     setPhase("closing");
 
-    closeTimerRef.current = window.setTimeout(
-      onClose,
-      reducedMotionRef.current ? QUICK_VIEW_REDUCED_CLOSE_MS : QUICK_VIEW_CLOSE_MS,
-    );
+    closeTimerRef.current = window.setTimeout(onClose, QUICK_VIEW_CLOSE_MS);
   }, [onClose]);
 
   React.useEffect(() => {
@@ -154,7 +141,6 @@ export function QuickViewOverlay({
         style={{
           position: "fixed",
           inset: 0,
-          display: "grid",
           gridTemplateRows: "1fr 1.2fr 1.3fr",
           gap: 10,
           pointerEvents: "none",

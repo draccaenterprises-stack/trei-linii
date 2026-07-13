@@ -489,20 +489,6 @@
     }
   }
 
-  @keyframes quick-view-reduced-accent {
-    0% {
-      opacity: 0;
-      transform: scale3d(0.72, 1, 1);
-    }
-    45% {
-      opacity: 0.68;
-    }
-    100% {
-      opacity: 0;
-      transform: scale3d(1, 1, 1);
-    }
-  }
-
   .quick-view-root {
     background: transparent;
     isolation: isolate;
@@ -522,7 +508,11 @@
   }
 
   .quick-view-bands {
+    contain: strict;
+    display: grid;
     opacity: 1;
+    overflow: hidden;
+    transform: translate3d(0, 0, 0);
     will-change: opacity;
   }
 
@@ -574,6 +564,14 @@
     opacity: 0;
     visibility: hidden;
     will-change: auto;
+  }
+
+  .quick-view-open {
+    background: #faf8f2;
+  }
+
+  .quick-view-open .quick-view-bands {
+    display: none;
   }
 
   .quick-view-open .quick-view-gallery {
@@ -677,36 +675,6 @@
 
 /* Accessibility: honor reduced-motion. Content stays fully visible. */
 @media (prefers-reduced-motion: reduce) {
-  .quick-view-opening .quick-view-clone {
-    animation: quick-view-text-exit 140ms ease-out both;
-  }
-
-  .quick-view-opening .quick-view-clone-text {
-    animation: quick-view-text-exit 90ms ease-out both;
-  }
-
-  .quick-view-opening .quick-view-band {
-    animation: none;
-    opacity: 0;
-  }
-
-  .quick-view-opening .quick-view-band:last-child {
-    animation: quick-view-reduced-accent 300ms ease-out 20ms both;
-    transform-origin: center;
-  }
-
-  .quick-view-opening .quick-view-gallery {
-    animation: quick-view-gallery-enter 300ms ease-out 60ms both;
-  }
-
-  .quick-view-closing {
-    animation-duration: 170ms;
-  }
-
-  .quick-view-closing .quick-view-gallery {
-    animation-duration: 170ms;
-  }
-
   .fade-up,
   .hero-media img,
   .manifest-hero-image,
