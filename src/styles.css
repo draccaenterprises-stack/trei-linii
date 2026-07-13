@@ -300,6 +300,33 @@
   }
 
   @media (max-width: 767px) {
+    .pc-view-btn {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+
+    .shop-collage-item {
+      box-shadow: 0 12px 30px rgb(26 26 24 / 0.13);
+    }
+
+    .shop-collage-item img {
+      backface-visibility: hidden;
+      transform: translateZ(0);
+    }
+
+    .motion-ready .shop-collage-item {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0) scale(0.985);
+      transition:
+        opacity 440ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .motion-ready .shop-collage-item.is-visible {
+      box-shadow: 0 12px 30px rgb(26 26 24 / 0.13);
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
     .trust-card {
       backface-visibility: hidden;
       border-radius: 18px !important;

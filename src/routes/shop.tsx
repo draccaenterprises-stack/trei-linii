@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
-import { QuickViewOverlay } from "@/components/ProductCard";
+import { preloadQuickViewImages, QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
 import {
   products as previewTemplates,
@@ -526,12 +526,15 @@ function Chapter({
     <button
       type="button"
       onClick={openQuickView}
+      onPointerEnter={() => preloadQuickViewImages(product)}
+      onPointerDown={() => preloadQuickViewImages(product)}
+      onFocus={() => preloadQuickViewImages(product)}
       aria-label={`Vezi produs ${product.title}`}
       className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 opacity-100 transition-opacity duration-300 md:opacity-0 md:group-hover/collage:opacity-100"
       style={{
         padding: "13px 28px",
-        background: "rgba(232,229,221,0.62)",
-        backdropFilter: "blur(10px)",
+        background: "rgba(232,229,221,0.94)",
+        boxShadow: "0 8px 24px rgba(20,18,14,0.12)",
         border: "none",
         borderRadius: 14,
         fontFamily: "var(--font-display)",

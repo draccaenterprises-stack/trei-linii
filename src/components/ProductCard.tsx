@@ -14,6 +14,27 @@ const badgeStyles: Record<string, string> = {
 };
 
 const EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
+const quickViewImageCache = new Set<string>();
+
+export function preloadQuickViewImages(product: Pick<Product, "images">) {
+  if (typeof window === "undefined") return;
+
+  const sources = window.matchMedia("(hover: hover)").matches
+    ? product.images
+    : product.images.slice(0, 1);
+
+  sources.forEach((src) => {
+    if (quickViewImageCache.has(src)) return;
+    quickViewImageCache.add(src);
+
+    const image = new Image();
+    image.decoding = "async";
+    image.src = src;
+    if (typeof image.decode === "function") {
+      void image.decode().catch(() => undefined);
+    }
+  });
+}
 
 /** Full-screen animated quick-view overlay. */
 export function QuickViewOverlay({
@@ -44,15 +65,8 @@ export function QuickViewOverlay({
   }, []);
 
   React.useEffect(() => {
-    product.images.forEach((src) => {
-      const img = new Image();
-      img.src = src;
-      if (typeof img.decode === "function") {
-        void img.decode().catch(() => undefined);
-      }
-    });
-
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobile = window.matchMedia("(max-width: 767px)").matches;
     const baseOptions: KeyframeAnimationOptions = { fill: "forwards", easing: EASING };
     const animations: Animation[] = [];
 
@@ -66,7 +80,7 @@ export function QuickViewOverlay({
       if (bandsRef.current) bandsRef.current.style.opacity = "0";
       if (gallery) {
         gallery.style.opacity = "1";
-        gallery.style.transform = "scale(1)";
+        gallery.style.transform = "translate3d(0, 0, 0)";
       }
       setOpen(true);
       return undefined;
@@ -76,15 +90,15 @@ export function QuickViewOverlay({
       animations.push(
         clone.animate(
           [
-            { transform: "translate3d(0, 0, 0) scaleY(1)" },
-            { transform: "translate3d(0, 0, 0) scaleY(0.055)" },
+            { transform: "translate3d(0, 0, 0) scale3d(1, 1, 1)" },
+            { transform: "translate3d(0, 0, 0) scale3d(1, 0.055, 1)" },
           ],
-          { ...baseOptions, duration: 190 },
+          { ...baseOptions, duration: mobile ? 180 : 165 },
         ),
         clone.animate([{ opacity: 1 }, { opacity: 0 }], {
           ...baseOptions,
-          duration: 120,
-          delay: 210,
+          duration: 150,
+          delay: mobile ? 145 : 130,
         }),
       );
     }
@@ -93,7 +107,7 @@ export function QuickViewOverlay({
       animations.push(
         cloneText.animate([{ opacity: 1 }, { opacity: 0 }], {
           ...baseOptions,
-          duration: 110,
+          duration: 90,
         }),
       );
     }
@@ -102,43 +116,91 @@ export function QuickViewOverlay({
       animations.push(
         band.animate(
           [
-            { opacity: 1, transform: "scaleX(0.002)" },
-            { opacity: 1, transform: "scaleX(1)" },
+            {
+              opacity: 1,
+              transform: "translate3d(-104%, 0, 0)",
+              offset: 0,
+              easing: EASING,
+            },
+            {
+              opacity: 1,
+              transform: "translate3d(0, 0, 0)",
+              offset: 0.46,
+              easing: EASING,
+            },
+            {
+              opacity: 1,
+              transform: "translate3d(0, 0, 0)",
+              offset: 0.58,
+              easing: EASING,
+            },
+            { opacity: 1, transform: "translate3d(104%, 0, 0)", offset: 1 },
           ],
-          { ...baseOptions, duration: 500, delay: 120 + index * 55 },
+          {
+            ...baseOptions,
+            easing: "linear",
+            duration: mobile ? 720 : 660,
+            delay: (mobile ? 20 : 10) + index * (mobile ? 58 : 46),
+          },
         ),
       );
     });
-
-    if (bandsRef.current) {
-      animations.push(
-        bandsRef.current.animate([{ opacity: 1 }, { opacity: 0.08 }], {
-          ...baseOptions,
-          duration: 260,
-          delay: 620,
-        }),
-      );
-    }
 
     if (gallery) {
       animations.push(
         gallery.animate([{ opacity: 0 }, { opacity: 1 }], {
           ...baseOptions,
-          duration: 390,
-          delay: 560,
+          duration: mobile ? 420 : 360,
+          delay: mobile ? 330 : 280,
         }),
-        gallery.animate([{ transform: "scale(0.985)" }, { transform: "scale(1)" }], {
-          ...baseOptions,
-          duration: 450,
-          delay: 560,
-        }),
+        gallery.animate(
+          [
+            { transform: `translate3d(0, ${mobile ? 18 : 12}px, 0)` },
+            { transform: "translate3d(0, 0, 0)" },
+          ],
+          {
+            ...baseOptions,
+            duration: mobile ? 500 : 420,
+            delay: mobile ? 300 : 250,
+          },
+        ),
       );
     }
 
     animationsRef.current = animations;
     let cancelled = false;
     void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
-      if (!cancelled && !closingRef.current) setOpen(true);
+      if (cancelled || closingRef.current) return;
+
+      animations.forEach((animation) => {
+        try {
+          animation.commitStyles();
+        } catch {
+          // Safari can omit commitStyles for some completed animations.
+        }
+        animation.cancel();
+      });
+
+      if (clone) {
+        clone.style.opacity = "0";
+        clone.style.willChange = "auto";
+      }
+      if (bandsRef.current) {
+        bandsRef.current.style.opacity = "0";
+        bandsRef.current.style.willChange = "auto";
+      }
+      bands.forEach((band) => {
+        band.style.opacity = "0";
+        band.style.willChange = "auto";
+      });
+      if (gallery) {
+        gallery.style.opacity = "1";
+        gallery.style.transform = "translate3d(0, 0, 0)";
+        gallery.style.willChange = "auto";
+      }
+      if (rootRef.current) rootRef.current.style.willChange = "auto";
+      animationsRef.current = [];
+      setOpen(true);
     });
 
     return () => {
@@ -150,6 +212,11 @@ export function QuickViewOverlay({
   const handleClose = React.useCallback(() => {
     if (closingRef.current) return;
     closingRef.current = true;
+
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      onClose();
+      return;
+    }
 
     animationsRef.current.forEach((animation) => {
       try {
@@ -166,10 +233,16 @@ export function QuickViewOverlay({
     if (galleryRef.current) {
       closeAnimations.push(
         galleryRef.current.animate(
-          [{ opacity: getComputedStyle(galleryRef.current).opacity }, { opacity: 0 }],
+          [
+            {
+              opacity: getComputedStyle(galleryRef.current).opacity,
+              transform: getComputedStyle(galleryRef.current).transform,
+            },
+            { opacity: 0, transform: "translate3d(0, 10px, 0)" },
+          ],
           {
             ...closeOptions,
-            duration: 180,
+            duration: 210,
           },
         ),
       );
@@ -215,11 +288,10 @@ export function QuickViewOverlay({
     return () => window.removeEventListener("keydown", onKey);
   }, [handleClose]);
 
-  const originX = `${origin.x + origin.width / 2}px`;
-
   return (
     <div
       ref={rootRef}
+      data-quick-view-root
       className="fixed inset-0 z-[100]"
       style={{
         background: "transparent",
@@ -249,7 +321,7 @@ export function QuickViewOverlay({
           transform: "translate3d(0, 0, 0)",
           opacity: 1,
           pointerEvents: "none",
-          zIndex: 3,
+          zIndex: 4,
           willChange: "transform, opacity",
           backfaceVisibility: "hidden",
         }}
@@ -273,6 +345,7 @@ export function QuickViewOverlay({
 
       <div
         ref={bandsRef}
+        data-quick-view-bands
         aria-hidden="true"
         style={{
           position: "fixed",
@@ -282,7 +355,7 @@ export function QuickViewOverlay({
           gap: 10,
           pointerEvents: "none",
           opacity: 1,
-          zIndex: 1,
+          zIndex: 3,
           willChange: "opacity",
         }}
       >
@@ -292,11 +365,11 @@ export function QuickViewOverlay({
             ref={(node) => {
               bandRefs.current[i] = node;
             }}
+            data-quick-view-band={i + 1}
             style={{
               background: color,
-              transformOrigin: `${originX} center`,
-              transform: "scaleX(0.002)",
-              opacity: 0,
+              transform: "translate3d(-104%, 0, 0)",
+              opacity: 1,
               willChange: "transform, opacity",
               backfaceVisibility: "hidden",
             }}
@@ -329,11 +402,12 @@ function GalleryLayer({
   return (
     <div
       ref={layerRef}
+      data-quick-view-gallery
       className="fixed inset-0 flex flex-col overflow-y-auto overscroll-y-contain"
       style={{
         background: "#faf8f2",
         opacity: 0,
-        transform: "scale(0.985)",
+        transform: "translate3d(0, 18px, 0)",
         pointerEvents: interactive ? "auto" : "none",
         zIndex: 2,
         willChange: "transform, opacity",
@@ -341,7 +415,7 @@ function GalleryLayer({
       }}
     >
       {/* Top bar */}
-      <div className="sticky top-0 z-10 flex items-center gap-4 border-b border-charcoal/10 bg-[#faf8f2]/95 px-5 py-4 backdrop-blur md:px-10 md:py-6">
+      <div className="sticky top-0 z-10 flex items-center gap-4 border-b border-charcoal/10 bg-[#faf8f2] px-5 py-4 md:bg-[#faf8f2]/95 md:px-10 md:py-6 md:backdrop-blur">
         <button
           type="button"
           onClick={onClose}
@@ -352,7 +426,7 @@ function GalleryLayer({
           <ArrowLeft strokeWidth={1.5} className="h-5 w-5" />
         </button>
         <div className="flex min-w-0 flex-1 items-baseline justify-between gap-4">
-          <h2 className="min-w-0 flex-1 truncate font-display text-2xl leading-none md:text-[32px]">
+          <h2 className="min-w-0 flex-1 font-display text-xl leading-tight md:truncate md:text-[32px] md:leading-none">
             {product.title}
           </h2>
           <span className="font-mono-xs whitespace-nowrap" style={{ color: "#ff006f" }}>
@@ -387,6 +461,9 @@ function GalleryLayer({
             <img
               src={src}
               alt={`${product.title} - ${i + 1}`}
+              decoding="async"
+              loading={i === 0 ? "eager" : "lazy"}
+              fetchPriority={i === 0 ? "high" : "auto"}
               style={{
                 width: "100%",
                 height: "min(62svh, 680px)",
@@ -651,12 +728,15 @@ export function ProductCard({
               ref={viewBtnRef}
               type="button"
               onClick={openQuickView}
+              onPointerEnter={() => preloadQuickViewImages(product)}
+              onPointerDown={() => preloadQuickViewImages(product)}
+              onFocus={() => preloadQuickViewImages(product)}
               aria-label={`Vezi produs ${product.title}`}
               className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
               style={{
                 padding: "13px 28px",
-                background: "rgba(232,229,221,0.62)",
-                backdropFilter: "blur(10px)",
+                background: "rgba(232,229,221,0.94)",
+                boxShadow: "0 8px 24px rgba(20,18,14,0.12)",
                 border: "none",
                 borderRadius: 14,
                 fontFamily: "var(--font-display)",
