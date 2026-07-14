@@ -1,19 +1,35 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { Bell, RotateCcw, ShieldCheck, Truck, X } from "lucide-react";
+import {
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  RotateCcw,
+  ShieldCheck,
+  Truck,
+  X,
+} from "lucide-react";
 import { SizeGuideTable } from "@/components/SizeGuideTable";
 import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
-import { fetchProductByHandle, fetchProducts, getStockForColor } from "@/lib/shopify";
+import { productRepository } from "@/lib/product-repository";
+import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
 import { SITE_URL } from "@/lib/site";
+import { trackEvent } from "@/lib/analytics";
+import { ResponsiveImage } from "@/components/ResponsiveImage";
+import { FeedbackRegion } from "@/components/FeedbackRegion";
+import { buildBreadcrumbSchema, buildProductSchema, serializeJsonLd } from "@/lib/schema";
+import { isKlaviyoConfigured } from "@/lib/klaviyo";
 
 export const Route = createFileRoute("/product/$handle")({
   loader: async ({ params }) => {
     const [product, products] = await Promise.all([
-      fetchProductByHandle(params.handle),
-      fetchProducts(),
+      productRepository.getProduct(params.handle),
+      productRepository.listProducts(),
     ]);
     if (!product) throw notFound();
     const related = products.filter((p) => p.id !== product.id).slice(0, 3);
@@ -25,38 +41,41 @@ export const Route = createFileRoute("/product/$handle")({
     const title = `${loaderData.product.title} - Trei Linii`;
     const description = loaderData.product.description;
     const image = loaderData.product.images[0];
+    const canPurchase = canPurchaseProduct(loaderData.product);
+    const productData = buildProductSchema({
+      product: loaderData.product,
+      url,
+      purchasable: canPurchase,
+    });
+    const breadcrumbData = buildBreadcrumbSchema([
+      { name: "Acasă", url: SITE_URL },
+      { name: "Shop", url: `${SITE_URL}/shop` },
+      { name: loaderData.product.title, url },
+    ]);
+
     return {
       meta: [
         { title },
         { name: "description", content: description },
+        ...(loaderData.product.isPreview ? [{ name: "robots", content: "noindex, nofollow" }] : []),
         { property: "og:title", content: title },
         { property: "og:description", content: description },
         { property: "og:url", content: url },
         { property: "og:type", content: "product" },
-        { property: "og:image", content: image },
+        ...(image ? [{ property: "og:image", content: image }] : []),
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: description },
-        { name: "twitter:image", content: image },
+        ...(image ? [{ name: "twitter:image", content: image }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            name: loaderData.product.title,
-            description,
-            image: loaderData.product.images,
-            url,
-            offers: {
-              "@type": "Offer",
-              price: loaderData.product.price,
-              priceCurrency: "RON",
-              availability: "https://schema.org/InStock",
-              url,
-            },
-          }),
+          children: serializeJsonLd(productData),
+        },
+        {
+          type: "application/ld+json",
+          children: serializeJsonLd(breadcrumbData),
         },
       ],
     };
@@ -64,9 +83,9 @@ export const Route = createFileRoute("/product/$handle")({
   component: ProductPage,
   notFoundComponent: () => (
     <div className="px-5 py-32 text-center">
-      <h1 className="font-display text-5xl">Produsul nu a fost gasit</h1>
+      <h1 className="font-display text-5xl">Produsul nu a fost găsit</h1>
       <Link to="/shop" className="font-mono-xs underline mt-6 inline-block">
-        Inapoi la modele
+        Înapoi la modele
       </Link>
     </div>
   ),
@@ -74,28 +93,52 @@ export const Route = createFileRoute("/product/$handle")({
 
 function ProductPage() {
   const { product, related } = Route.useLoaderData();
-  const { accentColor, siteMode, reviewsEnabled } = useSite();
+  const { accentColor, siteMode } = useSite();
   const { addItem } = useCart();
   const [size, setSize] = useState<(typeof product.sizes)[number] | null>(null);
-  const [color, setColor] = useState<string>(product.colors[0].name);
+  const [color, setColor] = useState<string>(
+    product.colors.length === 1 ? (product.colors[0]?.name ?? "") : "",
+  );
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [purchaseMessage, setPurchaseMessage] = useState("");
   const selectedColorStock = useMemo(() => getStockForColor(product, color), [product, color]);
+  const productCanBePurchased = canPurchaseProduct(product);
+  const galleryImages = product.images.length ? product.images : [""];
+
+  useEffect(() => {
+    trackEvent("view_item", {
+      itemId: product.id,
+      itemName: product.title,
+      value: product.price,
+      currency: "RON",
+    });
+  }, [product.id, product.price, product.title]);
 
   useEffect(() => {
     if (size && selectedColorStock[size] === 0) setSize(null);
   }, [selectedColorStock, size]);
 
   const handleAdd = () => {
-    if (siteMode === "pre-launch") return;
+    if (!productCanBePurchased) {
+      setPurchaseMessage("Comanda nu este activă momentan pentru această piesă.");
+      return;
+    }
+    if (!color) {
+      setPurchaseMessage("Alege o culoare înainte de a adăuga produsul în coș.");
+      return;
+    }
     if (!size) {
-      alert("Alege o marime inainte de a adauga produsul in cos.");
+      setPurchaseMessage("Alege o mărime înainte de a adăuga produsul în coș.");
       return;
     }
     if (selectedColorStock[size] === 0) {
-      alert("Varianta aleasa nu este momentan in stoc.");
+      setPurchaseMessage("Varianta aleasă nu este momentan în stoc.");
       return;
     }
-    addItem(product, size, color);
+    const result = addItem(product, size, color);
+    setPurchaseMessage(result.ok ? "" : result.message);
   };
 
   return (
@@ -111,58 +154,69 @@ function ProductPage() {
 
         <div className="grid lg:grid-cols-12 gap-8 lg:gap-16">
           <div className="lg:col-span-7 grid md:grid-cols-2 gap-3 md:gap-4">
-            {product.images.map((img: string, i: number) => (
-              <div key={i} className="aspect-[3/4] bg-warm-grey img-zoom">
-                <img
+            {galleryImages.map((img: string, i: number) => (
+              <button
+                key={`${img}-${i}`}
+                type="button"
+                className="group/image relative aspect-[3/4] bg-warm-grey img-zoom"
+                aria-label={`Mărește imaginea ${i + 1} pentru ${product.title}`}
+                disabled={!img}
+                onClick={() => {
+                  setGalleryIndex(i);
+                  setGalleryOpen(true);
+                }}
+              >
+                <ResponsiveImage
                   src={img}
                   alt={`${product.title} ${i === 0 ? "spate" : "detaliu"}`}
-                  decoding="async"
-                  loading={i === 0 ? "eager" : "lazy"}
+                  width={1200}
+                  height={1600}
+                  priority={i === 0}
+                  sizes="(min-width: 1024px) 29vw, (min-width: 768px) 50vw, 100vw"
                   className="w-full h-full object-cover"
                 />
-              </div>
+                {img && (
+                  <span className="absolute bottom-3 right-3 grid h-10 w-10 place-items-center bg-background/90 text-charcoal opacity-100 shadow-sm md:opacity-0 md:transition-opacity md:group-hover/image:opacity-100">
+                    <Maximize2 className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                )}
+              </button>
             ))}
           </div>
 
           <aside className="lg:col-span-5 lg:sticky lg:top-24 lg:self-start">
             <div className="flex items-center gap-3 mb-3">
               <span className="font-mono-xs bg-charcoal text-cream px-2 py-1">
-                {siteMode === "pre-launch" ? "previzualizare" : (product.badge ?? "disponibil")}
+                {productCanBePurchased ? (product.badge ?? "disponibil") : "în pregătire"}
               </span>
               <span className="font-mono-xs opacity-60">design pe spate</span>
             </div>
             <h1 className="font-display text-4xl md:text-5xl leading-tight">{product.title}</h1>
-            <p className="mt-3 font-mono-xs" style={{ color: accentColor }}>
-              🔥 47 de persoane au vazut produsul azi
-            </p>
-            <p className="mt-2 font-mono-xs text-muted-foreground">
-              9 persoane au produsul in cos acum
-            </p>
             <div className="mt-4">
               <div
                 className="font-display text-3xl md:text-4xl tabular-nums"
                 style={{ color: accentColor }}
               >
-                {siteMode === "live-shop" ? formatRON(product.price) : "~149 RON"}
+                {product.isPreview ? "În pregătire" : formatRON(product.price)}
               </div>
               <p className="mt-1 font-mono-xs text-muted-foreground">
-                {siteMode === "live-shop"
-                  ? "Pret final afisat inainte de plata securizata"
-                  : "Pretul final va fi confirmat la lansare"}
+                {productCanBePurchased
+                  ? "Livrarea se calculează în checkout"
+                  : "Comenzile pentru această piesă vor fi deschise la lansare"}
               </p>
             </div>
 
             <p className="mt-8 text-muted-foreground leading-relaxed">{product.description}</p>
-            <p className="mt-3 text-sm italic text-muted-foreground/80">{product.vibe}</p>
+            <p className="mt-3 text-sm italic text-muted-foreground">{product.vibe}</p>
 
             <div className="mt-6 grid grid-cols-2 gap-3 font-mono-xs">
               <div className="border border-border p-3">
-                <span className="opacity-50 block mb-1">Material</span>
-                Bumbac dens
+                <span className="mb-1 block text-muted-foreground">Material</span>
+                Detalii în descriere
               </div>
               <div className="border border-border p-3">
-                <span className="opacity-50 block mb-1">Fit</span>
-                Oversized relaxat
+                <span className="mb-1 block text-muted-foreground">Fit</span>
+                {product.fitNote}
               </div>
             </div>
 
@@ -171,20 +225,29 @@ function ProductPage() {
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono-xs">Culoare - {color}</span>
                 </div>
-                <VariantSelector colors={product.colors} value={color} onChange={setColor} />
+                <VariantSelector
+                  colors={product.colors}
+                  value={color}
+                  onChange={(nextColor) => {
+                    setColor(nextColor);
+                    setSize(null);
+                    setPurchaseMessage("");
+                    trackEvent("select_variant", { itemId: product.id, color: nextColor });
+                  }}
+                />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono-xs">Marime</span>
+                  <span className="font-mono-xs">Mărime</span>
                   <button
                     type="button"
                     onClick={() => setSizeGuideOpen(true)}
                     className="group relative font-mono-xs underline underline-offset-4 opacity-60 hover:opacity-100"
                   >
-                    Ghid marimi
+                    Ghid mărimi
                     <span className="pointer-events-none absolute bottom-full right-0 mb-3 hidden w-44 rotate-[-2deg] border-2 border-charcoal bg-cream px-3 py-2 text-left text-[10px] leading-snug text-charcoal opacity-0 shadow-sm transition-opacity group-hover:block group-hover:opacity-100">
-                      Apasa pentru a vedea ghidul
+                      Apasă pentru a vedea ghidul
                       <span className="absolute -bottom-2 right-5 h-3 w-3 rotate-45 border-b-2 border-r-2 border-charcoal bg-cream" />
                     </span>
                   </button>
@@ -193,71 +256,82 @@ function ProductPage() {
                   sizes={product.sizes}
                   stock={selectedColorStock}
                   value={size}
-                  onChange={setSize}
+                  onChange={(nextSize) => {
+                    setSize(nextSize);
+                    setPurchaseMessage("");
+                    trackEvent("select_variant", {
+                      itemId: product.id,
+                      color,
+                      size: nextSize,
+                    });
+                  }}
                 />
               </div>
 
-              {siteMode === "live-shop" ? (
+              {productCanBePurchased ? (
                 <button
+                  type="button"
                   onClick={handleAdd}
                   className="w-full bg-charcoal text-cream py-4 font-mono-xs hover:bg-charcoal/90 transition-colors"
                 >
-                  Adauga in cos - {formatRON(product.price)}
+                  Adaugă în coș - {formatRON(product.price)}
                 </button>
               ) : (
-                <a
-                  href="/#newsletter"
+                <Link
+                  to={isKlaviyoConfigured() ? "/" : "/shop"}
+                  hash={isKlaviyoConfigured() ? "newsletter" : undefined}
                   className="flex w-full items-center justify-center gap-2 border bg-transparent py-4 font-mono-xs transition-colors hover:bg-charcoal hover:text-cream"
                   style={{ borderColor: accentColor, color: accentColor }}
                 >
                   <Bell className="h-4 w-4" strokeWidth={1.5} />
-                  Primeste update produs
-                </a>
+                  {isKlaviyoConfigured() ? "Primește noutăți despre produs" : "Vezi colecțiile"}
+                </Link>
               )}
+              <FeedbackRegion message={purchaseMessage} tone="error" />
 
               <ul className="flex flex-wrap items-center gap-3 text-muted-foreground">
                 <li className="flex items-center gap-1.5">
                   <Truck className="h-4 w-4" strokeWidth={1.25} />
-                  <span className="font-mono-xs">Livrare</span>
+                  <Link to="/livrare" className="font-mono-xs underline-offset-4 hover:underline">
+                    Livrare
+                  </Link>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <RotateCcw className="h-4 w-4" strokeWidth={1.25} />
-                  <span className="font-mono-xs">Retur 14 zile</span>
+                  <Link to="/retur" className="font-mono-xs underline-offset-4 hover:underline">
+                    Retur 14 zile
+                  </Link>
                 </li>
                 <li className="flex items-center gap-1.5">
                   <ShieldCheck className="h-4 w-4" strokeWidth={1.25} />
-                  <span className="font-mono-xs">Plata securizata</span>
+                  <span className="font-mono-xs">Plată securizată</span>
                 </li>
               </ul>
 
-              <p className="font-mono-xs opacity-60">Croiala: {product.fitNote}</p>
+              <p className="font-mono-xs opacity-60">Croială: {product.fitNote}</p>
             </div>
 
             <div className="mt-10 space-y-8 border-t border-border pt-8">
-              <InfoBlock title="Ce il diferentiaza">
+              <InfoBlock title="Ce îl diferențiază">
                 <ul className="space-y-2">
-                  <li>Fata ramane curata, fara logo mare pe piept.</li>
+                  <li>Fața rămâne curată, fără logo mare pe piept.</li>
                   <li>Designul principal este plasat pe spate.</li>
-                  <li>Croiala oversized este gandita pentru o cadere relaxata.</li>
+                  <li>Detaliile de croială sunt prezentate în descrierea produsului.</li>
                 </ul>
               </InfoBlock>
 
-              <InfoBlock title="Ingrijire">
-                Spala pe dos la 30 grade C, nu folosi inalbitor si evita uscarea automata. Calca pe
-                dos, fara contact direct cu printul.
+              <InfoBlock title="Îngrijire">
+                Urmează instrucțiunile de pe eticheta produsului. Pentru protejarea printului, evită
+                contactul direct al fierului de călcat cu grafica.
               </InfoBlock>
             </div>
           </aside>
         </div>
 
-        {reviewsEnabled && (
-          <ProductReviews productTitle={product.title} accentColor={accentColor} />
-        )}
-
         <section className="mt-20 md:mt-32 border-t border-border pt-12">
           <div className="flex items-end justify-between gap-6 mb-8">
             <div>
-              <p className="font-mono-xs opacity-60">S-ar putea sa-ti placa si</p>
+              <p className="font-mono-xs opacity-60">S-ar putea să-ți placă și</p>
               <h2 className="font-display text-4xl md:text-6xl mt-3">Mai multe modele.</h2>
             </div>
             <Link to="/shop" className="font-mono-xs underline underline-offset-4">
@@ -267,12 +341,13 @@ function ProductPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {related.map((item: (typeof related)[number]) => (
               <Link key={item.id} to="/product/$handle" params={{ handle: item.handle }}>
-                <img
+                <ResponsiveImage
                   src={item.images[0]}
                   alt={item.title}
+                  width={1200}
+                  height={1600}
+                  sizes="(min-width: 768px) 33vw, 50vw"
                   className="aspect-[3/4] w-full object-cover bg-warm-grey"
-                  decoding="async"
-                  loading="lazy"
                 />
                 <div className="mt-3 flex justify-between gap-3">
                   <span className="font-display">{item.title}</span>
@@ -286,149 +361,148 @@ function ProductPage() {
         </section>
       </div>
 
-      {siteMode === "live-shop" && (
-        <div className="fixed md:hidden left-0 right-0 bottom-0 z-40 bg-background border-t border-border p-4">
-          <button onClick={handleAdd} className="w-full bg-charcoal text-cream py-4 font-mono-xs">
-            Adauga in cos - {formatRON(product.price)}
+      {productCanBePurchased && (
+        <div
+          className="fixed left-0 right-0 z-40 border-t border-border bg-background p-4 md:hidden"
+          style={{ bottom: "var(--cookie-banner-height, 0px)" }}
+        >
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="w-full bg-charcoal text-cream py-4 font-mono-xs"
+          >
+            Adaugă în coș - {formatRON(product.price)}
           </button>
         </div>
       )}
 
-      {sizeGuideOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-charcoal/45 px-5">
-          <div className="w-full max-w-2xl border border-border bg-background p-5 md:p-8 shadow-xl">
+      <Dialog.Root open={sizeGuideOpen} onOpenChange={setSizeGuideOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-charcoal/45" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 max-h-[calc(100svh-2.5rem)] w-[calc(100%-2.5rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto border border-border bg-background p-5 shadow-xl focus:outline-none md:p-8">
             <div className="flex items-start justify-between gap-6">
               <div>
                 <p className="font-mono-xs opacity-60">Fit oversized</p>
-                <h2 className="font-display text-4xl mt-2">Ghid marimi</h2>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  Masuratori in cm, pe produs intins. Daca esti intre doua marimi, alege marimea mai
-                  mare pentru o cadere oversized mai vizibila.
-                </p>
+                <Dialog.Title className="mt-2 font-display text-4xl">Ghid mărimi</Dialog.Title>
+                <Dialog.Description className="mt-3 text-sm text-muted-foreground">
+                  Compară măsurătorile produsului cu un tricou pe care îl porți deja. Dimensiunile
+                  exacte sunt publicate în descrierea fiecărei piese.
+                </Dialog.Description>
               </div>
-              <button
-                type="button"
-                onClick={() => setSizeGuideOpen(false)}
-                aria-label="Inchide ghidul de marimi"
+              <Dialog.Close
+                aria-label="Închide ghidul de mărimi"
                 className="grid h-9 w-9 shrink-0 place-items-center border border-border hover:bg-charcoal hover:text-cream"
               >
                 <X className="h-4 w-4" strokeWidth={1.5} />
-              </button>
+              </Dialog.Close>
             </div>
             <div className="mt-6">
               <SizeGuideTable />
             </div>
-          </div>
-        </div>
-      )}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
+      <Dialog.Root open={galleryOpen} onOpenChange={setGalleryOpen}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-[70] bg-charcoal/90" />
+          <Dialog.Content
+            className="fixed inset-0 z-[71] flex flex-col bg-charcoal text-cream outline-none"
+            onKeyDown={(event) => {
+              if (galleryImages.length <= 1) return;
+              if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                setGalleryIndex((index) => (index === 0 ? galleryImages.length - 1 : index - 1));
+              }
+              if (event.key === "ArrowRight") {
+                event.preventDefault();
+                setGalleryIndex((index) => (index + 1) % galleryImages.length);
+              }
+            }}
+          >
+            <Dialog.Title className="sr-only">Galerie foto {product.title}</Dialog.Title>
+            <Dialog.Description className="sr-only">
+              Imagine mărită. Folosește butoanele pentru a naviga între fotografii.
+            </Dialog.Description>
+
+            <div className="flex h-16 shrink-0 items-center justify-between border-b border-cream/15 px-4 md:px-8">
+              <p className="font-mono-xs text-cream/65">
+                {String(galleryIndex + 1).padStart(2, "0")} /{" "}
+                {String(galleryImages.length).padStart(2, "0")}
+              </p>
+              <Dialog.Close
+                aria-label="Închide galeria"
+                className="grid h-10 w-10 place-items-center border border-cream/25 hover:bg-cream hover:text-charcoal"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </Dialog.Close>
+            </div>
+
+            <div className="relative min-h-0 flex-1">
+              <ResponsiveImage
+                src={galleryImages[galleryIndex] ?? ""}
+                alt={`${product.title}, imagine mărită ${galleryIndex + 1}`}
+                width={1600}
+                height={2000}
+                sizes="100vw"
+                className="h-full w-full object-contain p-3 md:p-8"
+              />
+
+              {galleryImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    aria-label="Imaginea anterioară"
+                    className="absolute left-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-cream/25 bg-charcoal/65 hover:bg-cream hover:text-charcoal md:left-8"
+                    onClick={() =>
+                      setGalleryIndex((index) =>
+                        index === 0 ? galleryImages.length - 1 : index - 1,
+                      )
+                    }
+                  >
+                    <ChevronLeft className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Imaginea următoare"
+                    className="absolute right-3 top-1/2 grid h-11 w-11 -translate-y-1/2 place-items-center border border-cream/25 bg-charcoal/65 hover:bg-cream hover:text-charcoal md:right-8"
+                    onClick={() => setGalleryIndex((index) => (index + 1) % galleryImages.length)}
+                  >
+                    <ChevronRight className="h-5 w-5" aria-hidden="true" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {galleryImages.length > 1 && (
+              <div className="flex shrink-0 justify-center gap-2 overflow-x-auto border-t border-cream/15 px-4 py-3">
+                {galleryImages.map((image, index) => (
+                  <button
+                    key={`${image}-thumbnail-${index}`}
+                    type="button"
+                    aria-label={`Deschide imaginea ${index + 1}`}
+                    aria-pressed={galleryIndex === index}
+                    className={`h-16 w-12 shrink-0 border ${
+                      galleryIndex === index ? "border-signature" : "border-cream/20"
+                    }`}
+                    onClick={() => setGalleryIndex(index)}
+                  >
+                    <ResponsiveImage
+                      src={image}
+                      alt=""
+                      width={240}
+                      height={320}
+                      sizes="48px"
+                      className="h-full w-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </div>
-  );
-}
-
-function ProductReviews({
-  productTitle,
-  accentColor,
-}: {
-  productTitle: string;
-  accentColor: string;
-}) {
-  const [submitted, setSubmitted] = useState(false);
-  const [customReviews, setCustomReviews] = useState<Array<{ name: string; text: string }>>([]);
-  const visibleReviews = [
-    ["Alex", "Bucuresti", "Material dens, sta foarte bine pe umeri."],
-    ["Mara", "Cluj", "Minimal in fata, dar printul de pe spate face tot tricoul."],
-    ...customReviews.map((review) => [review.name, "Review nou", review.text]),
-  ];
-
-  return (
-    <section className="mt-20 md:mt-32 border-t border-border pt-12">
-      <div className="grid lg:grid-cols-12 gap-10">
-        <div className="lg:col-span-5">
-          <p className="font-mono-xs opacity-60">Review-uri</p>
-          <h2 className="font-display text-4xl md:text-6xl mt-3">Feedback clienti.</h2>
-          <div className="mt-8 space-y-6">
-            {visibleReviews.map(([name, city, text], index) => (
-              <figure key={`${name}-${index}`} className="border-t border-border pt-5">
-                <div className="font-mono-xs" style={{ color: accentColor }}>
-                  *****
-                </div>
-                <blockquote className="mt-3 text-muted-foreground">"{text}"</blockquote>
-                <figcaption className="mt-3 font-mono-xs opacity-60">
-                  {name} - {city}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-        <form
-          className="lg:col-span-6 lg:col-start-7 border border-border p-5 md:p-6 space-y-4"
-          onSubmit={async (event) => {
-            event.preventDefault();
-            const form = event.currentTarget;
-            const data = new FormData(form);
-            const email = String(data.get("email") ?? "");
-            const name = String(data.get("name") ?? "Client Trei Linii");
-            const review = String(data.get("review") ?? "");
-            try {
-              const { subscribeToKlaviyo, isKlaviyoConfigured } = await import("@/lib/klaviyo");
-              if (isKlaviyoConfigured()) await subscribeToKlaviyo(email);
-            } catch {
-              /* Review still works locally even if newsletter is unavailable. */
-            }
-            setCustomReviews((items) => [{ name, text: review }, ...items]);
-            try {
-              const stored = JSON.parse(
-                localStorage.getItem("trei-linii-product-reviews") ?? "[]",
-              ) as Array<{ productTitle: string; name: string; email: string; review: string }>;
-              localStorage.setItem(
-                "trei-linii-product-reviews",
-                JSON.stringify([{ productTitle, name, email, review }, ...stored].slice(0, 50)),
-              );
-            } catch {
-              /* best effort */
-            }
-            setSubmitted(true);
-            form.reset();
-          }}
-        >
-          <div>
-            <p className="font-mono-xs opacity-60">Lasa un review</p>
-            <h3 className="font-display text-2xl mt-2">{productTitle}</h3>
-          </div>
-          <input
-            name="name"
-            required
-            placeholder="Nume"
-            aria-label="Numele tau"
-            className="w-full border-b border-border bg-transparent py-3 outline-none"
-          />
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="Email pentru confirmare si noutati"
-            aria-label="Adresa de email"
-            className="w-full border-b border-border bg-transparent py-3 outline-none"
-          />
-          <textarea
-            name="review"
-            required
-            rows={4}
-            placeholder="Cum ti se pare produsul?"
-            aria-label="Mesajul tau despre produs"
-            className="w-full resize-none border-b border-border bg-transparent py-3 outline-none"
-          />
-          <button className="bg-charcoal text-cream px-5 py-3 font-mono-xs hover:bg-charcoal/90">
-            Trimite review
-          </button>
-          {submitted && (
-            <p className="font-mono-xs text-olive">
-              Multumim. Review-ul a fost primit si emailul poate fi folosit pentru update-uri.
-            </p>
-          )}
-        </form>
-      </div>
-    </section>
   );
 }
 

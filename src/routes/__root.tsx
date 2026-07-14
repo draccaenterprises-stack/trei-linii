@@ -1,31 +1,25 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  HeadContent,
-  Link,
-  Outlet,
-  Scripts,
-  createRootRouteWithContext,
-  useRouter,
-} from "@tanstack/react-router";
+import { HeadContent, Link, Scripts, createRootRoute, useRouter } from "@tanstack/react-router";
 
-import { CartDrawer } from "@/components/CartDrawer";
-import { CookieConsent } from "@/components/CookieConsent";
-import { Footer } from "@/components/Footer";
-import { Announcement, Header } from "@/components/Header";
+import { AppShell } from "@/components/AppShell";
+import { ErrorState, LoadingState } from "@/components/AsyncState";
 import { CartProvider } from "@/lib/cart-context";
 import { SiteProvider } from "@/lib/site-context";
-import { SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
+import { LEGAL, SITE_NAME, SITE_URL, absoluteUrl } from "@/lib/site";
+import { CatalogUnavailableError } from "@/lib/shopify";
+import { buildSiteSchema, serializeJsonLd } from "@/lib/schema";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-[80vh] items-center justify-center bg-background px-4">
+      <title>Pagina nu a fost găsită - Trei Linii</title>
+      <meta name="robots" content="noindex, nofollow" />
       <div className="max-w-md text-center">
         <h1 className="font-display text-7xl">404</h1>
-        <h2 className="mt-4 text-xl">Pagina nu a fost gasita</h2>
-        <p className="mt-2 text-sm text-muted-foreground">Pagina pe care o cauti nu exista.</p>
+        <h2 className="mt-4 text-xl">Pagina nu a fost găsită</h2>
+        <p className="mt-2 text-sm text-muted-foreground">Pagina pe care o cauți nu există.</p>
         <Link to="/" className="inline-block mt-6 bg-charcoal text-cream px-6 py-3 font-mono-xs">
-          Inapoi acasa
+          Înapoi acasă
         </Link>
       </div>
     </div>
@@ -35,61 +29,38 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
+  const catalogUnavailable = error instanceof CatalogUnavailableError;
   return (
-    <div className="flex min-h-[80vh] items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="font-display text-3xl">A aparut o eroare.</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Incearca din nou sau revino acasa.</p>
-        <div className="mt-6 flex justify-center gap-3">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="bg-charcoal text-cream px-6 py-3 font-mono-xs"
-          >
-            Incearca din nou
-          </button>
-          <a href="/" className="border border-border px-6 py-3 font-mono-xs">
-            Acasa
-          </a>
-        </div>
-      </div>
-    </div>
+    <ErrorState
+      title={catalogUnavailable ? "Catalogul ia o pauză scurtă." : "A apărut o eroare."}
+      message={
+        catalogUnavailable
+          ? "Nu am putut sincroniza produsele. Încearcă din nou în câteva momente."
+          : "Încearcă din nou sau revino la pagina principală."
+      }
+      onRetry={() => {
+        router.invalidate();
+        reset();
+      }}
+    />
   );
 }
 
 const seoTitle = "Trei Linii - Tricouri oversized cu design pe spate";
 const seoDescription =
-  "Trei Linii - tricouri oversized din bumbac dens, cu fata curata si print mai puternic pe spate. Lansarea 01 disponibila in curand.";
+  "Trei Linii - tricouri oversized cu fața curată și design construit pe spate. Descoperă colecțiile și detaliile fiecărei piese.";
 const ogImage = absoluteUrl("/og-image.jpg");
 
-// Organization + WebSite structured data for Google.
-const structuredData = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${SITE_URL}/#organization`,
-      name: SITE_NAME,
-      url: SITE_URL,
-      logo: absoluteUrl("/favicon.png"),
-      image: ogImage,
-      email: "contact@treilinii.ro",
-      description: seoDescription,
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE_URL}/#website`,
-      url: SITE_URL,
-      name: SITE_NAME,
-      inLanguage: "ro-RO",
-      publisher: { "@id": `${SITE_URL}/#organization` },
-    },
-  ],
-};
+const structuredData = buildSiteSchema({
+  siteUrl: SITE_URL,
+  siteName: SITE_NAME,
+  logo: absoluteUrl("/apple-touch-icon.png"),
+  image: ogImage,
+  description: seoDescription,
+  email: LEGAL.email || undefined,
+});
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       { charSet: "utf-8" },
@@ -105,20 +76,47 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: ogImage },
     ],
     links: [
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,600;1,6..96,400;1,6..96,500&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@300;400;500;600;700&display=swap",
+        rel: "preload",
+        href: "/fonts/hanken-grotesk-400-600-latin.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous" as const,
       },
+      {
+        rel: "preload",
+        href: "/fonts/hanken-grotesk-400-600-latin-ext.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      ...[
+        "cormorant-garamond-400-latin.woff2",
+        "cormorant-garamond-400-latin-ext.woff2",
+        "cormorant-garamond-400-italic-latin.woff2",
+        "cormorant-garamond-400-italic-latin-ext.woff2",
+        "ibm-plex-mono-400-latin.woff2",
+        "ibm-plex-mono-400-latin-ext.woff2",
+      ].map((font) => ({
+        rel: "preload",
+        href: `/fonts/${font}`,
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous" as const,
+        media: "(min-width: 768px)",
+      })),
       { rel: "stylesheet", href: appCss },
-      { rel: "icon", href: "/favicon.png" },
+      { rel: "icon", href: "/favicon-64.png", sizes: "64x64" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
   notFoundComponent: NotFoundComponent,
   errorComponent: ErrorComponent,
+  pendingComponent: LoadingState,
+  pendingMs: 250,
+  pendingMinMs: 300,
 });
 
 function RootShell({ children }: { children: React.ReactNode }) {
@@ -128,7 +126,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
         />
       </head>
       <body>
@@ -140,21 +138,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
   return (
-    <QueryClientProvider client={queryClient}>
-      <SiteProvider>
-        <CartProvider>
-          <Announcement />
-          <Header />
-          <main>
-            <Outlet />
-          </main>
-          <Footer />
-          <CartDrawer />
-          <CookieConsent />
-        </CartProvider>
-      </SiteProvider>
-    </QueryClientProvider>
+    <SiteProvider>
+      <CartProvider>
+        <AppShell />
+      </CartProvider>
+    </SiteProvider>
   );
 }

@@ -8,30 +8,37 @@ export const Route = createFileRoute("/anpc")({
     pageMeta({
       path: "/anpc",
       title: "ANPC | Trei Linii",
-      description: "Informatii ANPC pentru consumatorii Trei Linii.",
+      description: "Informații ANPC pentru consumatorii Trei Linii.",
     }),
 });
 
 function Anpc() {
   return (
     <LegalPage title="ANPC">
-      <LegalSection title="Protectia consumatorilor">
+      <LegalSection title="Protecția consumatorilor">
         <p>
-          Pentru orice problema legata de o comanda, te rugam sa ne contactezi mai intai prin pagina
-          de contact. Daca situatia nu se rezolva amiabil, consumatorii se pot adresa Autoritatii
-          Nationale pentru Protectia Consumatorilor.
+          Pentru orice problemă legată de o comandă, te rugăm să ne contactezi mai întâi prin pagina
+          de contact. Dacă situația nu se rezolvă amiabil, consumatorii se pot adresa Autorității
+          Naționale pentru Protecția Consumatorilor.
         </p>
         <p>
-          Linkuri utile:{" "}
-          <a href="https://anpc.ro/" className="underline underline-offset-4 hover:opacity-70">
+          Linkuri oficiale:{" "}
+          <a
+            href="https://anpc.ro/"
+            className="underline underline-offset-4 hover:opacity-70"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             anpc.ro
           </a>
           ,{" "}
           <a
             href="https://eservicii.anpc.ro/Depune-Cerere"
             className="underline underline-offset-4 hover:opacity-70"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            depune cerere ANPC
+            depune reclamație ANPC
           </a>
           .
         </p>

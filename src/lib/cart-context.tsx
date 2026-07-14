@@ -1,27 +1,36 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Product, Size } from "./mock-data";
-import { getSelectedVariantId } from "./shopify";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import type { Product, Size } from "./catalog-types";
+import { trackEvent } from "./analytics";
+import {
+  cartReducer,
+  initialCartState,
+  parsePersistedCart,
+  reconcileCartLines,
+  serializeCart,
+  type CartLine,
+} from "./cart-state";
+import { canPurchaseProduct, findSelectedVariant, isShopifyProductVariantId } from "./shopify";
+import { productRepository } from "./product-repository";
 
-export interface CartLine {
-  lineId: string;
-  productId: string;
-  merchandiseId?: string;
-  product?: Product;
-  handle: string;
-  title: string;
-  image: string;
-  price: number;
-  size: Size;
-  color: string;
-  quantity: number;
-}
+export type { CartLine } from "./cart-state";
+
+export type CartActionResult = { ok: true } | { ok: false; message: string };
 
 interface CartContextValue {
   lines: CartLine[];
   isOpen: boolean;
   open: () => void;
   close: () => void;
-  addItem: (product: Product, size: Size, color: string, quantity?: number) => void;
+  addItem: (product: Product, size: Size, color: string, quantity?: number) => CartActionResult;
   removeItem: (lineId: string) => void;
   updateQuantity: (lineId: string, quantity: number) => void;
   updateOptions: (lineId: string, size: Size, color: string) => void;
@@ -32,28 +41,51 @@ interface CartContextValue {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
-const STORAGE_KEY = "trei-linii-cart-v3";
+const STORAGE_KEY = "trei-linii-cart-v4";
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [lines, setLines] = useState<CartLine[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [state, dispatch] = useReducer(cartReducer, initialCartState);
+  const [hydrated, setHydrated] = useState(false);
+  const reconciled = useRef(false);
+  const { lines, isOpen } = state;
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setLines(JSON.parse(raw));
+      dispatch({ type: "hydrate", lines: parsePersistedCart(localStorage.getItem(STORAGE_KEY)) });
     } catch {
       /* noop */
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
+      if (hydrated) localStorage.setItem(STORAGE_KEY, serializeCart(lines));
     } catch {
       /* noop */
     }
-  }, [lines]);
+  }, [hydrated, lines]);
+
+  useEffect(() => {
+    if (!hydrated || reconciled.current) return undefined;
+    reconciled.current = true;
+    if (!lines.length) return undefined;
+
+    let active = true;
+    void productRepository
+      .listProducts()
+      .then((products) => {
+        if (active) dispatch({ type: "reconcile", lines: reconcileCartLines(lines, products) });
+      })
+      .catch(() => {
+        // Keep the validated local snapshot when the catalog is temporarily unavailable.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [hydrated, lines]);
 
   const value = useMemo<CartContextValue>(() => {
     const subtotal = lines.reduce((s, l) => s + l.price * l.quantity, 0);
@@ -61,70 +93,81 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return {
       lines,
       isOpen,
-      open: () => setIsOpen(true),
-      close: () => setIsOpen(false),
+      open: () => dispatch({ type: "open" }),
+      close: () => dispatch({ type: "close" }),
       addItem: (product, size, color, quantity = 1) => {
-        const merchandiseId = getSelectedVariantId(product, size, color);
-        const lineId = `${merchandiseId ?? product.id}-${size}-${color}`;
-        setLines((prev) => {
-          const existing = prev.find((l) => l.lineId === lineId);
-          if (existing) {
-            return prev.map((l) =>
-              l.lineId === lineId ? { ...l, quantity: l.quantity + quantity } : l,
-            );
-          }
-          return [
-            ...prev,
-            {
-              lineId,
-              productId: product.id,
-              merchandiseId,
-              product,
-              handle: product.handle,
-              title: product.title,
-              image: product.images[0],
-              price: product.price,
-              size,
-              color,
-              quantity,
-            },
-          ];
+        if (!canPurchaseProduct(product)) {
+          return { ok: false, message: "Produsul nu poate fi comandat momentan." };
+        }
+        const variant = findSelectedVariant(product, size, color);
+        if (
+          !variant?.availableForSale ||
+          !isShopifyProductVariantId(variant.id) ||
+          variant.quantityAvailable === 0
+        ) {
+          return { ok: false, message: "Varianta aleasă nu mai este disponibilă." };
+        }
+        const lineId = `${variant.id}-${size}-${color}`;
+        const existingQuantity = lines.find((line) => line.lineId === lineId)?.quantity ?? 0;
+        const available = variant.quantityAvailable ?? 20;
+        if (existingQuantity + quantity > available) {
+          return { ok: false, message: "Nu mai sunt suficiente produse în stoc." };
+        }
+        const line: CartLine = {
+          lineId,
+          productId: product.id,
+          merchandiseId: variant.id,
+          product,
+          handle: product.handle,
+          title: product.title,
+          image: product.images[0] ?? "",
+          price: product.price,
+          size,
+          color,
+          quantity,
+        };
+        dispatch({ type: "add", line });
+        trackEvent("add_to_cart", {
+          itemId: product.id,
+          quantity,
+          value: product.price * quantity,
+          currency: "RON",
         });
-        setIsOpen(true);
+        return { ok: true };
       },
-      removeItem: (lineId) => setLines((prev) => prev.filter((l) => l.lineId !== lineId)),
-      updateQuantity: (lineId, quantity) =>
-        setLines((prev) =>
-          prev
-            .map((l) => (l.lineId === lineId ? { ...l, quantity } : l))
-            .filter((l) => l.quantity > 0),
-        ),
-      updateOptions: (lineId, size, color) =>
-        setLines((prev) => {
-          const line = prev.find((l) => l.lineId === lineId);
-          if (!line?.product) return prev;
-
-          const merchandiseId = getSelectedVariantId(line.product, size, color);
-          const nextLineId = `${merchandiseId ?? line.product.id}-${size}-${color}`;
-          const updatedLine = { ...line, lineId: nextLineId, merchandiseId, size, color };
-
-          return prev
-            .filter((l) => l.lineId !== lineId)
-            .reduce<CartLine[]>(
-              (lines, current) => {
-                if (current.lineId === nextLineId) {
-                  return lines.map((item) =>
-                    item.lineId === nextLineId
-                      ? { ...item, quantity: item.quantity + current.quantity }
-                      : item,
-                  );
-                }
-                return [...lines, current];
-              },
-              [updatedLine],
-            );
-        }),
-      clear: () => setLines([]),
+      removeItem: (lineId) => dispatch({ type: "remove", lineId }),
+      updateQuantity: (lineId, quantity) => {
+        const line = lines.find((item) => item.lineId === lineId);
+        const variant = line?.product?.variants?.find(
+          (candidate) => candidate.id === line.merchandiseId,
+        );
+        const available = variant?.quantityAvailable ?? 20;
+        dispatch({ type: "quantity", lineId, quantity: Math.min(quantity, available) });
+      },
+      updateOptions: (lineId, size, color) => {
+        const line = lines.find((item) => item.lineId === lineId);
+        if (!line?.product) return;
+        const variant = findSelectedVariant(line.product, size, color);
+        if (
+          !variant?.availableForSale ||
+          variant.quantityAvailable === 0 ||
+          !isShopifyProductVariantId(variant.id)
+        )
+          return;
+        dispatch({
+          type: "options",
+          lineId,
+          line: {
+            ...line,
+            lineId: `${variant.id}-${size}-${color}`,
+            merchandiseId: variant.id,
+            size,
+            color,
+            quantity: Math.min(line.quantity, variant.quantityAvailable ?? 20),
+          },
+        });
+      },
+      clear: () => dispatch({ type: "clear" }),
       subtotal,
       count,
     };

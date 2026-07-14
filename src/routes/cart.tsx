@@ -1,28 +1,46 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
 import { ShopifyCheckoutButton } from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { getStockForColor } from "@/lib/shopify";
+import { trackEvent } from "@/lib/analytics";
+import { ResponsiveImage } from "@/components/ResponsiveImage";
+import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/cart")({
   component: CartPage,
-  head: () => ({ meta: [{ title: "Cos - Trei Linii" }] }),
+  head: () =>
+    pageMeta({
+      path: "/cart",
+      title: "Coș - Trei Linii",
+      description: "Produsele selectate în coșul Trei Linii.",
+      noIndex: true,
+    }),
 });
 
 function CartPage() {
   const { lines, removeItem, updateQuantity, updateOptions, subtotal } = useCart();
 
+  useEffect(() => {
+    trackEvent("view_cart", {
+      itemCount: lines.reduce((sum, line) => sum + line.quantity, 0),
+      value: subtotal,
+      currency: "RON",
+    });
+  }, [lines, subtotal]);
+
   if (lines.length === 0) {
     return (
       <div className="px-5 py-32 text-center">
-        <p className="font-mono-xs opacity-60">Cos</p>
-        <h1 className="font-display text-5xl md:text-7xl mt-2">Cosul este gol.</h1>
+        <p className="font-mono-xs opacity-60">Coș</p>
+        <h1 className="font-display text-5xl md:text-7xl mt-2">Coșul este gol.</h1>
         <Link
           to="/shop"
           className="inline-block mt-8 bg-charcoal text-cream px-6 py-3 font-mono-xs"
         >
-          Continua cumparaturile
+          Continuă cumpărăturile
         </Link>
       </div>
     );
@@ -31,7 +49,7 @@ function CartPage() {
   return (
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1400px]">
-        <p className="font-mono-xs opacity-60">Cos</p>
+        <p className="font-mono-xs opacity-60">Coș</p>
         <h1 className="font-display text-5xl md:text-7xl mt-2">Produse - {lines.length}</h1>
 
         <div className="mt-12 grid lg:grid-cols-12 gap-12">
@@ -49,22 +67,22 @@ function CartPage() {
 
           <aside className="lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
             <div className="bg-cream p-6 border border-border space-y-5">
-              <h2 className="font-display text-2xl">Sumar comanda</h2>
+              <h2 className="font-display text-2xl">Sumar comandă</h2>
               <div className="flex justify-between font-mono-xs">
                 <span>Subtotal</span>
                 <span className="tabular-nums text-base">{formatRON(subtotal)}</span>
               </div>
               <div className="flex justify-between font-mono-xs">
                 <span>Livrare</span>
-                <span>Calculata la finalizare</span>
+                <span>Calculată la finalizare</span>
               </div>
-              <div className="border-t border-border pt-4 flex justify-between">
+              <div className="border-t border-border pt-4 flex justify-between" aria-live="polite">
                 <span className="font-mono-xs">Total</span>
                 <span className="tabular-nums text-lg">{formatRON(subtotal)}</span>
               </div>
               <ShopifyCheckoutButton />
               <p className="font-mono-xs opacity-50 text-center">
-                Vei fi redirectionat catre finalizarea securizata a comenzii.
+                Vei fi redirecționat către finalizarea securizată a comenzii.
               </p>
             </div>
           </aside>
@@ -100,10 +118,11 @@ function CartPageLine({
   return (
     <div className="py-6 flex gap-5">
       <div className="w-28 h-36 bg-warm-grey shrink-0">
-        <img
+        <ResponsiveImage
           src={line.image}
           alt={line.title}
-          loading="lazy"
+          width={1000}
+          height={1200}
           className="w-full h-full object-cover"
         />
       </div>
@@ -118,10 +137,12 @@ function CartPageLine({
               {line.title}
             </Link>
             <button
+              type="button"
               onClick={() => onRemove(line.lineId)}
               className="font-mono-xs opacity-60 hover:opacity-100"
+              aria-label={`Elimină ${line.title} din coș`}
             >
-              Elimina
+              Elimină
             </button>
           </div>
 
@@ -142,7 +163,7 @@ function CartPageLine({
                 </select>
               </label>
               <label className="font-mono-xs opacity-70">
-                Marime
+                Mărime
                 <select
                   value={line.size}
                   onChange={(event) => onOptions(line.lineId, event.target.value, line.color)}
@@ -158,22 +179,26 @@ function CartPageLine({
             </div>
           ) : (
             <p className="font-mono-xs opacity-60 mt-2">
-              {line.color} - Marime {line.size}
+              {line.color} - Mărime {line.size}
             </p>
           )}
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center border border-border">
             <button
+              type="button"
               className="h-9 w-9 grid place-items-center"
               onClick={() => onQty(line.lineId, line.quantity - 1)}
+              aria-label={`Scade cantitatea pentru ${line.title}`}
             >
               <Minus className="h-3 w-3" />
             </button>
             <span className="w-8 text-center tabular-nums">{line.quantity}</span>
             <button
+              type="button"
               className="h-9 w-9 grid place-items-center"
               onClick={() => onQty(line.lineId, line.quantity + 1)}
+              aria-label={`Crește cantitatea pentru ${line.title}`}
             >
               <Plus className="h-3 w-3" />
             </button>

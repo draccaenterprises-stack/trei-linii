@@ -5,27 +5,23 @@ import {
   BundlePreview,
   MarqueeDivider,
   Newsletter,
-  Reviews,
   ThreeLineDivider,
   TrustStrip,
 } from "@/components/Sections";
-import { fetchCollections, fetchProducts } from "@/lib/shopify";
+import { loadCatalog } from "@/lib/product-repository";
 import { sectionEnabled, useSite } from "@/lib/site-context";
 
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  loader: async () => {
-    const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
-    return { products, collections };
-  },
+  loader: () => loadCatalog(),
   component: Index,
   head: () =>
     pageMeta({
       path: "/",
       title: "Trei Linii - Tricouri oversized cu design pe spate",
       description:
-        "Trei Linii - tricouri oversized din bumbac dens, cu fata curata si print mai puternic pe spate. Lansarea 01 disponibila in curand.",
+        "Trei Linii - tricouri cu fața curată și design construit pe spate. Descoperă colecțiile și detaliile fiecărei piese.",
     }),
 });
 
@@ -61,9 +57,9 @@ function Index() {
             <p className="font-mono-xs opacity-60">{conceptEyebrow}</p>
             <Link
               to="/manifest"
-              className="mt-10 inline-flex w-fit items-center gap-3 font-mono-xs text-[#ff006f] underline underline-offset-4 transition-opacity hover:opacity-65 md:mt-0"
+              className="mt-10 inline-flex w-fit items-center gap-3 font-mono-xs text-accent-text underline underline-offset-4 transition-opacity hover:opacity-65 md:mt-0"
             >
-              Citeste manifestul <span aria-hidden="true">&#8599;</span>
+              Citește manifestul <span aria-hidden="true">&#8599;</span>
             </Link>
           </div>
           <div className="md:col-span-8 md:col-start-5">
@@ -75,8 +71,8 @@ function Index() {
                 {conceptBody}
               </p>
               <div className="space-y-3 font-mono-xs text-charcoal/65">
-                <p>01 / 240gsm</p>
-                <p>02 / oversized fit</p>
+                <p>01 / specificații clare</p>
+                <p>02 / proporții relaxate</p>
                 <p>03 / design pe spate</p>
               </div>
             </div>
@@ -85,7 +81,7 @@ function Index() {
       </section>
       <ThreeLineDivider />
 
-      {sectionEnabled(sections, "featured-products") && (
+      {sectionEnabled(sections, "featured-products") && featured.length > 0 && (
         <section className="featured-showcase px-5 md:px-10 py-20 md:py-32">
           <div className="mx-auto max-w-[1600px]">
             <div className="featured-heading mb-12 flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
@@ -97,12 +93,12 @@ function Index() {
             </div>
             <ProductGrid products={featured} carousel showQuickView={false} />
             <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <p className="font-mono-xs opacity-45">← Gliseaza pentru mai multe modele</p>
+              <p className="font-mono-xs opacity-45">← Glisează pentru mai multe modele</p>
               <Link
                 to="/shop"
-                className="font-mono-xs text-[#ff006f] underline underline-offset-4 hover:opacity-70"
+                className="font-mono-xs text-accent-text underline underline-offset-4 hover:opacity-70"
               >
-                Vezi toate produsele si colectiile
+                Vezi toate produsele și colecțiile
               </Link>
             </div>
           </div>
@@ -113,14 +109,15 @@ function Index() {
 
       <BundlePreview />
 
-      {sectionEnabled(sections, "reviews") && <Reviews />}
-
       {sectionEnabled(sections, "faq") && (
         <section className="px-5 md:px-10 py-20 md:py-28 bg-cream border-y border-border">
           <div className="mx-auto max-w-[980px] text-center">
             <h2 className="font-display text-4xl md:text-6xl">
-              Ai intrebari? Intra in sectiunea de{" "}
-              <Link to="/faq" className="text-[#ff006f] hover:opacity-70">
+              Ai întrebări? Intră în secțiunea de{" "}
+              <Link
+                to="/faq"
+                className="text-accent-text underline decoration-1 underline-offset-4 hover:opacity-70"
+              >
                 FAQ
               </Link>
               .

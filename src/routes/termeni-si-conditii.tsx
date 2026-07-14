@@ -8,9 +8,9 @@ export const Route = createFileRoute("/termeni-si-conditii")({
   head: () =>
     pageMeta({
       path: "/termeni-si-conditii",
-      title: "Termeni si conditii | Trei Linii",
+      title: "Termeni și condiții | Trei Linii",
       description:
-        "Termenii si conditiile pentru folosirea site-ului Trei Linii si plasarea comenzilor online.",
+        "Termenii și condițiile pentru folosirea site-ului Trei Linii și plasarea comenzilor online.",
     }),
 });
 
@@ -18,11 +18,10 @@ function TermsRo() {
   const legalReady = hasLegalBusinessDetails();
 
   return (
-    <LegalPage title="Termeni si conditii">
-      <p>Ultima actualizare: {LEGAL.updatedAt}</p>
+    <LegalPage title="Termeni și condiții">
       <p>
         Bine ai venit pe {LEGAL.domain}, magazinul online al brandului {LEGAL.brand}. Prin accesarea
-        site-ului sau plasarea unei comenzi, confirmi ca ai citit si accepti acesti termeni.
+        site-ului sau plasarea unei comenzi, confirmi că ai citit și accepți acești termeni.
       </p>
 
       <LegalSection title="1. Datele comerciantului">
@@ -41,55 +40,55 @@ function TermsRo() {
         )}
       </LegalSection>
 
-      <LegalSection title="2. Produse, preturi si comenzi">
+      <LegalSection title="2. Produse, prețuri și comenzi">
         <p>
-          Trei Linii comercializeaza articole vestimentare, in principal tricouri oversized cu
-          design minimalist aplicat pe spate. Preturile sunt afisate in RON, iar costul livrarii
-          este afisat separat in checkout, inainte de finalizarea comenzii.
+          Trei Linii comercializează articole vestimentare, în principal tricouri oversized cu
+          design minimalist aplicat pe spate. Prețurile sunt afișate în RON, iar costul livrării
+          este afișat separat în checkout, înainte de finalizarea comenzii.
         </p>
         <p>
-          Ne rezervam dreptul de a modifica preturile, promotiile si disponibilitatea produselor
-          fara notificare prealabila. Pretul aplicabil unei comenzi este cel afisat in momentul
-          plasarii comenzii.
+          Ne rezervăm dreptul de a modifica prețurile, promoțiile și disponibilitatea produselor
+          fără notificare prealabilă. Prețul aplicabil unei comenzi este cel afișat în momentul
+          plasării comenzii.
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Plata si livrarea">
+      <LegalSection title="3. Plata și livrarea">
         <p>
-          Plata se face prin metodele afisate in checkout. Platile online sunt procesate securizat
-          prin {LEGAL.paymentProcessor}; Trei Linii nu stocheaza datele complete ale cardului.
+          Plata se face prin metodele afișate în checkout. Plățile online sunt procesate securizat
+          prin {LEGAL.paymentProcessor}; Trei Linii nu stochează datele complete ale cardului.
         </p>
         <p>
           Livrarea se face prin {LEGAL.courier}. Termen estimativ: {LEGAL.deliveryTerm}. Costul
-          livrarii: {LEGAL.shippingCost}.
+          livrării: {LEGAL.shippingCost}.
         </p>
       </LegalSection>
 
-      <LegalSection title="4. Retur si schimb de marime">
+      <LegalSection title="4. Retur și schimb de mărime">
         <p>
-          Consumatorul are dreptul sa se retraga din contract in termen de 14 zile calendaristice de
-          la primirea produsului, fara a preciza motivul. Produsul returnat trebuie sa fie nepurtat,
-          curat, fara urme de miros sau deteriorare si cu etichetele atasate, daca au fost livrate
+          Consumatorul are dreptul să se retragă din contract în termen de 14 zile calendaristice de
+          la primirea produsului, fără a preciza motivul. Produsul returnat trebuie să fie nepurtat,
+          curat, fără urme de miros sau deteriorare și cu etichetele atașate, dacă au fost livrate
           cu etichete.
         </p>
         <p>
-          Pentru retur sau schimb de marime, trimite o solicitare la {LEGAL.returnEmail}. Vezi si
-          paginile{" "}
+          Pentru retur sau schimb de mărime, folosește datele confirmate în pagina de contact și
+          consultă paginile{" "}
           <Link to="/retur" className="underline underline-offset-4 hover:opacity-70">
             Retur
           </Link>{" "}
-          si{" "}
+          și{" "}
           <Link to="/schimb-marime" className="underline underline-offset-4 hover:opacity-70">
-            Schimb marime
+            Schimb mărime
           </Link>
           .
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Reclamatii si solutionarea litigiilor">
+      <LegalSection title="5. Reclamații și soluționarea litigiilor">
         <p>
-          Pentru orice problema legata de comanda, produs, livrare, retur sau plata, contacteaza-ne
-          mai intai la {LEGAL.email}. Daca problema nu se rezolva amiabil, consumatorii se pot
+          Pentru orice problemă legată de comandă, produs, livrare, retur sau plată, contactează-ne
+          mai întâi prin pagina de contact. Dacă problema nu se rezolvă amiabil, consumatorii se pot
           adresa ANPC sau pot folosi procedura SAL.
         </p>
       </LegalSection>

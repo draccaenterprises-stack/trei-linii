@@ -1,0 +1,71 @@
+@layer components {
+  .tl-line-mark {
+    display: grid;
+    gap: 4px;
+    width: 34px;
+  }
+
+  .tl-line-mark span {
+    display: block;
+    height: 3px;
+    background: var(--charcoal);
+    transform-origin: left;
+  }
+
+  .tl-line-mark span:nth-child(2) {
+    width: 72%;
+  }
+
+  .tl-line-mark span:nth-child(3) {
+    width: 88%;
+    background: var(--signature);
+  }
+
+  .tl-divider {
+    display: grid;
+    gap: 7px;
+    padding-top: 3.5rem;
+    width: 100vw;
+  }
+
+  .tl-divider span {
+    display: block;
+    height: 2px;
+    background: var(--charcoal);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: none;
+    will-change: transform;
+  }
+
+  .tl-divider span:nth-child(2) {
+    transform: scaleX(0);
+  }
+
+  .tl-divider span:nth-child(3) {
+    background: var(--signature);
+    transform: scaleX(0);
+  }
+
+  .featured-showcase {
+    background:
+      linear-gradient(90deg, var(--signature) 0 2px, transparent 2px),
+      linear-gradient(180deg, color-mix(in srgb, var(--cream) 54%, transparent), transparent 62%);
+  }
+
+  .featured-heading {
+    border-left: 3px solid var(--signature);
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .featured-heading::after {
+    background: var(--signature);
+    content: "";
+    height: 2px;
+    left: 0;
+    position: absolute;
+    top: -1rem;
+    width: min(180px, 42vw);
+  }
+}

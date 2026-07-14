@@ -1,32 +1,25 @@
-import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
-import {
-  products as previewTemplates,
-  type Collection,
-  type Product,
-  type Size,
-} from "@/lib/mock-data";
-import { fetchCollections, fetchProducts, getStockForColor } from "@/lib/shopify";
+import type { Collection, Product, Size } from "@/lib/catalog-types";
+import { loadCatalog } from "@/lib/product-repository";
+import { canPurchaseProduct, getStockForColor, isPreviewCatalogEnabled } from "@/lib/shopify";
 import { useCart } from "@/lib/cart-context";
 import { clamp, createFrameScheduler } from "@/lib/motion";
 import { pageMeta } from "@/lib/seo";
 import { preloadQuickViewImages } from "@/lib/quick-view";
-
-const chapterQuotes = [
-  "O piesa care nu cere atentie. O pastreaza.",
-  "Spatele devine locul unde tricoul incepe sa vorbeasca.",
-  "Material dens, ritm grafic, liniste in fata.",
-  "Culoare purtata jos, semnatura pastrata sus.",
-] as const;
+import { ResponsiveImage } from "@/components/ResponsiveImage";
+import { FeedbackRegion } from "@/components/FeedbackRegion";
+import { EmptyState } from "@/components/AsyncState";
+import { SITE_MODE } from "@/lib/site";
 
 const contextCaptions = [
-  "Proba de material, in lumina atelierului",
-  "Cadru de spate, linie si distanta",
-  "Nota de fit, purtare zilnica",
-  "Detaliu cromatic, editie limitata",
+  "Vedere complementară a produsului",
+  "Detaliu de spate",
+  "Proporție și cădere",
+  "Detaliu cromatic",
 ] as const;
 
 const shopSearchSchema = z.object({
@@ -42,54 +35,55 @@ const previewCopy = [
   {
     title: "Linie de atelier",
     description:
-      "O compozitie liniara simpla, asezata vertical pe spate. Fata ramane complet curata.",
-    vibe: "Un studiu despre ritm, distanta si spatiu liber.",
+      "O compoziție liniară simplă, așezată vertical pe spate. Fața rămâne complet curată.",
+    vibe: "Un studiu despre ritm, distanță și spațiu liber.",
   },
   {
     title: "Cadru tipografic",
     description:
-      "Un cadru subtire si un semn tipografic discret construiesc spatele. Gandit pentru o baza neutra.",
-    vibe: "Tipografie redusa la forma si proportie.",
+      "Un cadru subțire și un semn tipografic discret construiesc spatele. Gândit pentru o bază neutră.",
+    vibe: "Tipografie redusă la formă și proporție.",
   },
   {
     title: "Semn modular",
-    description:
-      "Forme repetate, lasate sa respire pe materialul dens. Un model grafic fara aglomerare.",
-    vibe: "Repetitie controlata, cu o singura ruptura de ritm.",
+    description: "Forme repetate, lăsate să respire. Un model grafic fără aglomerare.",
+    vibe: "Repetiție controlată, cu o singură ruptură de ritm.",
   },
   {
     title: "Ritm vertical",
     description:
-      "Linii lungi si contrast redus pentru un spate mai calm. Constructia ramane vizibila de aproape.",
-    vibe: "Miscare verticala pastrata intr-un cadru simplu.",
+      "Linii lungi și contrast redus pentru un spate mai calm. Construcția rămâne vizibilă de aproape.",
+    vibe: "Mișcare verticală păstrată într-un cadru simplu.",
   },
   {
     title: "Contur nocturn",
     description:
-      "O directie charcoal cu grafica luminoasa si contur fin. Potrivita pentru o paleta inchisa.",
-    vibe: "Contrast scurt, desenat pentru lumina de seara.",
+      "O direcție charcoal cu grafică luminoasă și contur fin. Potrivită pentru o paletă închisă.",
+    vibe: "Contrast scurt, desenat pentru lumina de seară.",
   },
   {
-    title: "Material spalat",
+    title: "Material spălat",
     description:
-      "Culoarea spalata devine fundal pentru un print aerisit. Croiala pastreaza aceeasi cadere oversized.",
-    vibe: "Textura intai, semnatura grafica dupa.",
+      "Culoarea spălată devine fundal pentru un print aerisit. Proporția rămâne relaxată.",
+    vibe: "Textura întâi, semnătura grafică după.",
   },
   {
-    title: "Linie cromatica",
+    title: "Linie cromatică",
     description:
-      "Un singur accent de culoare traverseaza compozitia de pe spate. Restul ramane intentionat retinut.",
-    vibe: "Culoare folosita ca semn, nu ca decor.",
+      "Un singur accent de culoare traversează compoziția de pe spate. Restul rămâne intenționat reținut.",
+    vibe: "Culoare folosită ca semn, nu ca decor.",
   },
   {
-    title: "Arhiva urbana",
+    title: "Arhivă urbană",
     description:
-      "Referinte de atelier si notatii mici reunite intr-un print compact. Fata ramane fara mesaj.",
-    vibe: "O pagina de arhiva mutata pe material.",
+      "Referințe de atelier și notații mici reunite într-un print compact. Fața rămâne fără mesaj.",
+    vibe: "O pagină de arhivă mutată pe material.",
   },
 ] as const;
 
-function addPreviewProducts(groups: CollectionGroup[]) {
+function addPreviewProducts(groups: CollectionGroup[], previewTemplates: Product[]) {
+  if (!isPreviewCatalogEnabled() || !previewTemplates.length) return groups;
+
   return groups.map((group, groupIndex) => {
     const missingCount = Math.max(0, 4 - group.products.length);
     const previews = Array.from({ length: missingCount }, (_, offset) => {
@@ -106,7 +100,7 @@ function addPreviewProducts(groups: CollectionGroup[]) {
         title: `Tricou ${copy.title} ${number}`,
         description: copy.description,
         vibe: copy.vibe,
-        fitNote: "Pozitie demonstrativa pentru colectie.",
+        fitNote: "Croială oversized, cu linia umărului coborâtă.",
         collection: group.collection.handle,
         collections: [group.collection.handle],
         badge: undefined,
@@ -122,7 +116,11 @@ function addPreviewProducts(groups: CollectionGroup[]) {
   });
 }
 
-function buildCollectionGroups(products: Product[], collections: Collection[]): CollectionGroup[] {
+function buildCollectionGroups(
+  products: Product[],
+  collections: Collection[],
+  previewTemplates: Product[],
+): CollectionGroup[] {
   const groups = collections
     .map((collection) => ({
       collection,
@@ -143,9 +141,9 @@ function buildCollectionGroups(products: Product[], collections: Collection[]): 
     groups.push({
       collection: {
         handle: "selectia-deschisa",
-        title: "Selectia deschisa",
+        title: "Selecția deschisă",
         description:
-          "Piese disponibile separat, in afara unei colectii numerotate. Aceeasi constructie, lasata sa stea singura.",
+          "Piese disponibile separat, în afara unei colecții numerotate. Aceeași regulă vizuală, lăsată să stea singură.",
         image: unassignedProducts[0]?.images[0] ?? "",
         count: unassignedProducts.length,
         productIds: unassignedProducts.map((product) => product.id),
@@ -154,13 +152,13 @@ function buildCollectionGroups(products: Product[], collections: Collection[]): 
     });
   }
 
-  if (!groups.length) {
+  if (!groups.length && products.length) {
     groups.push({
       collection: {
         handle: "editia-curenta",
-        title: "Editia curenta",
+        title: "Ediția curentă",
         description:
-          "Piese oversized construite pe aceeasi regula: fata curata, material dens si design pe spate.",
+          "Piese construite pe aceeași regulă: față curată și design pe spate. Specificațiile rămân pe pagina fiecărui produs.",
         image: products[0]?.images[0] ?? "",
         count: products.length,
         productIds: products.map((product) => product.id),
@@ -169,7 +167,7 @@ function buildCollectionGroups(products: Product[], collections: Collection[]): 
     });
   }
 
-  return addPreviewProducts(groups);
+  return addPreviewProducts(groups, previewTemplates);
 }
 
 function conciseDescription(value: string) {
@@ -183,31 +181,30 @@ function conciseDescription(value: string) {
 export const Route = createFileRoute("/shop")({
   validateSearch: shopSearchSchema,
   loader: async () => {
-    const [products, collections] = await Promise.all([fetchProducts(), fetchCollections()]);
-    return { products, collections };
+    const catalog = await loadCatalog();
+    const previewTemplates =
+      import.meta.env.DEV && isPreviewCatalogEnabled()
+        ? (await import("@/lib/mock-data")).products
+        : [];
+    return { ...catalog, previewTemplates };
   },
-  component: ShopRouteComponent,
+  component: Shop,
   head: () =>
     pageMeta({
       path: "/shop",
       title: "Modele - Trei Linii",
       description:
-        "O prezentare editoriala a primei editii Trei Linii: tricouri oversized cu fata curata si design pe spate.",
+        "O prezentare editorială a colecțiilor Trei Linii: tricouri cu fața curată și design pe spate.",
     }),
 });
 
-function ShopRouteComponent() {
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
-  return pathname.startsWith("/shop/lista") ? <Outlet /> : <Shop />;
-}
-
 function Shop() {
-  const { products, collections } = Route.useLoaderData();
+  const { products, collections, previewTemplates } = Route.useLoaderData();
   const { colectie } = Route.useSearch();
   const navigate = Route.useNavigate();
   const collectionGroups = useMemo(
-    () => buildCollectionGroups(products, collections),
-    [collections, products],
+    () => buildCollectionGroups(products, collections, previewTemplates),
+    [collections, previewTemplates, products],
   );
   const activeGroup =
     collectionGroups.find((group) => group.collection.handle === colectie) ?? collectionGroups[0];
@@ -248,6 +245,10 @@ function Shop() {
       ),
     );
     if (!nodes.length) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      nodes.forEach((node) => node.classList.add("is-visible"));
+      return undefined;
+    }
     const stages = nodes.filter((node) =>
       node.matches(".shop-image-stage, .shop-context-image"),
     ) as HTMLElement[];
@@ -293,19 +294,33 @@ function Shop() {
 
     scheduler.runNow();
     window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("touchmove", scheduleUpdate, { passive: true });
     window.addEventListener("resize", scheduleUpdate);
 
     return () => {
       observer.disconnect();
       scheduler.cancel();
       window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("touchmove", scheduleUpdate);
       window.removeEventListener("resize", scheduleUpdate);
     };
   }, [activeGroup?.collection.handle, chapters.length]);
 
-  if (!activeGroup) return null;
+  if (!activeGroup || !chapters.length) {
+    return (
+      <EmptyState
+        eyebrow={SITE_MODE === "pre-launch" ? "În pregătire" : "Catalog momentan indisponibil"}
+        title={
+          SITE_MODE === "pre-launch" ? "Colecțiile se pregătesc." : "Catalogul revine în curând."
+        }
+        message={
+          SITE_MODE === "pre-launch"
+            ? "Piesele vor apărea aici după publicarea colecției."
+            : "Produsele nu pot fi încărcate acum. Încearcă din nou peste câteva momente."
+        }
+        actionLabel={SITE_MODE === "pre-launch" ? "Citește manifestul" : "Reîncarcă pagina"}
+        actionTo={SITE_MODE === "pre-launch" ? "/manifest" : "/shop"}
+      />
+    );
+  }
 
   const selectCollection = (handle: string) => {
     void navigate({ search: { colectie: handle }, replace: true });
@@ -321,21 +336,21 @@ function Shop() {
       <section className="px-5 py-16 md:px-10 md:py-24">
         <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-12 md:items-end">
           <div className="md:col-span-7">
-            <p className="font-mono-xs text-[#ff006f]">Colectii / Trei Linii</p>
+            <p className="font-mono-xs text-accent-text">Colecții / Trei Linii</p>
             <h1 className="mt-5 font-display text-5xl leading-[0.94] md:text-8xl">
-              Mai multe directii.
+              Colecții în capitole.
               <br />
-              <span className="italic text-muted-foreground">Aceeasi semnatura.</span>
+              <span className="italic text-muted-foreground">Aceeași semnătură.</span>
             </h1>
           </div>
           <div className="md:col-span-4 md:col-start-9">
             <p className="text-base leading-relaxed text-muted-foreground md:text-lg">
-              Fiecare colectie schimba ritmul, nu regula: croiala oversized, fata curata si grafica
-              asezata pe spate.
+              Fiecare colecție schimbă ritmul, nu regula: față curată, proporții relaxate și grafică
+              așezată pe spate.
             </p>
             <Link
               to="/shop/lista"
-              className="mt-6 inline-flex font-mono-xs text-[#ff006f] underline underline-offset-4"
+              className="mt-6 inline-flex font-mono-xs text-accent-text underline underline-offset-4"
             >
               Vezi toate produsele
             </Link>
@@ -343,32 +358,28 @@ function Shop() {
         </div>
       </section>
 
-      <nav className="border-y border-border bg-cream/35" aria-label="Alege colectia">
-        <div
-          className="mx-auto flex max-w-[1600px] snap-x snap-mandatory overflow-x-auto px-5 [scrollbar-width:none] md:px-10 [&::-webkit-scrollbar]:hidden"
-          role="tablist"
-        >
+      <nav className="border-y border-border bg-cream/35" aria-label="Alege colecția">
+        <div className="mx-auto flex max-w-[1600px] snap-x snap-mandatory overflow-x-auto px-5 [scrollbar-width:none] md:px-10 [&::-webkit-scrollbar]:hidden">
           {collectionGroups.map((group, index) => {
             const selected = group.collection.handle === activeGroup.collection.handle;
             return (
               <button
                 key={group.collection.handle}
                 type="button"
-                role="tab"
-                aria-selected={selected}
+                aria-pressed={selected}
                 onClick={() => selectCollection(group.collection.handle)}
                 className={`relative min-h-32 min-w-[76vw] snap-start border-r border-border px-5 py-7 text-left transition-colors sm:min-w-72 md:min-h-36 md:px-8 ${
                   selected ? "bg-charcoal text-cream" : "bg-transparent hover:bg-cream"
                 }`}
               >
-                <span className={`font-mono-xs ${selected ? "text-[#ff006f]" : "opacity-45"}`}>
+                <span className={`font-mono-xs ${selected ? "text-accent-text" : "opacity-45"}`}>
                   {String(index + 1).padStart(2, "0")} / {group.products.length} piese
                 </span>
                 <span className="mt-4 block font-display text-2xl leading-none md:text-3xl">
                   {group.collection.title}
                 </span>
                 <span
-                  className={`absolute inset-x-0 bottom-0 h-0.5 origin-left bg-[#ff006f] transition-transform duration-500 ${
+                  className={`absolute inset-x-0 bottom-0 h-0.5 origin-left bg-signature transition-transform duration-500 ${
                     selected ? "scale-x-100" : "scale-x-0"
                   }`}
                   aria-hidden="true"
@@ -385,7 +396,7 @@ function Shop() {
       >
         <div className="mx-auto grid max-w-[1600px] gap-10 md:grid-cols-12 md:items-center">
           <div className="md:col-span-7">
-            <p className="font-mono-xs opacity-55">Colectia selectata</p>
+            <p className="font-mono-xs opacity-55">Colecția selectată</p>
             <h2 className="mt-4 font-display text-5xl leading-[0.95] md:text-7xl">
               {activeGroup.collection.title}
             </h2>
@@ -395,12 +406,14 @@ function Shop() {
           </div>
           {activeGroup.collection.image && (
             <figure className="overflow-hidden bg-warm-grey md:col-span-4 md:col-start-9">
-              <img
+              <ResponsiveImage
                 src={activeGroup.collection.image}
-                alt={`Colectia ${activeGroup.collection.title}`}
+                alt={`Colecția ${activeGroup.collection.title}`}
+                width={1600}
+                height={1000}
+                priority
+                sizes="(min-width: 768px) 33vw, 100vw"
                 className="aspect-[16/10] w-full object-cover transition-transform duration-[1200ms] hover:scale-[1.025]"
-                decoding="async"
-                loading="eager"
               />
             </figure>
           )}
@@ -420,18 +433,18 @@ function Shop() {
 
       <section className="px-5 py-20 md:px-10 md:py-28">
         <div className="mx-auto max-w-[900px] border-t border-border pt-14 text-center">
-          <p className="font-mono-xs opacity-60">Ai vazut intreaga colectie</p>
+          <p className="font-mono-xs opacity-60">Ai văzut întreaga colecție</p>
           <h2 className="mt-5 font-display text-5xl leading-[1.02] md:text-7xl">
             {activeGroup.collection.title}.
             <br />
-            <span className="italic text-muted-foreground">Continua cu toate piesele.</span>
+            <span className="italic text-muted-foreground">Continuă cu toate piesele.</span>
           </h2>
           <Link
             to="/shop/lista"
             className="group mt-10 inline-flex items-center gap-4 bg-charcoal px-8 py-4 font-mono-xs text-cream"
           >
             Vezi toate produsele
-            <span className="h-px w-12 origin-left scale-x-[0.58] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
+            <span className="h-px w-12 origin-left scale-x-[0.58] bg-signature transition-transform group-hover:scale-x-100" />
           </Link>
         </div>
       </section>
@@ -502,8 +515,8 @@ function Chapter({
 
   const pattern = COLLAGE_PATTERNS[index % COLLAGE_PATTERNS.length];
   const slots = pattern
-    .map((slot, i) => ({ slot, src: product.images[i] }))
-    .filter((entry): entry is { slot: CollageSlot; src: string } => Boolean(entry.src));
+    .map((slot, i) => ({ slot, src: product.images[i] ?? (i === 0 ? "" : undefined) }))
+    .filter((entry): entry is { slot: CollageSlot; src: string } => entry.src !== undefined);
 
   const [overlay, setOverlay] = useState<null | {
     x: number;
@@ -511,10 +524,17 @@ function Chapter({
     width: number;
     height: number;
   }>(null);
+  const viewButtonRef = useRef<HTMLButtonElement>(null);
 
   const openQuickView = (e: MouseEvent<HTMLButtonElement>) => {
+    e.currentTarget.focus({ preventScroll: true });
     const rect = e.currentTarget.getBoundingClientRect();
     setOverlay({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
+  };
+
+  const closeQuickView = () => {
+    setOverlay(null);
+    window.requestAnimationFrame(() => viewButtonRef.current?.focus({ preventScroll: true }));
   };
 
   const badgeEl = (
@@ -525,6 +545,7 @@ function Chapter({
 
   const viewBtnEl = (
     <button
+      ref={viewButtonRef}
       type="button"
       onClick={openQuickView}
       onPointerEnter={() => preloadQuickViewImages(product)}
@@ -537,7 +558,7 @@ function Chapter({
         background: "rgba(232,229,221,0.94)",
         boxShadow: "0 8px 24px rgba(20,18,14,0.12)",
         border: "none",
-        borderRadius: 14,
+        borderRadius: 4,
         fontFamily: "var(--font-display)",
         fontSize: 16,
         fontWeight: 500,
@@ -564,9 +585,9 @@ function Chapter({
         }`}
       >
         <span
-          className={`pointer-events-none absolute top-8 font-display text-[11rem] italic leading-none opacity-[0.05] md:text-[19rem] ${
-            reverse ? "right-4 md:right-20" : "left-4 md:left-20"
-          }`}
+          className={`shop-ghost-number pointer-events-none absolute top-8 font-display text-[11rem] italic leading-none md:text-[19rem] ${
+            isDark ? "shop-ghost-number-dark" : ""
+          } ${reverse ? "right-4 md:right-20" : "left-4 md:left-20"}`}
           aria-hidden="true"
         >
           {number}
@@ -593,12 +614,14 @@ function Chapter({
                     transitionDelay: `${i * 110}ms`,
                   }}
                 >
-                  <img
+                  <ResponsiveImage
                     src={src}
                     alt={`${product.title} - imagine ${i + 1}`}
+                    width={1200}
+                    height={1600}
+                    priority={index === 0 && i === 0}
+                    sizes="(min-width: 1024px) 35vw, 70vw"
                     className="absolute inset-0 h-full w-full object-cover"
-                    decoding="async"
-                    loading={index === 0 && i === 0 ? "eager" : "lazy"}
                   />
                   {i === 0 && badgeEl}
                   {i === 1 && viewBtnEl}
@@ -612,83 +635,131 @@ function Chapter({
           >
             <p className={isDark ? "font-mono-xs text-cream/60" : "font-mono-xs opacity-60"}>
               Nr. {number} -{" "}
-              <span className="text-[#ff006f]">
-                {product.isPreview ? "pozitie demonstrativa" : "editie limitata"}
+              <span className="text-accent-text">
+                {product.isPreview ? "piesă în pregătire" : (product.badge ?? "piesă disponibilă")}
               </span>
             </p>
             <h2 className="mt-4 font-display text-4xl leading-[1.02] md:text-6xl">
               {product.title}
             </h2>
-            <blockquote className="mt-7 border-l border-[#ff006f] pl-5 font-display text-2xl italic leading-snug">
-              {product.isPreview ? product.vibe : (chapterQuotes[index] ?? product.vibe)}
-            </blockquote>
+            {product.isPreview && (
+              <blockquote className="mt-7 border-l border-signature pl-5 font-display text-2xl italic leading-snug">
+                {product.vibe}
+              </blockquote>
+            )}
             <p
               className={`mt-6 leading-relaxed ${isDark ? "text-cream/70" : "text-muted-foreground"}`}
             >
               {conciseDescription(product.description)}
             </p>
             <p className="mt-7 font-display text-4xl">
-              {product.isPreview ? "In pregatire" : formatRON(product.price)}
+              {product.isPreview ? "În pregătire" : formatRON(product.price)}
             </p>
 
             <ChapterQuickAdd product={product} isDark={isDark} />
 
             <div className="mt-12 hidden md:block">
               <div className="shop-context-image overflow-hidden">
-                <img
+                <ResponsiveImage
                   src={contextImage}
                   alt=""
+                  width={1600}
+                  height={1000}
+                  sizes="33vw"
                   className="aspect-[16/10] w-full object-cover"
-                  decoding="async"
-                  loading="lazy"
                 />
               </div>
-              <p className={`mt-3 font-mono-xs ${isDark ? "text-cream/45" : "opacity-45"}`}>
+              <p className={`mt-3 font-mono-xs ${isDark ? "text-cream/70" : "opacity-45"}`}>
                 {contextCaptions[index % contextCaptions.length]}
               </p>
             </div>
           </div>
         </div>
       </section>
-      {overlay && (
-        <QuickViewOverlay product={product} origin={overlay} onClose={() => setOverlay(null)} />
-      )}
+      {overlay && <QuickViewOverlay product={product} origin={overlay} onClose={closeQuickView} />}
     </>
   );
 }
 
 function ChapterQuickAdd({ product, isDark }: { product: Product; isDark: boolean }) {
   const { addItem } = useCart();
-  const color = product.colors[0]?.name ?? "";
-  const stock = useMemo(() => getStockForColor(product, color), [product, color]);
+  const [selectedColor, setSelectedColor] = useState<string | null>(
+    product.colors.length === 1 ? (product.colors[0]?.name ?? null) : null,
+  );
+  const stock = useMemo(
+    () => getStockForColor(product, selectedColor ?? ""),
+    [product, selectedColor],
+  );
   const [selectedSize, setSelectedSize] = useState<Size | null>(null);
   const [message, setMessage] = useState("");
+  const [messageTone, setMessageTone] = useState<"error" | "success">("error");
   const selectedStock = selectedSize ? (stock[selectedSize] ?? 0) : 0;
 
-  if (product.isPreview) {
+  if (!canPurchaseProduct(product)) {
     return (
       <div className="mt-8 max-w-md border border-current/20 px-5 py-5">
-        <p className="font-mono-xs text-[#ff006f]">Preview de colectie</p>
+        <p className="font-mono-xs text-accent-text">
+          {product.isPreview ? "Colecție în pregătire" : "Comandă indisponibilă momentan"}
+        </p>
         <p
           className={`mt-3 text-sm leading-relaxed ${isDark ? "text-cream/65" : "text-muted-foreground"}`}
         >
-          Loc rezervat pentru produsul final. Va fi inlocuit automat dupa publicarea lui in Shopify.
+          {product.isPreview
+            ? "Direcție de colecție în pregătire. Detaliile finale vor apărea odată cu publicarea piesei."
+            : "Poți vedea toate detaliile piesei. Comenzile vor fi deschise la lansare."}
         </p>
       </div>
     );
   }
 
   const addToCart = () => {
-    if (!selectedSize) {
-      setMessage("Alege o marime pentru a continua.");
+    if (!selectedColor) {
+      setMessage("Alege o culoare pentru a continua.");
+      setMessageTone("error");
       return;
     }
-    addItem(product, selectedSize, color);
-    setMessage("");
+    if (!selectedSize) {
+      setMessage("Alege o mărime pentru a continua.");
+      setMessageTone("error");
+      return;
+    }
+    const result = addItem(product, selectedSize, selectedColor);
+    setMessage(result.ok ? "Produsul a fost adăugat în coș." : result.message);
+    setMessageTone(result.ok ? "success" : "error");
   };
 
   return (
     <div className="mt-8">
+      <div className="mb-6">
+        <div className="flex items-center justify-between gap-4">
+          <p className="font-mono-xs">Culoare</p>
+          {selectedColor && <p className="text-sm opacity-65">{selectedColor}</p>}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {product.colors.map((color) => {
+            const active = selectedColor === color.name;
+            return (
+              <button
+                key={color.name}
+                type="button"
+                aria-label={`Alege culoarea ${color.name}`}
+                aria-pressed={active}
+                onClick={() => {
+                  setSelectedColor(color.name);
+                  setSelectedSize(null);
+                  setMessage("");
+                }}
+                className={`h-11 w-11 border p-1 transition-colors ${
+                  active ? "border-current" : "border-current/25 hover:border-current/60"
+                }`}
+              >
+                <span className="block h-full w-full" style={{ backgroundColor: color.hex }} />
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="grid max-w-sm grid-cols-4 border border-current/25">
         {product.sizes.map((size) => {
           const disabled = (stock[size] ?? 0) <= 0;
@@ -697,7 +768,9 @@ function ChapterQuickAdd({ product, isDark }: { product: Product; isDark: boolea
             <button
               key={size}
               type="button"
-              disabled={disabled}
+              disabled={!selectedColor || disabled}
+              aria-pressed={active}
+              aria-label={`Mărimea ${size}${!selectedColor || disabled ? ", indisponibilă" : ""}`}
               onClick={() => {
                 setSelectedSize(size);
                 setMessage("");
@@ -717,11 +790,11 @@ function ChapterQuickAdd({ product, isDark }: { product: Product; isDark: boolea
       </div>
 
       {selectedSize && selectedStock > 0 && selectedStock <= 4 && (
-        <p className="mt-3 font-mono-xs text-[#ff006f]">
-          Ultimele {selectedStock} piese pe marimea {selectedSize}
+        <p className="mt-3 font-mono-xs text-accent-text">
+          Ultimele {selectedStock} piese pe mărimea {selectedSize}
         </p>
       )}
-      {message && <p className="mt-3 font-mono-xs text-[#ff006f]">{message}</p>}
+      <FeedbackRegion message={message} tone={messageTone} className="mt-3" />
 
       <div className="mt-6 flex flex-wrap items-center gap-5">
         <button
@@ -731,8 +804,8 @@ function ChapterQuickAdd({ product, isDark }: { product: Product; isDark: boolea
             isDark ? "bg-cream text-charcoal" : "bg-charcoal text-cream"
           }`}
         >
-          Adauga in cos
-          <span className="h-px w-10 origin-left scale-x-[0.6] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
+          Adaugă în coș
+          <span className="h-px w-10 origin-left scale-x-[0.6] bg-signature transition-transform group-hover:scale-x-100" />
         </button>
         <Link
           to="/product/$handle"
@@ -759,7 +832,7 @@ function ChapterIndex({ products, activeChapter }: { products: Product[]; active
               key={product.id}
               href={`#capitol-${number}`}
               className={`font-display text-lg italic transition-[color,transform] ${
-                activeChapter === index ? "scale-125 text-[#ff006f]" : "text-charcoal/35"
+                activeChapter === index ? "scale-125 text-accent-text" : "text-muted-foreground"
               }`}
             >
               {number}
@@ -769,9 +842,9 @@ function ChapterIndex({ products, activeChapter }: { products: Product[]; active
         <span className="my-2 h-16 w-px bg-border" aria-hidden="true" />
         <Link
           to="/shop/lista"
-          className="font-mono-xs text-charcoal/50 [writing-mode:vertical-rl] hover:text-[#ff006f]"
+          className="font-mono-xs text-charcoal/50 [writing-mode:vertical-rl] hover:text-accent-text"
         >
-          Lista completa
+          Lista completă
         </Link>
       </nav>
     </aside>

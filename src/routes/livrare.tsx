@@ -9,24 +9,24 @@ export const Route = createFileRoute("/livrare")({
     pageMeta({
       path: "/livrare",
       title: "Livrare | Trei Linii",
-      description: "Informatii despre livrare pentru comenzile Trei Linii.",
+      description: "Informații despre livrare pentru comenzile Trei Linii.",
     }),
 });
 
 function Livrare() {
   return (
     <LegalPage title="Livrare">
-      <LegalSection title="Termen si cost">
+      <LegalSection title="Termen și cost">
         <p>
           Livrarea se face prin {LEGAL.courier}. Termen estimativ: {LEGAL.deliveryTerm}. Costul
-          livrarii este {LEGAL.shippingCost} si va fi afisat in checkout inainte de finalizarea
+          livrării este {LEGAL.shippingCost} și va fi afișat în checkout înainte de finalizarea
           comenzii.
         </p>
       </LegalSection>
       <LegalSection title="Date corecte de livrare">
         <p>
-          Clientul este responsabil pentru corectitudinea datelor de livrare. Daca o comanda nu
-          poate fi livrata din cauza datelor gresite sau incomplete, costurile suplimentare pot fi
+          Clientul este responsabil pentru corectitudinea datelor de livrare. Dacă o comandă nu
+          poate fi livrată din cauza datelor greșite sau incomplete, costurile suplimentare pot fi
           suportate de client.
         </p>
       </LegalSection>

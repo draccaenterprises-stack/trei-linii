@@ -1,120 +1,129 @@
 # Trei Linii storefront
 
-Frontend ecommerce custom generat in Lovable pentru brandul Trei Linii.
+Storefront editorial pentru Trei Linii, construit cu React 19, TanStack Start, TypeScript,
+Tailwind CSS și Shopify Storefront API. Aplicația folosește SSR și pre-rendering pentru rutele
+publice, iar producția pornește implicit în mod sigur de pre-lansare.
 
-## Dezvoltare locala
+## Pornire locală
+
+Cerințe: Node.js 20+ și npm.
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Verificari:
+Vite afișează adresa locală disponibilă. Catalogul vizual din `src/lib/mock-data.ts` este folosit
+numai în dezvoltare și în testele E2E. Nu este introdus automat în build-ul de producție.
+
+## Comenzi
 
 ```bash
-npm run build
-npm run lint
-npm run verify:storefront -- http://127.0.0.1:5175 --min-products=8
+npm run dev              # server local
+npm run build            # build SSR + pre-render rute statice
+npm run preview          # Worker local din .output
+npm run format:check     # verificare Prettier
+npm run lint             # ESLint, fără warnings
+npm run typecheck        # TypeScript strict
+npm run test             # teste unitare și de componente
+npm run test:coverage    # teste cu raport de coverage
+npm run test:e2e         # Playwright: mobil, tabletă și desktop
+npm run test:a11y        # axe pe rutele principale
+npm run verify:security  # secret scan, headere și npm audit
+npm run verify:perf      # Lighthouse, 3 rulări per scenariu
+npm run verify:all       # release gate local
 ```
 
-## Date locale de pre-lansare
-
-Proiectul poate afisa produse, categorii, FAQ, recenzii si setari homepage locale din:
-
-```text
-src/lib/mock-data.ts
-src/lib/site-context.tsx
-```
-
-Aceste date raman fallback de pre-lansare pana exista produse publicate in Shopify pe canalul
-Headless.
-
-Catalogul vizual este limitat la 8 produse. Daca Shopify are mai putine produse publicate, site-ul
-completeaza lista cu produse locale de prezentare, ca layout-ul sa ramana plin pana incarci
-produsele finale in Shopify.
-
-## Cum se adauga produse
-
-Produsele reale se adauga direct din Shopify Admin.
-
-Shopify gestioneaza:
-
-- produse
-- titluri si descrieri
-- preturi
-- imagini
-- variante precum marime si culoare
-- stoc
-- reduceri
-- checkout
-- plati
-- comenzi
-- taxe
-- livrare si integrari cu firme de curierat
-
-Frontend-ul custom citeste catalogul din Shopify si trimite clientul la Shopify Checkout.
-
-## Integrare Shopify
-
-Layer-ul de integrare este aici:
-
-```text
-src/lib/shopify.ts
-```
-
-Variabile recomandate:
-
-```text
-VITE_SHOPIFY_STORE_DOMAIN=aa01qm-mq.myshopify.com
-VITE_SHOPIFY_STOREFRONT_TOKEN=token_public_storefront
-VITE_SHOPIFY_API_VERSION=2026-01
-```
-
-Adminul temporar este dezactivat implicit in build-urile publice. Pentru test local:
-
-```text
-VITE_ENABLE_LOCAL_ADMIN=true
-```
-
-Nu seta `VITE_ENABLE_LOCAL_ADMIN=true` in Lovable sau in deployment public. Adminul este
-disponibil doar pe serverul de dezvoltare local; nu folosi variabile `VITE_` pentru PIN-uri sau
-secrete, pentru ca ajung in bundle-ul public.
-
-Status integrare:
-
-1. Produsele si colectiile sunt citite prin Shopify Storefront API.
-2. Ruta `/product/$handle` cauta produsul dupa handle-ul Shopify.
-3. Cosul foloseste ID-urile variantelor Shopify cand produsul vine din Shopify.
-4. Checkout-ul foloseste `cartCreate` si `cartLinesAdd`.
-5. Clientul este redirectionat catre `checkoutUrl` primit de la Shopify.
-
-Nu construim checkout custom.
-
-Pentru Trei Linii, domeniul Shopify curent este `aa01qm-mq.myshopify.com`.
-Tokenul Storefront este public si poate fi folosit din browser, dar variabilele de mediu raman metoda
-recomandata pentru Lovable/deploy. Daca Shopify nu are inca produse publicate pe canalul Headless,
-frontend-ul pastreaza produsele locale de pre-lansare ca site-ul sa nu para gol.
-
-## Publicare Lovable
-
-Dupa fiecare push pe GitHub:
-
-1. Deschide proiectul in Lovable.
-2. Confirma ca proiectul este sincronizat cu repository-ul GitHub `draccaenterprises-stack/trei-linii`.
-3. Seteaza Environment Variables in Lovable daca nu sunt deja setate:
-
-```text
-VITE_SHOPIFY_STORE_DOMAIN=aa01qm-mq.myshopify.com
-VITE_SHOPIFY_STOREFRONT_TOKEN=token_public_storefront
-VITE_SHOPIFY_API_VERSION=2026-01
-```
-
-4. Apasa `Publish`.
-5. Verifica URL-ul public:
+Verificări împotriva unui server pornit:
 
 ```bash
-npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8
+npm run verify:storefront -- http://localhost:4176
+npm run verify:seo -- http://localhost:4176
 ```
 
-Deployment-ul public nu este gata daca verificarea gaseste `model1`, `model2`, texte test,
-pagini lipsa sau mesajul Lovable de proiect nepublicat.
+Pentru un deploy public, înlocuiește URL-ul local cu URL-ul public.
+
+## Modurile site-ului
+
+`VITE_SITE_MODE=pre-launch` este valoarea implicită și sigură. Catalogul real, comenzile și
+checkout-ul devin active numai când sunt îndeplinite simultan condițiile următoare:
+
+- `VITE_SITE_MODE=live-shop`;
+- domeniul și tokenul public Shopify Storefront sunt configurate;
+- datele comerciale obligatorii sunt completate;
+- produsul are o variantă Shopify reală și disponibilă.
+
+Dacă lipsește oricare condiție, aplicația nu simulează tranzacții: ascunde sau dezactivează
+acțiunea și păstrează paginile într-o stare coerentă de pre-lansare.
+
+## Configurare
+
+Lista completă și explicațiile sunt în `.env.example`. Variabilele principale sunt:
+
+```text
+VITE_SITE_URL
+VITE_SITE_MODE
+VITE_SHOPIFY_STORE_DOMAIN
+VITE_SHOPIFY_STOREFRONT_TOKEN
+VITE_SHOPIFY_API_VERSION
+VITE_CHECKOUT_HOSTS
+VITE_LEGAL_COMPANY
+VITE_LEGAL_CUI
+VITE_LEGAL_REG_COM
+VITE_LEGAL_ADDRESS
+VITE_CONTACT_EMAIL
+VITE_CONTACT_FORM_ENDPOINT
+VITE_KLAVIYO_COMPANY_ID
+VITE_KLAVIYO_LIST_ID
+VITE_GA_ID
+VITE_META_PIXEL_ID
+```
+
+Numai tokenul public Storefront poate fi expus printr-o variabilă `VITE_`. Tokenurile Shopify
+Admin, cheile private și alte secrete nu trebuie adăugate în frontend, în repository sau în
+variabile publice. `.env.production` rămâne fără token și în mod `pre-launch`; mediul de deploy
+furnizează valorile reale.
+
+## Shopify
+
+Produsele și colecțiile se administrează în Shopify și trebuie publicate pe canalul folosit de
+Storefront API. Frontend-ul preia din Shopify:
+
+- titlul, descrierea, handle-ul și imaginile;
+- prețul și moneda;
+- colecțiile;
+- variantele de mărime și culoare;
+- disponibilitatea și cantitatea, când API-ul o oferă;
+- URL-ul de checkout emis de Shopify Cart API.
+
+Produsele interne de test și colecțiile de sistem sunt filtrate. Catalogul real nu este redenumit
+și nu este completat cu produse locale în producție. Checkout-ul acceptă numai URL-uri HTTPS ale
+hosturilor configurate.
+
+Adaptorul principal este în `src/lib/shopify.ts`, repository-ul comercial în
+`src/lib/product-repository.ts`, iar starea coșului în `src/lib/cart-context.tsx` și
+`src/lib/cart-state.ts`.
+
+## SEO, privacy și securitate
+
+- fiecare rută publică are metadata, canonical și HTML SSR;
+- sitemapul și `robots.txt` sunt generate la build;
+- rutele statice indexabile sunt pre-randate în `.output/public`;
+- schema JSON-LD folosește aceleași modele ca paginile;
+- analytics și marketing pornesc numai după consimțământ;
+- formularele externe rămân ascunse când adaptorul nu este configurat;
+- headerele recomandate pentru hosting sunt în `public/_headers`;
+- redirecturile de checkout sunt validate prin allowlist.
+
+## Deploy
+
+`npm run build` generează Worker-ul și fișierele publice în `.output`. După deploy trebuie rulate
+cel puțin verificările de storefront, SEO și Shopify readiness pe URL-ul public. Publicarea nu este
+considerată completă până când produsele reale, datele comerciale și un checkout de test sunt
+confirmate în mediul de producție.
+
+## Baseline curent
+
+Build-ul verificat după curățarea dependențelor produce aproximativ 492 KB JavaScript pentru
+chunk-ul principal (circa 154 KB gzip) și 67 KB CSS (circa 12 KB gzip). Pragurile funcționale,
+Lighthouse și securitate sunt impuse de scripturile de release, nu doar de dimensiunea bundle-ului.

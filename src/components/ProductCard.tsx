@@ -1,13 +1,15 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Flame, PackageCheck, Percent } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import * as React from "react";
 import { createPortal } from "react-dom";
-import type { Product } from "@/lib/mock-data";
+import type { Product } from "@/lib/catalog-types";
 import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import { preloadQuickViewImages } from "@/lib/quick-view";
-import { getStockForColor } from "@/lib/shopify";
+import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
+import { ResponsiveImage } from "@/components/ResponsiveImage";
+import { FeedbackRegion } from "@/components/FeedbackRegion";
 
 const badgeStyles: Record<string, string> = {
   noutate: "bg-charcoal text-cream",
@@ -34,12 +36,19 @@ export function QuickViewOverlay({
   const [phase, setPhase] = React.useState<QuickViewPhase>("preparing");
   const closingRef = React.useRef(false);
   const closeTimerRef = React.useRef<number | null>(null);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const previousFocusRef = React.useRef<HTMLElement | null>(null);
+  const reducedMotionRef = React.useRef(false);
 
   React.useEffect(() => {
+    reducedMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = prev;
+      previousFocusRef.current?.focus({ preventScroll: true });
     };
   }, []);
 
@@ -53,7 +62,12 @@ export function QuickViewOverlay({
       if (started || closingRef.current) return;
       started = true;
       window.clearTimeout(fallbackTimer);
-      setPhase("opening");
+      if (reducedMotionRef.current) {
+        setOpen(true);
+        setPhase("open");
+      } else {
+        setPhase("opening");
+      }
     };
 
     // Two painted frames keep iOS Safari from coalescing the mounted and animated states.
@@ -91,6 +105,10 @@ export function QuickViewOverlay({
   const handleClose = React.useCallback(() => {
     if (closingRef.current) return;
     closingRef.current = true;
+    if (reducedMotionRef.current) {
+      onClose();
+      return;
+    }
     setOpen(false);
     setPhase("closing");
 
@@ -100,10 +118,29 @@ export function QuickViewOverlay({
   React.useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") handleClose();
+      if (e.key !== "Tab" || phase !== "open") return;
+
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focusable?.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handleClose]);
+  }, [handleClose, phase]);
+
+  React.useEffect(() => {
+    if (phase === "open") closeButtonRef.current?.focus({ preventScroll: true });
+  }, [phase]);
 
   if (typeof document === "undefined") return null;
 
@@ -116,6 +153,7 @@ export function QuickViewOverlay({
       aria-modal="true"
       aria-busy={phase !== "open"}
       aria-label={`Galerie ${product.title}`}
+      ref={dialogRef}
     >
       <div
         className="quick-view-clone"
@@ -128,7 +166,7 @@ export function QuickViewOverlay({
           height: origin.height,
           // Opaque approximation of the translucent button — avoids backdrop-filter repaints on mobile.
           background: "#e8e5dd",
-          borderRadius: 14,
+          borderRadius: 4,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -181,7 +219,7 @@ export function QuickViewOverlay({
           zIndex: 3,
         }}
       >
-        {["#000000", "#000000", "#ff006f"].map((color, i) => (
+        {["#000000", "#000000", "var(--signature)"].map((color, i) => (
           <div
             key={i}
             className="quick-view-band"
@@ -195,7 +233,12 @@ export function QuickViewOverlay({
       </div>
 
       {/* Gallery */}
-      <GalleryLayer product={product} interactive={open} onClose={handleClose} />
+      <GalleryLayer
+        product={product}
+        interactive={open}
+        onClose={handleClose}
+        closeButtonRef={closeButtonRef}
+      />
     </div>,
     document.body,
   );
@@ -205,10 +248,12 @@ function GalleryLayer({
   product,
   interactive,
   onClose,
+  closeButtonRef,
 }: {
   product: Product;
   interactive: boolean;
   onClose: () => void;
+  closeButtonRef: React.RefObject<HTMLButtonElement | null>;
 }) {
   return (
     <div
@@ -221,11 +266,12 @@ function GalleryLayer({
       }}
     >
       {/* Top bar */}
-      <div className="sticky top-0 z-10 flex items-center gap-4 border-b border-charcoal/10 bg-[#faf8f2] px-5 py-4 md:bg-[#faf8f2]/95 md:px-10 md:py-6 md:backdrop-blur">
+      <div className="sticky top-0 z-10 flex items-center gap-4 border-b border-charcoal/10 bg-background px-5 py-4 md:bg-background/95 md:px-10 md:py-6 md:backdrop-blur">
         <button
+          ref={closeButtonRef}
           type="button"
           onClick={onClose}
-          aria-label="Inchide galeria"
+          aria-label="Închide galeria"
           className="inline-flex items-center justify-center border border-charcoal bg-transparent text-charcoal hover:bg-charcoal hover:text-cream transition-colors"
           style={{ width: 44, height: 44 }}
         >
@@ -235,8 +281,8 @@ function GalleryLayer({
           <h2 className="min-w-0 flex-1 font-display text-xl leading-tight md:truncate md:text-[32px] md:leading-none">
             {product.title}
           </h2>
-          <span className="font-mono-xs whitespace-nowrap" style={{ color: "#ff006f" }}>
-            {product.isPreview ? "In pregatire" : formatRON(product.price)}
+          <span className="font-mono-xs whitespace-nowrap text-accent-text">
+            {product.isPreview ? "În pregătire" : formatRON(product.price)}
           </span>
         </div>
       </div>
@@ -264,12 +310,13 @@ function GalleryLayer({
               width: "calc(min(62svh, 680px) * 3 / 4)",
             }}
           >
-            <img
+            <ResponsiveImage
               src={src}
               alt={`${product.title} - ${i + 1}`}
-              decoding="async"
-              loading={i === 0 ? "eager" : "lazy"}
-              fetchPriority={i === 0 ? "high" : "auto"}
+              width={1200}
+              height={1600}
+              priority={i === 0}
+              sizes="min(78vw, 510px)"
               style={{
                 width: "100%",
                 height: "min(62svh, 680px)",
@@ -300,24 +347,30 @@ function QuickViewPurchaseControls({
   onAdded: () => void;
 }) {
   const { addItem } = useCart();
-  const [selectedColor, setSelectedColor] = React.useState(product.colors[0]?.name ?? "");
+  const [selectedColor, setSelectedColor] = React.useState(
+    product.colors.length === 1 ? (product.colors[0]?.name ?? "") : "",
+  );
   const [selectedSize, setSelectedSize] = React.useState<string | null>(null);
   const [message, setMessage] = React.useState("");
   const stock = React.useMemo(
     () => getStockForColor(product, selectedColor),
     [product, selectedColor],
   );
-  const hasStock = product.sizes.some((size) => (stock[size] ?? 0) > 0);
+  const hasStock = Boolean(selectedColor) && product.sizes.some((size) => (stock[size] ?? 0) > 0);
   const selectedStock = selectedSize ? (stock[selectedSize] ?? 0) : 0;
+  const productCanBePurchased = canPurchaseProduct(product);
 
-  if (product.isPreview) {
+  if (!productCanBePurchased) {
     return (
       <div className="border-t border-charcoal/15 px-5 py-8 md:px-10 md:py-10">
         <div className="mx-auto max-w-4xl border border-charcoal/20 px-5 py-5 md:px-7">
-          <p className="font-mono-xs text-[#ff006f]">Pozitie demonstrativa</p>
+          <p className="font-mono-xs text-accent-text">
+            {product.isPreview ? "Piesă în pregătire" : "Comandă indisponibilă momentan"}
+          </p>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-            Aceasta piesa arata ritmul colectiei pana la publicarea produsului final in Shopify. Nu
-            poate fi adaugata in cos.
+            {product.isPreview
+              ? "Această piesă arată direcția colecției până la publicarea variantei finale. Nu poate fi adăugată în coș."
+              : "Galeria rămâne disponibilă, iar comenzile pentru această piesă vor fi deschise la lansare."}
           </p>
         </div>
       </div>
@@ -325,12 +378,20 @@ function QuickViewPurchaseControls({
   }
 
   const addToCart = () => {
+    if (!selectedColor) {
+      setMessage("Alege o culoare pentru a continua.");
+      return;
+    }
     if (!selectedSize) {
-      setMessage("Alege o marime pentru a continua.");
+      setMessage("Alege o mărime pentru a continua.");
       return;
     }
 
-    addItem(product, selectedSize, selectedColor);
+    const result = addItem(product, selectedSize, selectedColor);
+    if (!result.ok) {
+      setMessage(result.message);
+      return;
+    }
     setMessage("");
     onAdded();
   };
@@ -339,7 +400,7 @@ function QuickViewPurchaseControls({
     <div className="border-t border-charcoal/15 px-5 py-8 md:px-10 md:py-10">
       <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-12 md:items-start">
         <div className="md:col-span-5">
-          <p className="font-mono-xs text-[#ff006f]">Adauga direct in cos</p>
+          <p className="font-mono-xs text-accent-text">Adaugă direct în coș</p>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
             {product.description}
           </p>
@@ -378,7 +439,7 @@ function QuickViewPurchaseControls({
           </div>
 
           <div className="mt-6">
-            <p className="font-mono-xs">Marime</p>
+            <p className="font-mono-xs">Mărime</p>
             <div className="mt-3 grid grid-cols-4 border border-charcoal/25">
               {product.sizes.map((size) => {
                 const disabled = (stock[size] ?? 0) <= 0;
@@ -387,8 +448,9 @@ function QuickViewPurchaseControls({
                   <button
                     key={size}
                     type="button"
-                    disabled={disabled}
+                    disabled={!selectedColor || disabled}
                     aria-pressed={active}
+                    aria-label={`Mărimea ${size}${!selectedColor || disabled ? ", indisponibilă" : ""}`}
                     onClick={() => {
                       setSelectedSize(size);
                       setMessage("");
@@ -405,11 +467,11 @@ function QuickViewPurchaseControls({
           </div>
 
           {selectedSize && selectedStock > 0 && selectedStock <= 4 && (
-            <p className="mt-3 font-mono-xs text-[#ff006f]">
-              Ultimele {selectedStock} piese pe marimea {selectedSize}
+            <p className="mt-3 font-mono-xs text-accent-text">
+              Ultimele {selectedStock} piese pe mărimea {selectedSize}
             </p>
           )}
-          {message && <p className="mt-3 font-mono-xs text-[#ff006f]">{message}</p>}
+          <FeedbackRegion message={message} tone="error" className="mt-3" />
 
           <div className="mt-6 flex flex-wrap items-center gap-4">
             <button
@@ -418,9 +480,9 @@ function QuickViewPurchaseControls({
               disabled={!hasStock}
               className="group inline-flex min-h-12 items-center gap-4 bg-charcoal px-6 font-mono-xs text-cream disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {hasStock ? "Adauga in cos" : "Stoc epuizat"}
+              {hasStock ? "Adaugă în coș" : "Stoc epuizat"}
               {hasStock && (
-                <span className="h-px w-10 origin-left scale-x-[0.6] bg-[#ff006f] transition-transform group-hover:scale-x-100" />
+                <span className="h-px w-10 origin-left scale-x-[0.6] bg-signature transition-transform group-hover:scale-x-100" />
               )}
             </button>
             <Link
@@ -461,7 +523,8 @@ export function ProductCard({
     ? (product.images[1] ?? product.images[0])
     : product.images[0];
   const hoverImage = primaryImage === product.images[0] ? product.images[1] : product.images[0];
-  const lowStockCount = availableSizes.length;
+  const productCanBePurchased = canPurchaseProduct(product);
+  const [quickMessage, setQuickMessage] = React.useState("");
 
   const viewBtnRef = React.useRef<HTMLButtonElement>(null);
   const [overlay, setOverlay] = React.useState<null | {
@@ -474,93 +537,86 @@ export function ProductCard({
   const openQuickView = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    e.currentTarget.focus({ preventScroll: true });
     const rect = viewBtnRef.current?.getBoundingClientRect();
     if (!rect) return;
     setOverlay({ x: rect.left, y: rect.top, width: rect.width, height: rect.height });
   };
 
+  const closeQuickView = React.useCallback(() => {
+    setOverlay(null);
+    window.requestAnimationFrame(() => viewBtnRef.current?.focus({ preventScroll: true }));
+  }, []);
+
   return (
     <article className="product-card group">
-      <Link to="/product/$handle" params={{ handle: product.handle }} className="block">
-        <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
-          <img
-            src={primaryImage}
-            alt={`${product.title} - vedere produs`}
-            decoding="async"
-            loading="lazy"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-          {hoverImage && hoverImage !== primaryImage && (
-            <img
-              src={hoverImage}
-              alt=""
-              decoding="async"
-              loading="lazy"
-              className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-700"
+      <div className="group/media relative">
+        <Link to="/product/$handle" params={{ handle: product.handle }} className="block">
+          <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
+            <ResponsiveImage
+              src={primaryImage}
+              alt={`${product.title} - vedere produs`}
+              width={1200}
+              height={1600}
+              sizes="(min-width: 1024px) 25vw, 50vw"
+              className="absolute inset-0 w-full h-full object-cover"
             />
-          )}
-          {siteMode === "live-shop" && productCardShowLiveBadges && product.badge && (
-            <span
-              className={`absolute top-3 left-3 px-2 py-1 font-mono-xs ${badgeStyles[product.badge]}`}
-            >
-              {product.badge}
-            </span>
-          )}
-          {siteMode === "pre-launch" && productCardShowPreviewBadge && (
-            <span className="absolute top-3 left-3 px-2 py-1 font-mono-xs bg-charcoal text-cream">
-              previzualizare
-            </span>
-          )}
-          {siteMode === "live-shop" && (
-            <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1 bg-cream/95 px-2 py-1 font-mono-xs text-charcoal">
-                <PackageCheck className="h-3.5 w-3.5" strokeWidth={1.5} />
-                240gsm
+            {hoverImage && hoverImage !== primaryImage && (
+              <ResponsiveImage
+                src={hoverImage}
+                alt=""
+                width={1200}
+                height={1600}
+                sizes="(min-width: 1024px) 25vw, 50vw"
+                className="absolute inset-0 w-full h-full object-cover opacity-0 group-hover/media:opacity-100 transition-opacity duration-700"
+              />
+            )}
+            {productCanBePurchased && productCardShowLiveBadges && product.badge && (
+              <span
+                className={`absolute top-3 left-3 px-2 py-1 font-mono-xs ${badgeStyles[product.badge]}`}
+              >
+                {product.badge}
               </span>
-              <span className="inline-flex items-center gap-1 bg-cream/95 px-2 py-1 font-mono-xs text-charcoal">
-                <Flame className="h-3.5 w-3.5" strokeWidth={1.5} />
-                {lowStockCount <= 2 ? "stoc mic" : "oversized"}
+            )}
+            {product.isPreview && productCardShowPreviewBadge && (
+              <span className="absolute top-3 left-3 px-2 py-1 font-mono-xs bg-charcoal text-cream">
+                în pregătire
               </span>
-              <span className="inline-flex items-center gap-1 bg-[#ff006f] px-2 py-1 font-mono-xs text-cream">
-                <Percent className="h-3.5 w-3.5" strokeWidth={1.5} />
-                bundle
-              </span>
-            </div>
-          )}
+            )}
+          </div>
+        </Link>
 
-          {/* "Vezi produs" floating button — hover on desktop, always visible on mobile */}
-          {showQuickView && (
-            <button
-              ref={viewBtnRef}
-              type="button"
-              onClick={openQuickView}
-              onPointerEnter={() => preloadQuickViewImages(product)}
-              onPointerDown={() => preloadQuickViewImages(product)}
-              onFocus={() => preloadQuickViewImages(product)}
-              aria-label={`Vezi produs ${product.title}`}
-              className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
-              style={{
-                padding: "13px 28px",
-                background: "rgba(232,229,221,0.94)",
-                boxShadow: "0 8px 24px rgba(20,18,14,0.12)",
-                border: "none",
-                borderRadius: 14,
-                fontFamily: "var(--font-display)",
-                fontSize: 16,
-                fontWeight: 500,
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                color: "#1a1a18",
-                cursor: "pointer",
-                whiteSpace: "nowrap",
-                visibility: overlay ? "hidden" : undefined,
-              }}
-            >
-              Vezi produs
-            </button>
-          )}
-        </div>
-      </Link>
+        {showQuickView && (
+          <button
+            ref={viewBtnRef}
+            type="button"
+            onClick={openQuickView}
+            onPointerEnter={() => preloadQuickViewImages(product)}
+            onPointerDown={() => preloadQuickViewImages(product)}
+            onFocus={() => preloadQuickViewImages(product)}
+            aria-label={`Vezi produs ${product.title}`}
+            className="pc-view-btn absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 md:opacity-0 md:group-hover/media:opacity-100 transition-opacity duration-300"
+            style={{
+              padding: "13px 28px",
+              background: "rgba(232,229,221,0.94)",
+              boxShadow: "0 8px 24px rgba(20,18,14,0.12)",
+              border: "none",
+              borderRadius: 4,
+              fontFamily: "var(--font-display)",
+              fontSize: 16,
+              fontWeight: 500,
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: "#1a1a18",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+              visibility: overlay ? "hidden" : undefined,
+            }}
+          >
+            Vezi produs
+          </button>
+        )}
+      </div>
 
       <div className="pt-4 flex items-start justify-between gap-3">
         <div>
@@ -568,13 +624,13 @@ export function ProductCard({
             <h3 className="text-sm md:text-base font-display tracking-tight">{product.title}</h3>
           </Link>
           <p className="font-mono-xs opacity-50 mt-1">
-            {productCardMetaText} - {product.sizes.length} marimi
+            {productCardMetaText} - {product.sizes.length} mărimi
           </p>
         </div>
         {showPrice && <div className="text-sm tabular-nums">{formatRON(product.price)}</div>}
       </div>
 
-      {siteMode === "live-shop" && productCardQuickAdd ? (
+      {productCanBePurchased && productCardQuickAdd && product.colors.length === 1 ? (
         <>
           <div
             className="mt-4 grid border border-border"
@@ -587,18 +643,12 @@ export function ProductCard({
                   type="button"
                   key={size}
                   disabled={disabled}
-                  onPointerUp={(event) => {
-                    event.preventDefault();
-                    addItem(product, size, product.colors[0].name);
-                  }}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      addItem(product, size, product.colors[0].name);
-                    }
+                  onClick={() => {
+                    const result = addItem(product, size, quickAddColor);
+                    setQuickMessage(result.ok ? "Produs adăugat în coș." : result.message);
                   }}
                   className="h-10 font-mono-xs border-r border-border last:border-r-0 hover:bg-charcoal hover:text-cream transition-colors disabled:opacity-30 disabled:line-through disabled:hover:bg-transparent disabled:hover:text-charcoal"
-                  aria-label={`Adauga ${product.title}, marimea ${size}, in cos`}
+                  aria-label={`Adaugă ${product.title}, mărimea ${size}, în coș`}
                 >
                   {size}
                 </button>
@@ -606,8 +656,9 @@ export function ProductCard({
             })}
           </div>
           <p className="mt-2 font-mono-xs opacity-45">
-            Adauga rapid: {availableSizes.length ? availableSizes.join(" / ") : "stoc epuizat"}
+            Adaugă rapid: {availableSizes.length ? availableSizes.join(" / ") : "stoc epuizat"}
           </p>
+          <FeedbackRegion message={quickMessage} tone="success" className="sr-only" />
         </>
       ) : (
         <Link
@@ -615,13 +666,11 @@ export function ProductCard({
           params={{ handle: product.handle }}
           className="mt-4 inline-flex border border-charcoal px-4 py-2 font-mono-xs hover:bg-charcoal hover:text-cream transition-colors"
         >
-          {siteMode === "pre-launch" ? "Vezi previzualizarea" : "Vezi produsul"}
+          {product.isPreview || siteMode === "pre-launch" ? "Vezi piesa" : "Vezi produsul"}
         </Link>
       )}
 
-      {overlay && (
-        <QuickViewOverlay product={product} origin={overlay} onClose={() => setOverlay(null)} />
-      )}
+      {overlay && <QuickViewOverlay product={product} origin={overlay} onClose={closeQuickView} />}
     </article>
   );
 }

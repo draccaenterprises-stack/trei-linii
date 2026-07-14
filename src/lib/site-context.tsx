@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { homepageSections as defaultSections } from "./mock-data";
+import { createContext, useContext, type ReactNode } from "react";
+import { homepageSections as defaultSections } from "./brand-content";
+import { LEGAL, SITE_MODE, externalConfig } from "./site";
 
 export type SiteMode = "pre-launch" | "live-shop";
 
@@ -75,7 +76,6 @@ export interface SiteSettings {
   productCardShowLiveBadges: boolean;
   productCardQuickAdd: boolean;
   productCardMetaText: string;
-  reviewsEnabled: boolean;
   trustItemsPreLaunch: TrustItem[];
   trustItemsLiveShop: TrustItem[];
   faqItems: FaqItem[];
@@ -106,61 +106,61 @@ export interface SiteSettings {
 }
 
 const defaults: SiteSettings = {
-  siteMode: "live-shop",
+  siteMode: SITE_MODE,
   logoText: "Trei Linii",
-  favicon: "/favicon.png",
+  favicon: "/favicon-64.png",
   announcementVisible: true,
   primaryColor: "#2b2a28",
-  accentColor: "#ff006f",
+  accentColor: "#d40059",
   font: "Serif Editorial",
-  announcement: "8 modele noi - bumbac dens 240gsm - oversized fit",
+  announcement: "Trei Linii - design pe spate - București",
   launchDate: "",
-  heroEyebrow: "Design pe spate / 240gsm",
-  heroHeadline: "Tricouri care spun orasul din spate.",
+  heroEyebrow: "Design pe spate / fit oversized",
+  heroHeadline: "Tricouri care spun orașul din spate.",
   heroSubcopy:
-    "Tricouri oversized cu design minimalist pe spate. Croiala relaxata, material dens si grafica simpla, fara logo-uri mari pe piept.",
+    "Tricouri cu fața curată și design construit pe spate. Fiecare piesă își arată materialul, croiala și disponibilitatea direct în pagina de produs.",
   heroPrimaryCtaText: "Vezi shop",
   heroPrimaryCtaLink: "/shop",
   heroSecondaryCtaText: "Conceptul",
   heroSecondaryCtaLink: "/about",
-  heroBadges: "Croiala oversized - Design pe spate - Bumbac 240gsm",
+  heroBadges: "Croială oversized - Design pe spate - Material specificat pe produs",
   conceptEyebrow: "Concept",
-  conceptTitle: "Tricouri simple in fata, gandite sa arate bine din spate.",
+  conceptTitle: "Tricouri simple în față, gândite să arate bine din spate.",
   conceptBody:
-    "Trei Linii porneste de la o idee clara: fit oversized, material dens (bumbac 100%, 240 g/mp) si design minimalist plasat pe spate. Fara logo mare pe piept, fara zgomot vizual inutil.",
-  featuredEyebrowPreLaunch: "01 - Previzualizare modele",
+    "Trei Linii pornește de la o regulă simplă: fața rămâne curată, iar ideea se construiește pe spate. Specificațiile fiecărei piese apar clar în pagina produsului, fără zgomot vizual inutil.",
+  featuredEyebrowPreLaunch: "01 - Selecție în pregătire",
   featuredEyebrowLiveShop: "01 - Modele disponibile",
-  featuredTitlePreLaunch: "Primele directii.",
+  featuredTitlePreLaunch: "Primele direcții.",
   featuredTitleLiveShop: "Alege modelul.",
   featuredLinkText: "Vezi modelele",
   collectionsEyebrow: "02 - Structura",
-  collectionsTitle: "Fit, material si design pe spate.",
+  collectionsTitle: "Fit, material și design pe spate.",
   lookbookEyebrow: "03 - Lookbook",
   lookbookTitle: "Cum cade tricoul.",
   lookbookLinkText: "Deschide lookbook",
   socialProofEyebrow: "Lookbook",
   socialProofTitle: "Fit-ul din spate.",
-  socialProofCardTitle: "Designul sta pe spate.",
+  socialProofCardTitle: "Designul stă pe spate.",
   socialProofCardText:
-    "Fata ramane simpla. Grafica este plasata pe spate, gandita pentru un tricou purtabil zi de zi.",
+    "Fața rămâne simplă. Grafica este plasată pe spate, gândită pentru un tricou purtabil zi de zi.",
   faqEyebrow: "04 - FAQ",
-  faqTitle: "Intrebari utile.",
-  faqLinkText: "Vezi toate intrebarile",
-  newsletterEyebrowPreLaunch: "Noutati produs",
-  newsletterEyebrowLiveShop: "Noutati",
-  newsletterTitlePreLaunch: "Primeste update-uri despre colectie.",
-  newsletterTitleLiveShop: "Ramai aproape de urmatoarea lansare.",
+  faqTitle: "Întrebări utile.",
+  faqLinkText: "Vezi toate întrebările",
+  newsletterEyebrowPreLaunch: "Noutăți produs",
+  newsletterEyebrowLiveShop: "Noutăți",
+  newsletterTitlePreLaunch: "Primește noutăți despre colecție.",
+  newsletterTitleLiveShop: "Rămâi aproape de următoarea lansare.",
   newsletterBody:
-    "Lasa emailul si primesti update-uri despre modele, stoc si drop-uri noi. Scriem rar, doar ce conteaza.",
-  newsletterButtonText: "Primesc update",
-  newsletterSuccessText: "Email salvat. Iti trimitem update-uri despre colectie.",
-  launchBannerEyebrow: "Drop 2026 - stoc limitat",
+    "Lasă emailul și primești noutăți despre modele, stoc și lansări. Scriem rar, doar ce contează.",
+  newsletterButtonText: "Mă abonez",
+  newsletterSuccessText: "Email salvat. Îți trimitem noutăți despre colecție.",
+  launchBannerEyebrow: "Următoarea ediție",
   launchBannerTitle:
-    "Modele oversized cu fata curata si design pe spate, construite pentru purtare zilnica.",
+    "Modele oversized cu fața curată și design pe spate, construite pentru purtare zilnică.",
   launchBannerCtaText: "Vezi shop",
   launchBannerCtaLink: "/shop",
-  liveBannerEyebrow: "Oferta de lansare",
-  liveBannerTitle: "Doua tricouri in cos pot debloca beneficii de livrare la finalizare.",
+  liveBannerEyebrow: "Selecția Trei Linii",
+  liveBannerTitle: "Alege piesele care funcționează împreună în garderoba ta.",
   liveBannerCtaText: "Vezi modelele",
   liveBannerCtaLink: "/shop",
   productCardBackImageFirst: true,
@@ -168,184 +168,126 @@ const defaults: SiteSettings = {
   productCardShowLiveBadges: true,
   productCardQuickAdd: true,
   productCardMetaText: "Design pe spate",
-  reviewsEnabled: true,
   trustItemsPreLaunch: [
     {
       id: "fit",
-      title: "Croiala oversized",
-      text: "Fit relaxat, gandit pentru purtare zilnica.",
+      title: "Croială oversized",
+      text: "Fit relaxat, gândit pentru purtare zilnică.",
       enabled: true,
     },
     {
       id: "back-design",
       title: "Design pe spate",
-      text: "Fata ramane curata, grafica sta pe spate.",
+      text: "Fața rămâne curată, grafica stă pe spate.",
       enabled: true,
     },
     {
       id: "size-exchange",
-      title: "Schimb marime 14 zile",
-      text: "Schimbi marimea daca nu se potriveste, simplu.",
+      title: "Schimb mărime",
+      text: "Schimbul este posibil în limita stocului disponibil.",
       enabled: true,
     },
     {
       id: "launch-list",
-      title: "Stoc limitat",
-      text: "Modelele sunt gandite in serii compacte.",
+      title: "Detalii clare",
+      text: "Specificațiile sunt confirmate pe fiecare produs.",
       enabled: true,
     },
   ],
   trustItemsLiveShop: [
     {
       id: "delivery",
-      title: "Livrare 2-3 zile",
-      text: "Costul final se afiseaza la finalizare.",
+      title: "Livrare urmărită",
+      text: "Termenul și costul sunt afișate în checkout.",
       enabled: true,
     },
     {
       id: "returns",
       title: "Retur 14 zile",
-      text: "Pentru produse nepurtate si curate.",
+      text: "Pentru produse nepurtate și curate.",
       enabled: true,
     },
     {
       id: "size-exchange",
-      title: "Schimb marime",
-      text: "Te ajutam sa alegi fit-ul potrivit.",
+      title: "Schimb mărime",
+      text: "Te ajutăm să alegi fit-ul potrivit.",
       enabled: true,
     },
     {
       id: "secure-payment",
-      title: "Plata securizata",
-      text: "Comanda se finalizeaza prin plata securizata.",
+      title: "Plată securizată",
+      text: "Comanda se finalizează prin checkout securizat.",
       enabled: true,
     },
   ],
   faqItems: [
     {
       id: "size",
-      q: "Cum aleg marimea?",
-      a: "Tricourile sunt gandite oversized. Alege marimea normala pentru un fit relaxat sau o marime mai mica pentru o cadere mai apropiata de corp.",
+      q: "Cum aleg mărimea?",
+      a: "Tricourile sunt gândite oversized. Alege mărimea normală pentru un fit relaxat sau o mărime mai mică pentru o cădere mai apropiată de corp.",
       enabled: true,
     },
     {
       id: "material",
       q: "Din ce material sunt tricourile?",
-      a: "Bumbac 100%, material dens de 240 g/mp, cu textura stabila si cadere curata. Gramajul apare si pe pagina fiecarui produs.",
+      a: "Materialul și compoziția pot varia între piese. Specificațiile exacte apar pe pagina fiecărui produs.",
       enabled: true,
     },
     {
       id: "launch",
-      q: "Cand se lanseaza primele modele?",
-      a: "Colectia este pregatita in serii compacte. Lasa emailul pentru update-uri despre stoc si drop-uri noi.",
+      q: "Când se lansează primele modele?",
+      a: "Colecția este pregătită în serii compacte. Lasă emailul pentru noutăți despre stoc și lansări.",
       enabled: true,
     },
     {
       id: "checkout",
-      q: "Cum va functiona comanda?",
-      a: "Cand magazinul este activ, alegi marimea, adaugi produsul in cos si finalizezi comanda prin plata securizata.",
+      q: "Cum va funcționa comanda?",
+      a: "Când magazinul este activ, alegi mărimea, adaugi produsul în coș și finalizezi comanda prin checkout-ul securizat.",
       enabled: true,
     },
   ],
-  legalBusinessName: "",
-  legalBusinessDetails: "",
-  contactEmail: "contact@treilinii.ro",
-  whatsapp: "",
-  instagram: "https://instagram.com",
-  tiktok: "https://tiktok.com",
-  footerTagline: "Simplu in fata,\ndesign pe spate.",
-  footerLocation: "Bucuresti",
+  legalBusinessName: LEGAL.company,
+  legalBusinessDetails: [LEGAL.cui && `CUI ${LEGAL.cui}`, LEGAL.regCom, LEGAL.address]
+    .filter(Boolean)
+    .join(" - "),
+  contactEmail: LEGAL.email,
+  whatsapp: externalConfig.social.whatsapp,
+  instagram: externalConfig.social.instagram,
+  tiktok: externalConfig.social.tiktok,
+  footerTagline: "Simplu în față,\ndesign pe spate.",
+  footerLocation: "București",
   footerNewsletterText:
-    "Afla cand apar primele modele si cand devine disponibila finalizarea comenzii.",
-  footerTrustItems: ["Retur 14 zile", "Schimb marime", "Plata securizata la finalizare"],
+    "Află când apar primele modele și când devine disponibilă finalizarea comenzii.",
+  footerTrustItems: ["Retur conform politicii", "Schimb de mărime în limita stocului"],
   deliveryTitle: "Livrare",
   deliveryBody:
-    "Comenzile sunt pregatite dupa confirmarea platii. Estimarea de livrare este afisata la finalizare, in functie de adresa si metoda disponibila.",
+    "Comenzile sunt pregătite după confirmarea plății. Estimarea de livrare este afișată la finalizare, în funcție de adresă și metoda disponibilă.",
   returnsTitle: "Retur",
   returnsBody:
-    "Conform legii (OUG 34/2014), ai dreptul de retur in 14 zile de la primire, fara a invoca un motiv. Produsele trebuie sa fie nepurtate, nespalate, fara urme de folosire si cu etichetele intacte. Rambursarea se face dupa receptia produsului returnat.",
-  exchangeTitle: "Schimb marime",
+    "Conform legii (OUG 34/2014), ai dreptul de retur în 14 zile de la primire, fără a invoca un motiv. Produsele trebuie să fie nepurtate, nespălate, fără urme de folosire și cu etichetele intacte. Rambursarea se face după recepția produsului returnat.",
+  exchangeTitle: "Schimb mărime",
   exchangeBody:
-    "Daca marimea nu se potriveste, poti cere schimb cu o alta marime disponibila. Produsul trebuie sa fie nepurtat, nespalat si cu etichetele intacte.",
+    "Dacă mărimea nu se potrivește, poți cere schimb cu o altă mărime disponibilă. Produsul trebuie să fie nepurtat, nespălat și cu etichetele intacte.",
   legalIntro:
-    "Termenii de utilizare si conditiile comerciale vor guverna comenzile plasate pe site dupa activarea magazinului.",
+    "Termenii de utilizare și condițiile comerciale vor guverna comenzile plasate pe site după activarea magazinului.",
   privacyIntro:
-    "Datele personale sunt folosite pentru procesarea comenzilor, comunicari de suport si update-uri despre produse.",
+    "Datele personale sunt folosite pentru procesarea comenzilor, comunicări de suport și noutăți despre produse.",
   cookiesIntro:
-    "Site-ul poate folosi cookies necesare pentru navigare, cos, formulare si masurarea performantei.",
+    "Site-ul poate folosi cookies necesare pentru navigare, coș, formulare și măsurarea performanței.",
   seoTitle: "Trei Linii - Tricouri oversized cu design pe spate",
   seoDescription:
-    "Tricouri oversized cu fata curata si design minimalist pe spate. Croiala relaxata, material dens si modele simple.",
+    "Tricouri cu fața curată și design minimalist pe spate. Descoperă colecțiile Trei Linii și detaliile fiecărei piese.",
   sections: defaultSections,
   featuredProductIds: ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"],
   featuredCollectionHandles: ["fit", "material", "spate", "grafica"],
 };
 
-interface Ctx extends SiteSettings {
-  update: (patch: Partial<SiteSettings>) => void;
-  toggleSection: (id: string) => void;
-  updateFaqItem: (id: string, patch: Partial<FaqItem>) => void;
-  updateTrustItem: (
-    mode: "pre-launch" | "live-shop",
-    id: string,
-    patch: Partial<TrustItem>,
-  ) => void;
-  reset: () => void;
-}
+type Ctx = SiteSettings;
 
 const SiteContext = createContext<Ctx | null>(null);
-const STORAGE_KEY = "trei-linii-site-v11";
 
 export function SiteProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<SiteSettings>(defaults);
-
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setSettings({ ...defaults, ...JSON.parse(raw) });
-    } catch {
-      /* noop */
-    }
-  }, []);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    } catch {
-      /* noop */
-    }
-  }, [settings]);
-
-  const value = useMemo<Ctx>(
-    () => ({
-      ...settings,
-      update: (patch) => setSettings((s) => ({ ...s, ...patch })),
-      toggleSection: (id) =>
-        setSettings((s) => ({
-          ...s,
-          sections: s.sections.map((sec) =>
-            sec.id === id ? { ...sec, enabled: !sec.enabled } : sec,
-          ),
-        })),
-      updateFaqItem: (id, patch) =>
-        setSettings((s) => ({
-          ...s,
-          faqItems: s.faqItems.map((item) => (item.id === id ? { ...item, ...patch } : item)),
-        })),
-      updateTrustItem: (mode, id, patch) =>
-        setSettings((s) => {
-          const key = mode === "pre-launch" ? "trustItemsPreLaunch" : "trustItemsLiveShop";
-          return {
-            ...s,
-            [key]: s[key].map((item) => (item.id === id ? { ...item, ...patch } : item)),
-          };
-        }),
-      reset: () => setSettings(defaults),
-    }),
-    [settings],
-  );
-
-  return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;
+  return <SiteContext.Provider value={defaults}>{children}</SiteContext.Provider>;
 }
 
 export function useSite() {

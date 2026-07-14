@@ -8,9 +8,9 @@ export const Route = createFileRoute("/confidentialitate")({
   head: () =>
     pageMeta({
       path: "/confidentialitate",
-      title: "Politica de confidentialitate | Trei Linii",
+      title: "Politica de confidențialitate | Trei Linii",
       description:
-        "Afla cum colecteaza si foloseste Trei Linii datele personale ale clientilor si vizitatorilor.",
+        "Află cum colectează și folosește Trei Linii datele personale ale clienților și vizitatorilor.",
     }),
 });
 
@@ -18,50 +18,51 @@ function Confidentialitate() {
   const legalReady = hasLegalBusinessDetails();
 
   return (
-    <LegalPage title="Politica de confidentialitate">
-      <p>Ultima actualizare: {LEGAL.updatedAt}</p>
+    <LegalPage title="Politica de confidențialitate">
       <p>
-        Aceasta politica explica modul in care Trei Linii colecteaza, foloseste si protejeaza datele
-        personale ale vizitatorilor si clientilor.
+        Această politică explică modul în care Trei Linii colectează, folosește și protejează datele
+        personale ale vizitatorilor și clienților.
       </p>
 
       <LegalSection title="1. Operatorul datelor">
         {legalReady ? (
           <p>
-            Operatorul este {LEGAL.company}, CUI {LEGAL.cui}, cu sediul in {LEGAL.address}. Pentru
-            solicitari privind datele personale, scrie la {LEGAL.email}.
+            Operatorul este {LEGAL.company}, CUI {LEGAL.cui}, cu sediul în {LEGAL.address}. Pentru
+            solicitări privind datele personale, folosește adresa de contact afișată pe site.
           </p>
         ) : (
           <p>
-            {legalBusinessFallback()} Pentru solicitari GDPR, scrie la {LEGAL.email}.
+            {legalBusinessFallback()} Canalul pentru solicitări GDPR va fi publicat înainte de
+            activarea comenzilor.
           </p>
         )}
       </LegalSection>
 
-      <LegalSection title="2. Ce date colectam si de ce">
+      <LegalSection title="2. Ce date colectăm și de ce">
         <p>
-          Putem colecta date de comanda si livrare, date de contact, date necesare procesarii
-          platilor, date de suport, date pentru newsletter si date tehnice de navigare. Le folosim
-          pentru executarea comenzilor, suport, obligatii legale, comunicari comerciale doar cu
-          acordul tau si imbunatatirea site-ului.
+          Putem colecta date de comandă și livrare, date de contact, date necesare procesării
+          plăților, date de suport, date pentru newsletter și date tehnice de navigare. Le folosim
+          pentru executarea comenzilor, suport, obligații legale, comunicări comerciale doar cu
+          acordul tău și îmbunătățirea site-ului.
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Furnizori si transferuri">
+      <LegalSection title="3. Furnizori și transferuri">
         <p>
-          Putem folosi servicii precum Shopify, procesatori de plati, curieri, servicii de email si
-          instrumente de analiza. Unii furnizori pot procesa date in afara UE, cu garantii adecvate.
+          Putem folosi servicii precum Shopify, procesatori de plăți, curieri, servicii de email și
+          instrumente de analiză. Unii furnizori pot procesa date în afara UE, cu garanții adecvate.
         </p>
       </LegalSection>
 
       <LegalSection title="4. Drepturile tale">
         <p>
-          Ai dreptul de acces, rectificare, stergere, restrictionare, portabilitate, opozitie si
-          retragere a consimtamantului. Ne poti scrie la {LEGAL.email}. Ai si dreptul de a depune o
-          plangere la{" "}
+          Ai dreptul de acces, rectificare, ștergere, restricționare, portabilitate, opoziție și
+          retragere a consimțământului. Ne poți contacta prin canalul afișat pe site. Ai și dreptul
+          de a depune o plângere la{" "}
           <a
             href="https://www.dataprotection.ro/"
             className="underline underline-offset-4 hover:opacity-70"
+            target="_blank"
             rel="noopener noreferrer"
           >
             ANSPDCP
@@ -72,7 +73,7 @@ function Confidentialitate() {
 
       <LegalSection title="5. Cookies">
         <p>
-          Detalii despre cookies si cum le controlezi gasesti in pagina{" "}
+          Detalii despre cookies și cum le controlezi găsești în pagina{" "}
           <Link to="/cookies" className="underline underline-offset-4 hover:opacity-70">
             Cookies
           </Link>

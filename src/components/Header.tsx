@@ -1,14 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Menu, X } from "lucide-react";
 import * as React from "react";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
-import logoFull from "@/assets/trei-linii-logo-full-cropped.png";
+import logoFull from "@/assets/trei-linii-logo-full-cropped.webp";
+import { ResponsiveImage } from "@/components/ResponsiveImage";
+import { primaryNavigation } from "@/lib/routes";
 
 const tickerMessages = [
-  "8 modele noi · lansare 2026",
-  "Locuri limitate pentru drop-ul 2026",
-  "Bumbac dens 240gsm · oversized fit",
+  "Trei Linii · București",
+  "Față curată · design pe spate",
+  "Detalii clare · pe fiecare produs",
 ] as const;
 
 /** Returns ms left until target, null if target is empty/invalid. Updates each minute. */
@@ -30,28 +33,15 @@ function useCountdown(target: string): number | null {
   return remaining;
 }
 
-const preLaunchNav = [
-  { to: "/shop", label: "Shop" },
-  { to: "/lookbook", label: "Lookbook" },
-  { to: "/manifest", label: "Manifest" },
-] as const;
-
-const liveShopNav = [
-  { to: "/shop", label: "Shop" },
-  { to: "/lookbook", label: "Lookbook" },
-  { to: "/manifest", label: "Manifest" },
-] as const;
-
-function NavLink({ to, label, accentColor }: { to: string; label: string; accentColor: string }) {
+function NavLink({ to, label }: { to: string; label: string }) {
   const isShopLink = to === "/shop";
   const className = isShopLink
-    ? "font-mono text-sm font-bold tracking-normal hover:opacity-70 transition-opacity"
+    ? "font-mono text-sm font-bold tracking-normal text-accent-text hover:opacity-70 transition-opacity"
     : "font-mono-xs hover:opacity-60 transition-opacity";
-  const style = isShopLink ? { color: accentColor } : undefined;
 
   if (to.includes("#")) {
     return (
-      <a href={to} className={className} style={style}>
+      <a href={to} className={className}>
         {label}
       </a>
     );
@@ -61,7 +51,6 @@ function NavLink({ to, label, accentColor }: { to: string; label: string; accent
     <Link
       to={to}
       className={className}
-      style={style}
       activeProps={{ className: `${className} underline underline-offset-4` }}
     >
       {label}
@@ -80,12 +69,13 @@ function ThreeLineMark({ className = "" }: { className?: string }) {
 }
 
 export function Announcement() {
-  const { accentColor, announcement, announcementVisible, launchDate } = useSite();
+  const { announcement, announcementVisible, launchDate } = useSite();
   const [tickerIndex, setTickerIndex] = React.useState(0);
   const remaining = useCountdown(launchDate);
 
   React.useEffect(() => {
     if (!announcementVisible) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     const id = window.setInterval(() => {
       setTickerIndex((index) => (index + 1) % tickerMessages.length);
     }, 3_000);
@@ -102,7 +92,7 @@ export function Announcement() {
     return (
       <div className="bg-charcoal text-cream border-b border-charcoal">
         <div className="mx-auto flex max-w-[1600px] items-center justify-center gap-3 px-5 md:px-10 py-2 font-mono-xs">
-          <span className="opacity-70">Lansare in</span>
+          <span className="opacity-70">Lansare în</span>
           <span className="tabular-nums">
             {days}z {hours}h {mins}m
           </span>
@@ -123,10 +113,9 @@ export function Announcement() {
         {tickerMessages.map((message, index) => (
           <span
             key={message}
-            className={`absolute transition-[opacity,transform] duration-700 ease-out ${
+            className={`absolute text-accent-on-dark transition-[opacity,transform] duration-700 ease-out ${
               index === tickerIndex ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
             }`}
-            style={index === tickerIndex ? { color: accentColor } : undefined}
           >
             {message}
           </span>
@@ -140,6 +129,7 @@ export function Announcement() {
 function useHideOnScroll() {
   const [hidden, setHidden] = React.useState(false);
   React.useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
     let lastY = window.scrollY;
     let acc = 0;
     let ticking = false;
@@ -177,17 +167,14 @@ function useHideOnScroll() {
   return hidden;
 }
 
-
 export function Header() {
   const hidden = useHideOnScroll();
   const { count, open } = useCart();
   const { accentColor, logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
-  const nav = siteMode === "pre-launch" ? preLaunchNav : liveShopNav;
-  const detailsRef = React.useRef<HTMLDetailsElement>(null);
-  const closeMobileMenu = () => {
-    if (detailsRef.current) detailsRef.current.open = false;
-  };
+  const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+
+  React.useEffect(() => setMobileMenuOpen(false), [pathname]);
 
   return (
     <header
@@ -199,73 +186,92 @@ export function Header() {
     >
       <div className="mx-auto max-w-[1600px] px-5 md:px-10 h-16 flex items-center justify-between gap-6">
         <Link to="/" className="inline-flex items-center gap-3" aria-label={logoText}>
-          <img src={logoFull} alt={logoText} className="h-8 md:h-10 w-auto object-contain" />
+          <ResponsiveImage
+            src={logoFull}
+            alt={logoText}
+            width={320}
+            height={179}
+            priority
+            className="h-8 w-auto object-contain md:h-10"
+          />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          {nav.map((n) => (
-            <NavLink key={n.to} to={n.to} label={n.label} accentColor={accentColor} />
+          {primaryNavigation.map((n) => (
+            <NavLink key={n.to} to={n.to} label={n.label} />
           ))}
         </nav>
 
         <div className="flex items-center gap-4">
           {siteMode === "live-shop" ? (
             <button
+              type="button"
               onClick={open}
-              className="font-mono-xs flex items-center gap-2 text-[#ff006f] hover:opacity-70 transition-opacity"
-              aria-label="Deschide cosul"
+              className="font-mono-xs flex items-center gap-2 text-accent-text hover:opacity-70 transition-opacity"
+              aria-label={`Deschide coșul, ${count} produse`}
             >
               <ThreeLineMark className="w-7" />
-              <span>Cos ({count})</span>
+              <span>Coș ({count})</span>
+              <span className="sr-only" aria-live="polite">
+                {count} produse în coș
+              </span>
             </button>
           ) : (
-            <a
-              href="/shop"
-              className="font-mono-xs rounded-full px-4 py-2 text-charcoal transition-opacity hover:opacity-80"
+            <Link
+              to="/shop"
+              className="font-mono-xs border border-charcoal px-4 py-2 text-cream transition-opacity hover:opacity-80"
               style={{ backgroundColor: accentColor }}
             >
               Vezi shop
-            </a>
+            </Link>
           )}
-          <details ref={detailsRef} className="md:hidden">
-            <summary
-              className="list-none cursor-pointer [&::-webkit-details-marker]:hidden"
-              aria-label="Deschide meniul"
-            >
-              <Menu className="h-5 w-5" strokeWidth={1.25} />
-            </summary>
-            <div className="absolute inset-x-0 top-full z-50 bg-charcoal text-cream border-b border-border shadow-sm">
-              <nav className="flex flex-col px-5 py-6 gap-5">
-                {nav.map((n) =>
-                  n.to.includes("#") ? (
-                    <a
-                      key={n.to}
-                      href={n.to}
-                      className="font-display text-3xl"
-                      onClick={closeMobileMenu}
+          <Dialog.Root open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <Dialog.Trigger asChild>
+              <button
+                type="button"
+                className="grid h-11 w-11 place-items-center md:hidden"
+                aria-label="Deschide meniul"
+              >
+                <Menu className="h-5 w-5" strokeWidth={1.25} />
+              </button>
+            </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Overlay className="fixed inset-0 z-50 bg-charcoal/45 md:hidden" />
+              <Dialog.Content className="fixed inset-x-0 top-0 z-[51] bg-charcoal px-5 pb-10 pt-5 text-cream shadow-xl outline-none md:hidden">
+                <div className="flex items-center justify-between border-b border-cream/15 pb-5">
+                  <Dialog.Title className="font-mono-xs">Navigație</Dialog.Title>
+                  <Dialog.Description className="sr-only">
+                    Meniul principal Trei Linii.
+                  </Dialog.Description>
+                  <Dialog.Close asChild>
+                    <button
+                      type="button"
+                      className="grid h-11 w-11 place-items-center"
+                      aria-label="Închide meniul"
                     >
-                      {n.label}
-                    </a>
-                  ) : (
+                      <X className="h-5 w-5" strokeWidth={1.25} />
+                    </button>
+                  </Dialog.Close>
+                </div>
+                <nav className="flex flex-col gap-5 pt-8">
+                  {primaryNavigation.map((item) => (
                     <Link
-                      key={n.to}
-                      to={n.to}
+                      key={item.to}
+                      to={item.to}
                       className={
-                        n.to === "/shop" ? "font-display text-4xl" : "font-display text-3xl"
+                        item.to === "/shop" ? "font-display text-5xl" : "font-display text-4xl"
                       }
-                      style={n.to === "/shop" ? { color: accentColor } : undefined}
-                      onClick={closeMobileMenu}
+                      style={item.to === "/shop" ? { color: accentColor } : undefined}
                     >
-                      {n.label}
+                      {item.label}
                     </Link>
-                  ),
-                )}
-              </nav>
-            </div>
-          </details>
+                  ))}
+                </nav>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
         </div>
       </div>
-      <span className="sr-only">{pathname}</span>
     </header>
   );
 }
