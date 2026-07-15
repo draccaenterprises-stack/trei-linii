@@ -1,5 +1,5 @@
 import { defineTool } from "@lovable.dev/mcp-js";
-import { fetchCollections } from "@/lib/shopify";
+import { productRepository } from "@/lib/product-repository";
 
 export default defineTool({
   name: "list_collections",
@@ -8,7 +8,7 @@ export default defineTool({
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
   handler: async () => {
-    const collections = await fetchCollections();
+    const collections = await productRepository.listCollections();
     return {
       content: [{ type: "text", text: JSON.stringify(collections, null, 2) }],
       structuredContent: { collections },

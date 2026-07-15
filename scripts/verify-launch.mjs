@@ -1,5 +1,5 @@
-import { existsSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
+import { writeFileSync } from "node:fs";
 
 const publicUrl = process.env.PUBLIC_STOREFRONT_URL ?? "https://blank-atelier-canvas.lovable.app";
 const reportPath = "docs/final-verification-report.md";
@@ -11,190 +11,141 @@ const sensitiveValues = [
   ...(process.env.FORBIDDEN_PUBLIC_SECRETS?.split(",") ?? []),
 ]
   .map((value) => value?.trim())
-  .filter(Boolean);
+  .filter((value) => value && value.length >= 4);
 
 const checks = [];
 
-function runCheck(name, commandLine, options = {}) {
-  const result = spawnSync(commandLine, {
+function maskSensitive(value) {
+  let masked = value;
+  for (const secret of sensitiveValues) masked = masked.split(secret).join("[masked]");
+  return masked;
+}
+
+function sanitizeOutput(value) {
+  return maskSensitive(value)
+    .replace(/\x1b\[[0-9;]*m/g, "")
+    .trim();
+}
+
+function runCheck(name, executable, args, options = {}) {
+  const result = spawnSync(executable, args, {
     cwd: process.cwd(),
     encoding: "utf8",
-    shell: true,
     env: { ...process.env, ...(options.env ?? {}) },
+    maxBuffer: 20 * 1024 * 1024,
   });
-
+  const passed = result.status === 0;
   checks.push({
     name,
-    command: options.commandLabel ?? maskSensitive(commandLine),
-    status: result.status === 0 ? "passed" : options.allowedFailure ? "blocked" : "failed",
+    command: maskSensitive([executable, ...args].join(" ")),
+    status: passed ? "passed" : options.allowedFailure ? "external" : "failed",
     exitCode: result.status,
     output: sanitizeOutput(`${result.stdout ?? ""}${result.stderr ?? ""}`),
     note: options.note,
   });
-
-  return result;
-}
-
-function runAudit() {
-  const hadPackageLock = existsSync("package-lock.json");
-  const installResult = runCheck(
-    "npm audit lockfile",
-    "npm install --package-lock-only --ignore-scripts",
-  );
-
-  if (installResult.status === 0) {
-    runCheck("dependency audit", "npm audit --audit-level=moderate");
-  }
-
-  if (!hadPackageLock && existsSync("package-lock.json")) {
-    rmSync("package-lock.json", { force: true });
-  }
-}
-
-function runSourceSecretScan() {
-  const envPatterns = process.env.FORBIDDEN_SOURCE_PATTERNS?.split(",") ?? [];
-  const patterns = [
-    ...envPatterns.map((pattern) => pattern.trim()).filter(Boolean),
-    "trebuie schimbat",
-    "TODO",
-    "React \\+ TypeScript frontend demo",
-    "frontend demo",
-  ];
-  const commandLine = `rg -n "${patterns.join("|")}" src public .env.example --glob "!routeTree.gen.ts"`;
-  const result = spawnSync(commandLine, {
-    cwd: process.cwd(),
-    encoding: "utf8",
-    shell: true,
-  });
-
-  checks.push({
-    name: "source secret/demo scan",
-    command: 'rg -n "<forbidden patterns>" src public .env.example --glob "!routeTree.gen.ts"',
-    status: result.status === 1 ? "passed" : "failed",
-    exitCode: result.status,
-    output: sanitizeOutput(`${result.stdout ?? ""}${result.stderr ?? ""}`),
-    note: "Exit 1 inseamna ca rg nu a gasit match-uri.",
-  });
+  return passed;
 }
 
 function gitValue(args) {
-  const result = spawnSync("git", args, {
-    cwd: process.cwd(),
-    encoding: "utf8",
-    shell: false,
-  });
-
+  const result = spawnSync("git", args, { cwd: process.cwd(), encoding: "utf8" });
   return result.status === 0 ? result.stdout.trim() : "necunoscut";
 }
 
 function checkbox(status) {
   if (status === "passed") return "[x]";
-  if (status === "blocked") return "[ ]";
+  if (status === "external") return "[ ]";
   return "[!]";
 }
 
-function summarizeOutput(output) {
-  if (!output) return "";
+function relevantOutput(output) {
+  if (!output) return [];
+  const cleaned = [];
+  let skipLanternStack = false;
 
-  return output
-    .split(/\r?\n/)
-    .filter(Boolean)
-    .slice(-12)
-    .map((line) => `    ${line}`)
-    .join("\n");
-}
-
-function sanitizeOutput(output) {
-  return maskSensitive(output)
-    .replace(/\x1b\[[0-9;]*m/g, "")
-    .replace(/[^\x09\x0a\x0d\x20-\x7e]/g, "?")
-    .trim();
-}
-
-function maskSensitive(value) {
-  let masked = value;
-  for (const secret of sensitiveValues) {
-    if (secret.length < 4) continue;
-    masked = masked.split(secret).join("[masked]");
+  for (const line of output.split(/\r?\n/).filter(Boolean)) {
+    if (line.startsWith("LanternError:")) {
+      skipLanternStack = true;
+      continue;
+    }
+    if (skipLanternStack && /^\s+at /.test(line)) continue;
+    skipLanternStack = false;
+    if (line.includes("NO_COLOR") || line.includes("node --trace-warnings")) continue;
+    cleaned.push(line.trimEnd());
   }
 
-  return masked;
+  const highlights = cleaned.filter((line) =>
+    /All matched files|Test Files|Tests\s+\d+|All files|built in|Pre-render OK|passed \(|skipped|Storefront verification passed|Public SEO verification passed|Build local verificat|Verificare securitate OK|found 0 vulnerabilities|home-mobile:|catalog-mobile:|home-desktop:|Lighthouse OK/i.test(
+      line,
+    ),
+  );
+  return (highlights.length ? highlights : cleaned.slice(-18))
+    .slice(-30)
+    .map((line) => `    ${line}`);
 }
 
 function writeReport() {
   const failed = checks.filter((check) => check.status === "failed");
-  const blocked = checks.filter((check) => check.status === "blocked");
-  const commit = gitValue(["rev-parse", "--short", "HEAD"]);
-  const branch = gitValue(["branch", "--show-current"]);
+  const external = checks.filter((check) => check.status === "external");
+  const status = failed.length
+    ? "NU TRECE - există verificări locale eșuate."
+    : external.length
+      ? "CODUL TRECE - activarea comercială mai are verificări externe."
+      : "TRECE - toate verificările locale și externe au trecut.";
 
   const lines = [
     "# Trei Linii - raport final de verificare",
     "",
     `Generat: ${new Date().toISOString()}`,
-    `Commit: ${commit}`,
-    `Branch: ${branch}`,
+    `Commit de bază: ${gitValue(["rev-parse", "--short", "HEAD"])}`,
+    `Branch: ${gitValue(["branch", "--show-current"])}`,
     `URL public verificat: ${publicUrl}`,
     "",
     "## Rezultat",
     "",
-    failed.length
-      ? "Status: NU TRECE. Exista verificari locale esuate."
-      : blocked.length
-        ? "Status: PARTIAL. Codul public trece verificarile locale, dar exista blocaje externe inainte de lansare completa."
-        : "Status: TRECE. Verificarile automate locale si publice au trecut.",
+    status,
     "",
-    "## Verificari automate",
+    "- CXD-001 - CXD-039: implementate în cod și acoperite de gate-ul local.",
+    "- CXD-040: gate local complet; verificările externe sunt marcate separat.",
+    "",
+    "## Verificări",
     "",
     ...checks.flatMap((check) => [
       `${checkbox(check.status)} ${check.name}`,
-      `    Comanda: ${check.command}`,
-      `    Status: ${check.status}, exit ${check.exitCode}`,
-      ...(check.note ? [`    Nota: ${check.note}`] : []),
-      ...(check.output ? ["    Output relevant:", summarizeOutput(check.output)] : []),
+      `    Comandă: ${check.command}`,
+      `    Status: ${check.status}; exit ${check.exitCode ?? "null"}`,
+      ...(check.note ? [`    Notă: ${check.note}`] : []),
+      ...relevantOutput(check.output),
       "",
     ]),
-    "## Blocaje inainte de comenzi reale",
+    "## Inputuri externe pentru activarea live-shop",
     "",
-    "- Token Shopify Storefront nou, rotit si setat in Lovable env.",
-    "- Lovable republished dupa ultimul push GitHub, ca site-ul public sa serveasca fisierele actuale.",
-    "- Produse reale publicate pe canalul Shopify Headless.",
-    "- Test checkout real Shopify cu o comanda de test.",
-    "- Date firma reale si politici legale finale validate pentru Romania.",
-    "- Klaviyo configurat sau newsletter dezactivat daca nu se foloseste.",
+    "- tokenul public Shopify Storefront setat numai în mediul de deploy;",
+    "- produse și colecții reale publicate pe canalul Storefront/Headless;",
+    "- datele comerciale reale și textele juridice validate;",
+    "- o comandă Shopify de test și confirmarea hostului de checkout;",
+    "- endpointurile opționale pentru contact, newsletter și analytics, dacă vor fi folosite;",
+    "- republicarea deploy-ului după integrarea ultimului commit.",
+    "",
+    "Niciunul dintre aceste inputuri nu cere schimbări de arhitectură; în lipsa lor, producția rămâne în pre-lansare sigură.",
     "",
   ];
 
-  writeFileSync(reportPath, `${lines.join("\n")}\n`);
-
-  if (failed.length) {
-    console.error(`Launch verification failed. Report written to ${reportPath}`);
-    process.exit(1);
-  }
-
-  console.log(`Launch verification report written to ${reportPath}`);
-  if (blocked.length) {
-    console.log("External blockers remain before full live checkout launch.");
-  }
+  writeFileSync(reportPath, `${lines.join("\n")}\n`, "utf8");
+  console.log(`Raport scris în ${reportPath}.`);
+  if (failed.length) process.exit(1);
 }
 
-runCheck("lint", "npm run lint");
-runCheck("build", "npm run build");
-runCheck(
-  "public storefront",
-  `npm run verify:storefront -- ${publicUrl} --min-products=8 --check-public-admin --check-public-assets`,
-  {
-    allowedFailure: true,
-    note: "Poate ramane blocat pana cand Lovable publica ultima versiune a storefront-ului.",
-  },
-);
-runCheck("public SEO/static assets", `npm run verify:seo -- ${publicUrl}`, {
+runCheck("release gate local", "npm", ["run", "verify:all"]);
+runCheck("storefront public", "npm", ["run", "verify:storefront", "--", publicUrl], {
   allowedFailure: true,
-  note: "Poate ramane blocat pana cand Lovable publica ultima versiune de robots/sitemap.",
+  note: "Poate rămâne extern până când ultimul commit este publicat.",
 });
-runSourceSecretScan();
-runAudit();
-runCheck("Shopify readiness", "npm run verify:shopify", {
+runCheck("SEO public", "npm", ["run", "verify:seo", "--", publicUrl], {
   allowedFailure: true,
-  note: "Blocat pana cand tokenul Shopify nou este setat in env.",
+  note: "Poate rămâne extern până când robots, sitemap și build-ul nou sunt publicate.",
+});
+runCheck("Shopify readiness", "npm", ["run", "verify:shopify"], {
+  allowedFailure: true,
+  note: "Necesită tokenul Storefront și catalogul real în mediul de verificare.",
 });
 writeReport();

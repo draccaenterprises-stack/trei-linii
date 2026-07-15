@@ -32,10 +32,9 @@ import { Route as ConfidentialitateRouteImport } from './routes/confidentialitat
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as CartRouteImport } from './routes/cart'
 import { Route as AnpcRouteImport } from './routes/anpc'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ShopListaRouteImport } from './routes/shop.lista'
+import { Route as ShopListaRouteImport } from './routes/shop_.lista'
 import { Route as ProductHandleRouteImport } from './routes/product.$handle'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
@@ -156,11 +155,6 @@ const AnpcRoute = AnpcRouteImport.update({
   path: '/anpc',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -172,9 +166,9 @@ const IndexRoute = IndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShopListaRoute = ShopListaRouteImport.update({
-  id: '/lista',
-  path: '/lista',
-  getParentRoute: () => ShopRoute,
+  id: '/shop_/lista',
+  path: '/shop/lista',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProductHandleRoute = ProductHandleRouteImport.update({
   id: '/product/$handle',
@@ -203,7 +197,6 @@ const Char91DotmcpChar93InvokeToolToolRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/anpc': typeof AnpcRoute
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
@@ -222,7 +215,7 @@ export interface FileRoutesByFullPath {
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
   '/schimb-marime': typeof SchimbMarimeRoute
-  '/shop': typeof ShopRouteWithChildren
+  '/shop': typeof ShopRoute
   '/size-guide': typeof SizeGuideRoute
   '/sol': typeof SolRoute
   '/termeni-si-conditii': typeof TermeniSiConditiiRoute
@@ -236,7 +229,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/anpc': typeof AnpcRoute
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
@@ -255,7 +247,7 @@ export interface FileRoutesByTo {
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
   '/schimb-marime': typeof SchimbMarimeRoute
-  '/shop': typeof ShopRouteWithChildren
+  '/shop': typeof ShopRoute
   '/size-guide': typeof SizeGuideRoute
   '/sol': typeof SolRoute
   '/termeni-si-conditii': typeof TermeniSiConditiiRoute
@@ -270,7 +262,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRoute
   '/anpc': typeof AnpcRoute
   '/cart': typeof CartRoute
   '/collections': typeof CollectionsRoute
@@ -289,7 +280,7 @@ export interface FileRoutesById {
   '/retur': typeof ReturRoute
   '/returns': typeof ReturnsRoute
   '/schimb-marime': typeof SchimbMarimeRoute
-  '/shop': typeof ShopRouteWithChildren
+  '/shop': typeof ShopRoute
   '/size-guide': typeof SizeGuideRoute
   '/sol': typeof SolRoute
   '/termeni-si-conditii': typeof TermeniSiConditiiRoute
@@ -297,7 +288,7 @@ export interface FileRoutesById {
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/product/$handle': typeof ProductHandleRoute
-  '/shop/lista': typeof ShopListaRoute
+  '/shop_/lista': typeof ShopListaRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
@@ -305,7 +296,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/admin'
     | '/anpc'
     | '/cart'
     | '/collections'
@@ -338,7 +328,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/admin'
     | '/anpc'
     | '/cart'
     | '/collections'
@@ -371,7 +360,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/admin'
     | '/anpc'
     | '/cart'
     | '/collections'
@@ -398,14 +386,13 @@ export interface FileRouteTypes {
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/product/$handle'
-    | '/shop/lista'
+    | '/shop_/lista'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRoute
   AnpcRoute: typeof AnpcRoute
   CartRoute: typeof CartRoute
   CollectionsRoute: typeof CollectionsRoute
@@ -424,7 +411,7 @@ export interface RootRouteChildren {
   ReturRoute: typeof ReturRoute
   ReturnsRoute: typeof ReturnsRoute
   SchimbMarimeRoute: typeof SchimbMarimeRoute
-  ShopRoute: typeof ShopRouteWithChildren
+  ShopRoute: typeof ShopRoute
   SizeGuideRoute: typeof SizeGuideRoute
   SolRoute: typeof SolRoute
   TermeniSiConditiiRoute: typeof TermeniSiConditiiRoute
@@ -432,6 +419,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ProductHandleRoute: typeof ProductHandleRoute
+  ShopListaRoute: typeof ShopListaRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 
@@ -598,13 +586,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnpcRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -619,12 +600,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shop/lista': {
-      id: '/shop/lista'
-      path: '/lista'
+    '/shop_/lista': {
+      id: '/shop_/lista'
+      path: '/shop/lista'
       fullPath: '/shop/lista'
       preLoaderRoute: typeof ShopListaRouteImport
-      parentRoute: typeof ShopRoute
+      parentRoute: typeof rootRouteImport
     }
     '/product/$handle': {
       id: '/product/$handle'
@@ -657,20 +638,9 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface ShopRouteChildren {
-  ShopListaRoute: typeof ShopListaRoute
-}
-
-const ShopRouteChildren: ShopRouteChildren = {
-  ShopListaRoute: ShopListaRoute,
-}
-
-const ShopRouteWithChildren = ShopRoute._addFileChildren(ShopRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRoute,
   AnpcRoute: AnpcRoute,
   CartRoute: CartRoute,
   CollectionsRoute: CollectionsRoute,
@@ -689,7 +659,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReturRoute: ReturRoute,
   ReturnsRoute: ReturnsRoute,
   SchimbMarimeRoute: SchimbMarimeRoute,
-  ShopRoute: ShopRouteWithChildren,
+  ShopRoute: ShopRoute,
   SizeGuideRoute: SizeGuideRoute,
   SolRoute: SolRoute,
   TermeniSiConditiiRoute: TermeniSiConditiiRoute,
@@ -698,6 +668,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   ProductHandleRoute: ProductHandleRoute,
+  ShopListaRoute: ShopListaRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
 }
 export const routeTree = rootRouteImport

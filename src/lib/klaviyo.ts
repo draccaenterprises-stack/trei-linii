@@ -2,8 +2,10 @@
 // Uses the public Client API (company_id is a public site id, safe in the browser).
 // No server needed, which keeps the Lovable static frontend simple.
 
-const COMPANY_ID = publicId(import.meta.env.VITE_KLAVIYO_COMPANY_ID as string | undefined);
-const LIST_ID = publicId(import.meta.env.VITE_KLAVIYO_LIST_ID as string | undefined);
+import { externalConfig } from "./site";
+
+const COMPANY_ID = publicId(externalConfig.forms.klaviyoCompanyId);
+const LIST_ID = publicId(externalConfig.forms.klaviyoListId);
 const REVISION = "2024-10-15";
 
 export function isKlaviyoConfigured(): boolean {
@@ -20,33 +22,42 @@ export async function subscribeToKlaviyo(email: string): Promise<void> {
     throw new Error("Klaviyo nu este configurat (lipseste company id sau list id).");
   }
 
-  const res = await fetch(`https://a.klaviyo.com/client/subscriptions/?company_id=${COMPANY_ID}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      revision: REVISION,
-    },
-    body: JSON.stringify({
-      data: {
-        type: "subscription",
-        attributes: {
-          profile: {
-            data: {
-              type: "profile",
-              attributes: { email },
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), 10_000);
+  try {
+    const res = await fetch(
+      `https://a.klaviyo.com/client/subscriptions/?company_id=${COMPANY_ID}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          revision: REVISION,
+        },
+        body: JSON.stringify({
+          data: {
+            type: "subscription",
+            attributes: {
+              profile: {
+                data: {
+                  type: "profile",
+                  attributes: { email },
+                },
+              },
+            },
+            relationships: {
+              list: { data: { type: "list", id: LIST_ID } },
             },
           },
-        },
-        relationships: {
-          list: { data: { type: "list", id: LIST_ID } },
-        },
+        }),
+        signal: controller.signal,
       },
-    }),
-  });
+    );
 
-  // The client subscriptions endpoint returns 202 Accepted with no body on success.
-  if (res.status !== 202 && !res.ok) {
-    throw new Error(`Klaviyo subscribe failed: ${res.status}`);
+    if (res.status !== 202 && !res.ok) {
+      throw new Error("Inscrierea nu a putut fi procesata.");
+    }
+  } finally {
+    window.clearTimeout(timeout);
   }
 }
 

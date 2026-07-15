@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
-import { LEGAL } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/retur")({
@@ -9,7 +8,7 @@ export const Route = createFileRoute("/retur")({
     pageMeta({
       path: "/retur",
       title: "Retur | Trei Linii",
-      description: "Conditiile de retur pentru produsele Trei Linii.",
+      description: "Condițiile de retur pentru produsele Trei Linii.",
     }),
 });
 
@@ -18,23 +17,23 @@ function Retur() {
     <LegalPage title="Retur">
       <LegalSection title="Drept de retragere">
         <p>
-          Ai dreptul sa te retragi din contract in 14 zile calendaristice de la primirea produsului,
-          fara a preciza motivul. Trimite solicitarea la {LEGAL.returnEmail}, cu numarul comenzii si
-          produsul returnat.
+          Ai dreptul să te retragi din contract în 14 zile calendaristice de la primirea produsului,
+          fără a preciza motivul. Trimite solicitarea prin canalul de retur afișat pe site, cu
+          numărul comenzii și produsul returnat.
         </p>
       </LegalSection>
-      <LegalSection title="Conditii pentru produs">
+      <LegalSection title="Condiții pentru produs">
         <ul className="list-disc space-y-1 pl-5">
           <li>produs nepurtat si curat;</li>
-          <li>fara urme de miros, parfum, deodorant sau deteriorare;</li>
-          <li>cu etichetele atasate, daca au fost livrate cu etichete;</li>
+          <li>fără urme de miros, parfum, deodorant sau deteriorare;</li>
+          <li>cu etichetele atașate, dacă au fost livrate cu etichete;</li>
           <li>ambalat corespunzator pentru transport.</li>
         </ul>
       </LegalSection>
       <LegalSection title="Rambursare">
         <p>
-          Rambursarea se face in termenul legal, dupa primirea si verificarea produselor returnate,
-          prin aceeasi metoda de plata folosita la comanda, daca nu se agreeaza altfel.
+          Rambursarea se face în termenul legal, după primirea și verificarea produselor returnate,
+          prin aceeași metodă de plată folosită la comandă, dacă nu se agreează altfel.
         </p>
       </LegalSection>
     </LegalPage>

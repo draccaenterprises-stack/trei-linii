@@ -1,4 +1,4 @@
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, absoluteUrl } from "@/lib/site";
 
 export function pageMeta(opts: {
   path: string;
@@ -6,6 +6,7 @@ export function pageMeta(opts: {
   description: string;
   ogType?: string;
   image?: string;
+  noIndex?: boolean;
 }) {
   const url = `${SITE_URL}${opts.path === "/" ? "" : opts.path}`;
   const meta: Array<Record<string, string>> = [
@@ -17,11 +18,12 @@ export function pageMeta(opts: {
     { property: "og:type", content: opts.ogType ?? "website" },
     { name: "twitter:title", content: opts.title },
     { name: "twitter:description", content: opts.description },
+    { name: "twitter:card", content: "summary_large_image" },
   ];
-  if (opts.image) {
-    meta.push({ property: "og:image", content: opts.image });
-    meta.push({ name: "twitter:image", content: opts.image });
-  }
+  const image = opts.image ?? absoluteUrl("/og-image.jpg");
+  meta.push({ property: "og:image", content: image });
+  meta.push({ name: "twitter:image", content: image });
+  if (opts.noIndex) meta.push({ name: "robots", content: "noindex, nofollow" });
   return {
     meta,
     links: [{ rel: "canonical", href: url }],

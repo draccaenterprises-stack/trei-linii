@@ -1,4 +1,4 @@
-import type { Size, ColorVariant } from "@/lib/mock-data";
+import type { ColorVariant, Size } from "@/lib/catalog-types";
 
 export function SizeSelector({
   sizes,
@@ -18,9 +18,12 @@ export function SizeSelector({
         const selected = value === s;
         return (
           <button
+            type="button"
             key={s}
             disabled={disabled}
             onClick={() => onChange(s)}
+            aria-pressed={selected}
+            aria-label={`Mărimea ${s}${disabled ? ", indisponibilă" : ""}`}
             className={`min-w-12 h-12 px-4 font-mono-xs border transition-colors ${
               selected
                 ? "bg-charcoal text-cream border-charcoal ring-2 ring-charcoal ring-offset-2 ring-offset-background"
@@ -48,8 +51,11 @@ export function VariantSelector({
     <div className="flex flex-wrap gap-3">
       {colors.map((c) => (
         <button
+          type="button"
           key={c.name}
           onClick={() => onChange(c.name)}
+          aria-pressed={value === c.name}
+          aria-label={`Culoarea ${c.name}`}
           className="flex items-center gap-2 group"
         >
           <span

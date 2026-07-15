@@ -3,23 +3,24 @@ import { FAQAccordion } from "@/components/FAQAccordion";
 import { useSite } from "@/lib/site-context";
 import { pageMeta } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
+import { serializeJsonLd } from "@/lib/schema";
 
 const FAQ_SEO_ITEMS: Array<{ q: string; a: string }> = [
   {
-    q: "Cum aleg marimea?",
-    a: "Tricourile sunt gandite oversized. Alege marimea normala pentru un fit relaxat sau o marime mai mica pentru o cadere mai apropiata de corp.",
+    q: "Cum aleg mărimea?",
+    a: "Consultă ghidul de mărimi și informațiile de croială de pe pagina produsului. Pentru o alegere sigură, compară dimensiunile cu un tricou pe care îl porți deja.",
   },
   {
     q: "Din ce material sunt tricourile?",
-    a: "Bumbac 100%, material dens de 240 g/mp, cu textura stabila si cadere curata. Gramajul apare si pe pagina fiecarui produs.",
+    a: "Materialul și compoziția pot varia între piese. Specificațiile exacte apar pe pagina fiecărui produs.",
   },
   {
-    q: "Cand se lanseaza primele modele?",
-    a: "Colectia este pregatita in serii compacte. Lasa emailul pentru update-uri despre stoc si drop-uri noi.",
+    q: "Când se lansează modelele?",
+    a: "Colecțiile sunt pregătite în serii compacte. Abonează-te la newsletter pentru informații despre stoc și lansări noi.",
   },
   {
-    q: "Cum va functiona comanda?",
-    a: "Cand magazinul este activ, alegi marimea, adaugi produsul in cos si finalizezi comanda prin plata securizata.",
+    q: "Cum funcționează comanda?",
+    a: "Când magazinul este activ, alegi varianta disponibilă, adaugi produsul în coș și finalizezi comanda în pagina de plată securizată.",
   },
 ];
 
@@ -29,14 +30,14 @@ export const Route = createFileRoute("/faq")({
     const base = pageMeta({
       path: "/faq",
       title: "FAQ - Trei Linii",
-      description: "Intrebari despre marimi, materiale, livrare si retur.",
+      description: "Întrebări despre mărimi, materiale, livrare și retur.",
     });
     return {
       ...base,
       scripts: [
         {
           type: "application/ld+json",
-          children: JSON.stringify({
+          children: serializeJsonLd({
             "@context": "https://schema.org",
             "@type": "FAQPage",
             url: `${SITE_URL}/faq`,
@@ -60,21 +61,24 @@ function FAQPage() {
     <div className="px-5 md:px-10 py-12 md:py-20">
       <div className="mx-auto max-w-[1100px]">
         <p className="font-mono-xs opacity-60">FAQ</p>
-        <h1 className="font-display text-5xl md:text-8xl mt-2">Intrebari frecvente.</h1>
+        <h1 className="font-display text-5xl md:text-8xl mt-2">Întrebări frecvente.</h1>
         <p className="mt-6 text-muted-foreground text-lg max-w-xl">
-          Raspunsuri rapide despre croiala, material, livrare si modul in care vor functiona
-          lansarile.
+          Răspunsuri rapide despre croială, materiale, livrare și modul în care funcționează
+          lansările.
         </p>
         <div className="mt-16">
           <FAQAccordion items={visibleFaqs} />
         </div>
         <div className="mt-14 border-t border-border pt-8">
           <p className="font-display text-3xl md:text-4xl">
-            Ai alte intrebari?{" "}
-            <Link to="/contact" className="text-[#ff006f] hover:opacity-70">
-              Da-ne un mail
+            Ai alte întrebări?{" "}
+            <Link
+              to="/contact"
+              className="text-accent-text underline decoration-1 underline-offset-4 hover:opacity-70"
+            >
+              Dă-ne un mail
             </Link>{" "}
-            si vom raspunde cat se poate de repede.
+            și vom răspunde cât se poate de repede.
           </p>
         </div>
       </div>

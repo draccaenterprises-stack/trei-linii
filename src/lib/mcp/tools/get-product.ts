@@ -1,6 +1,6 @@
 import { defineTool } from "@lovable.dev/mcp-js";
 import { z } from "zod";
-import { fetchProductByHandle } from "@/lib/shopify";
+import { productRepository } from "@/lib/product-repository";
 
 export default defineTool({
   name: "get_product",
@@ -11,7 +11,7 @@ export default defineTool({
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: true },
   handler: async ({ handle }) => {
-    const product = await fetchProductByHandle(handle);
+    const product = await productRepository.getProduct(handle);
     if (!product) {
       return {
         content: [{ type: "text", text: `No product found with handle "${handle}".` }],

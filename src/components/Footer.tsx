@@ -1,5 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { isKlaviyoConfigured } from "@/lib/klaviyo";
 import { useSite } from "@/lib/site-context";
+import { footerNavigation, legalNavigation, supportNavigation } from "@/lib/routes";
+
+function publicSocialUrl(value: string) {
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.pathname !== "/" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
 
 export function Footer() {
   const {
@@ -19,8 +30,14 @@ export function Footer() {
   const businessLine =
     legalBusinessName && legalBusinessDetails
       ? `${legalBusinessName} · ${legalBusinessDetails}`
-      : logoText;
+      : "";
   const taglineLines = footerTagline.split("\n").filter(Boolean);
+  const newsletterAvailable = isKlaviyoConfigured();
+  const socialLinks = [
+    { label: "Instagram", href: publicSocialUrl(instagram) },
+    { label: "TikTok", href: publicSocialUrl(tiktok) },
+    { label: "WhatsApp", href: publicSocialUrl(whatsapp) },
+  ].filter((item): item is { label: string; href: string } => Boolean(item.href));
 
   return (
     <footer className="bg-charcoal text-cream mt-32">
@@ -41,78 +58,64 @@ export function Footer() {
             <div className="mt-8 grid max-w-44 gap-2" aria-hidden="true">
               <span className="h-px w-full bg-cream/75" />
               <span className="h-px w-[76%] bg-cream/75" />
-              <span className="h-px w-[88%] bg-[#ff006f]" />
+              <span className="h-px w-[88%] bg-signature" />
             </div>
           </div>
 
           <div className="md:col-span-2">
-            <h4 className="font-mono-xs opacity-50 mb-4">Navigatie</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">Navigație</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/shop" className="hover:opacity-60">
-                  Modele
-                </Link>
-              </li>
-              <li>
-                <Link to="/size-guide" className="hover:opacity-60">
-                  Ghid marimi
-                </Link>
-              </li>
-              <li>
-                <Link to="/lookbook" className="hover:opacity-60">
-                  Lookbook
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="hover:opacity-60">
-                  Concept
-                </Link>
-              </li>
+              {footerNavigation.map((item) => (
+                <li key={item.to}>
+                  <Link to={item.to} className="hover:opacity-60">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="md:col-span-2">
             <h4 className="font-mono-xs opacity-50 mb-4">Suport</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/contact" className="hover:opacity-60">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="hover:opacity-60">
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link to="/livrare" className="hover:opacity-60">
-                  Livrare
-                </Link>
-              </li>
-              <li>
-                <Link to="/retur" className="hover:opacity-60">
-                  Retur
-                </Link>
-              </li>
-              <li>
-                <Link to="/schimb-marime" className="hover:opacity-60">
-                  Schimb marime
-                </Link>
-              </li>
+              {supportNavigation.map((item) => (
+                <li key={item.to}>
+                  <Link to={item.to} className="hover:opacity-60">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">
-              {siteMode === "pre-launch" ? "Noutati produs" : "Noutati"}
-            </h4>
-            <p className="text-sm opacity-70 mb-3">{footerNewsletterText}</p>
-            <a
-              href="/#newsletter"
-              className="font-mono-xs underline underline-offset-4 hover:opacity-60"
-            >
-              Primesc update
-            </a>
+            {newsletterAvailable ? (
+              <>
+                <h4 className="font-mono-xs opacity-50 mb-4">
+                  {siteMode === "pre-launch" ? "Noutăți produs" : "Noutăți"}
+                </h4>
+                <p className="text-sm opacity-70 mb-3">{footerNewsletterText}</p>
+                <a
+                  href="/#newsletter"
+                  className="font-mono-xs underline underline-offset-4 hover:opacity-60"
+                >
+                  Mă abonez
+                </a>
+              </>
+            ) : (
+              <>
+                <h4 className="font-mono-xs opacity-50 mb-4">Din atelier</h4>
+                <p className="text-sm opacity-70 mb-3">
+                  Povestea, regulile și direcția din spatele fiecărei ediții.
+                </p>
+                <Link
+                  to="/manifest"
+                  className="font-mono-xs underline underline-offset-4 hover:opacity-60"
+                >
+                  Citește manifestul
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -120,59 +123,47 @@ export function Footer() {
           <div className="md:col-span-3">
             <h4 className="font-mono-xs opacity-50 mb-4">Legal</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <Link to="/termeni-si-conditii" className="hover:opacity-60">
-                  Termeni si conditii
-                </Link>
-              </li>
-              <li>
-                <Link to="/confidentialitate" className="hover:opacity-60">
-                  Confidentialitate
-                </Link>
-              </li>
-              <li>
-                <Link to="/cookies" className="hover:opacity-60">
-                  Cookies
-                </Link>
-              </li>
-              <li>
-                <Link to="/anpc" className="hover:opacity-60">
-                  ANPC
-                </Link>
-              </li>
-              <li>
-                <Link to="/sol" className="hover:opacity-60">
-                  SOL/SAL
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">Social</h4>
-            <ul className="space-y-2 text-sm">
-              <li>
-                <a href={instagram} className="hover:opacity-60">
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a href={tiktok} className="hover:opacity-60">
-                  TikTok
-                </a>
-              </li>
-              {whatsapp && (
-                <li>
-                  <a href={whatsapp} className="hover:opacity-60">
-                    WhatsApp
-                  </a>
+              {legalNavigation.map((item) => (
+                <li key={item.to}>
+                  <Link to={item.to} className="hover:opacity-60">
+                    {item.label}
+                  </Link>
                 </li>
-              )}
+              ))}
+              <li>
+                <button
+                  type="button"
+                  className="hover:opacity-60"
+                  onClick={() => window.dispatchEvent(new Event("trei-linii:cookie-settings"))}
+                >
+                  Preferințe cookies
+                </button>
+              </li>
             </ul>
           </div>
 
+          {socialLinks.length > 0 && (
+            <div className="md:col-span-3">
+              <h4 className="font-mono-xs opacity-50 mb-4">Social</h4>
+              <ul className="space-y-2 text-sm">
+                {socialLinks.map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      className="hover:opacity-60"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">Incredere</h4>
+            <h4 className="font-mono-xs opacity-50 mb-4">Încredere</h4>
             <ul className="space-y-2 text-sm opacity-80">
               {footerTrustItems.filter(Boolean).map((item) => (
                 <li key={item}>{item}</li>
@@ -180,16 +171,20 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="md:col-span-3">
-            <h4 className="font-mono-xs opacity-50 mb-4">Contact</h4>
-            <p className="text-sm opacity-70 leading-relaxed">
-              <a href={`mailto:${contactEmail}`} className="hover:opacity-60">
-                {contactEmail}
-              </a>
-              <br />
-              {businessLine}
-            </p>
-          </div>
+          {(contactEmail || businessLine) && (
+            <div className="md:col-span-3">
+              <h4 className="font-mono-xs opacity-50 mb-4">Contact</h4>
+              <p className="text-sm opacity-70 leading-relaxed">
+                {contactEmail && (
+                  <a href={`mailto:${contactEmail}`} className="hover:opacity-60">
+                    {contactEmail}
+                  </a>
+                )}
+                {contactEmail && businessLine && <br />}
+                {businessLine}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="mt-10 pt-6 border-t border-cream/15 flex flex-col md:flex-row justify-between gap-3 font-mono-xs opacity-50">

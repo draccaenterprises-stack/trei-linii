@@ -1,4 +1,4 @@
-import type { Product } from "@/lib/mock-data";
+import type { Product } from "@/lib/catalog-types";
 
 const quickViewImageCache = new Set<string>();
 

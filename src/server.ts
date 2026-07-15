@@ -66,12 +66,55 @@ async function normalizeCatastrophicSsrResponse(response: Response): Promise<Res
   return brandedErrorResponse();
 }
 
+/** WebKit does not commit an HTML navigation containing literal NUL bytes. */
+export function escapeHtmlNullBytes(response: Response): Response {
+  const contentType = response.headers.get("content-type") ?? "";
+  if (!response.body || !contentType.includes("text/html")) return response;
+
+  const replacement = new TextEncoder().encode("\\u0000");
+  const stream = response.body.pipeThrough(
+    new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        let nullCount = 0;
+        for (const byte of chunk) {
+          if (byte === 0) nullCount += 1;
+        }
+
+        if (!nullCount) {
+          controller.enqueue(chunk);
+          return;
+        }
+
+        const output = new Uint8Array(chunk.length + nullCount * (replacement.length - 1));
+        let cursor = 0;
+        for (const byte of chunk) {
+          if (byte === 0) {
+            output.set(replacement, cursor);
+            cursor += replacement.length;
+          } else {
+            output[cursor] = byte;
+            cursor += 1;
+          }
+        }
+        controller.enqueue(output);
+      },
+    }),
+  );
+  const headers = new Headers(response.headers);
+  headers.delete("content-length");
+  return new Response(stream, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      return escapeHtmlNullBytes(await normalizeCatastrophicSsrResponse(response));
     } catch (error) {
       console.error(error);
       return brandedErrorResponse();

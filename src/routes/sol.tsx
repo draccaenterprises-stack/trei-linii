@@ -8,26 +8,28 @@ export const Route = createFileRoute("/sol")({
     pageMeta({
       path: "/sol",
       title: "SOL/SAL | Trei Linii",
-      description: "Informatii despre solutionarea alternativa a litigiilor prin ANPC/SAL.",
+      description: "Informații despre soluționarea alternativă a litigiilor prin ANPC/SAL.",
     }),
 });
 
 function Sol() {
   return (
     <LegalPage title="SOL / SAL">
-      <LegalSection title="Solutionare alternativa a litigiilor">
+      <LegalSection title="Soluționare alternativă a litigiilor">
         <p>
-          Platforma europeana ODR/SOL a fost inchisa si nu mai este folosita pentru reclamatii noi.
-          Pentru solutionarea alternativa a litigiilor, consumatorii din Romania pot folosi
+          Platforma europeană ODR/SOL a fost închisă și nu mai este folosită pentru reclamații noi.
+          Pentru soluționarea alternativă a litigiilor, consumatorii din România pot folosi
           procedurile SAL prin ANPC.
         </p>
         <p>
-          Link util:{" "}
+          Link oficial:{" "}
           <a
-            href="https://reclamatiisal.anpc.ro/"
+            href="https://anpc.ro/sal/"
             className="underline underline-offset-4 hover:opacity-70"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            reclamatiisal.anpc.ro
+            informații despre SAL prin ANPC
           </a>
           .
         </p>

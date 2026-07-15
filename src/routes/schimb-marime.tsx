@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { LegalPage, LegalSection } from "@/components/LegalLayout";
-import { LEGAL } from "@/lib/site";
 import { pageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/schimb-marime")({
@@ -8,25 +7,25 @@ export const Route = createFileRoute("/schimb-marime")({
   head: () =>
     pageMeta({
       path: "/schimb-marime",
-      title: "Schimb marime | Trei Linii",
-      description: "Informatii despre schimbul de marime pentru tricourile Trei Linii.",
+      title: "Schimb mărime | Trei Linii",
+      description: "Informații despre schimbul de mărime pentru tricourile Trei Linii.",
     }),
 });
 
 function SchimbMarime() {
   return (
-    <LegalPage title="Schimb marime">
-      <LegalSection title="Cum functioneaza">
+    <LegalPage title="Schimb mărime">
+      <LegalSection title="Cum funcționează">
         <p>
-          Schimbul de marime este posibil in limita stocului disponibil. Trimite o solicitare la{" "}
-          {LEGAL.returnEmail}, cu numarul comenzii, marimea primita si marimea dorita.
+          Schimbul de mărime este posibil în limita stocului disponibil. Trimite o solicitare prin
+          canalul de retur afișat pe site, cu numărul comenzii, mărimea primită și mărimea dorită.
         </p>
       </LegalSection>
-      <LegalSection title="Conditii">
+      <LegalSection title="Condiții">
         <p>
-          Produsul trimis pentru schimb trebuie sa fie nepurtat, curat si fara urme de deteriorare.
-          Daca marimea dorita nu mai este disponibila, poti alege rambursarea sau un alt produs
-          disponibil, dupa caz.
+          Produsul trimis pentru schimb trebuie să fie nepurtat, curat și fără urme de deteriorare.
+          Dacă mărimea dorită nu mai este disponibilă, poți alege rambursarea sau un alt produs
+          disponibil, după caz.
         </p>
       </LegalSection>
     </LegalPage>

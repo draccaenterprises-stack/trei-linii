@@ -8,7 +8,7 @@ export const Route = createFileRoute("/cookies")({
     pageMeta({
       path: "/cookies",
       title: "Cookies - Trei Linii",
-      description: "Ce cookies folosim pe site-ul Trei Linii si cum le poti controla.",
+      description: "Ce cookies folosim pe site-ul Trei Linii și cum le poți controla.",
     }),
 });
 
@@ -16,41 +16,49 @@ function Cookies() {
   return (
     <LegalPage title="Cookies">
       <p>
-        Cookies sunt fisiere mici salvate in browserul tau. Le folosim pentru functionarea site-ului
-        si, cu acordul tau, pentru a intelege cum este folosit.
+        Cookies sunt fișiere mici salvate în browserul tău. Le folosim pentru funcționarea site-ului
+        și, cu acordul tău, pentru a înțelege cum este folosit.
       </p>
 
       <LegalSection title="Cookies necesare">
         <p>
-          Asigura functii de baza: navigare, cos de cumparaturi, formulare, retinerea optiunii tale
-          privind cookies. Fara ele site-ul nu functioneaza corect, deci nu pot fi dezactivate.
+          Asigură funcții de bază: navigare, coș de cumpărături, formulare și reținerea opțiunii
+          tale privind cookies. Fără ele site-ul nu funcționează corect, deci nu pot fi dezactivate.
         </p>
       </LegalSection>
 
-      <LegalSection title="Cookies de analiza (optionale)">
+      <LegalSection title="Cookies de analiză (opționale)">
         <p>
-          Cu acordul tau, folosim Google Analytics pentru a masura traficul si a imbunatati site-ul.
-          Datele sunt agregate si ne ajuta sa intelegem ce pagini sunt utile.
+          Cu acordul tău, putem folosi Google Analytics pentru a măsura traficul și a îmbunătăți
+          site-ul. Serviciul se încarcă numai dacă este configurat și ai acceptat categoria de
+          analiză.
         </p>
       </LegalSection>
 
-      <LegalSection title="Cookies de marketing (optionale)">
+      <LegalSection title="Cookies de marketing (opționale)">
         <p>
-          Cu acordul tau, folosim Meta Pixel pentru a masura performanta si, pe viitor, pentru
-          reclame relevante pe Facebook si Instagram.
+          Cu acordul tău, putem folosi Meta Pixel pentru a măsura performanța campaniilor. Serviciul
+          se încarcă numai dacă este configurat și ai acceptat categoria de marketing.
         </p>
       </LegalSection>
 
       <LegalSection title="Cum le controlezi">
         <p>
-          Cand intri prima data, alegi din banner daca accepti sau refuzi cookies optionale. Poti
-          oricand sa stergi cookies sau sa le blochezi din setarile browserului. Blocarea unora
-          poate afecta experienta de navigare. Vezi si politica de{" "}
-          <Link to="/privacy" className="underline underline-offset-4 hover:opacity-70">
-            confidentialitate
+          Când intri prima dată, alegi din banner dacă accepți sau refuzi cookies opționale. Poți
+          oricând redeschide preferințele din footer sau să le blochezi din setările browserului.
+          Blocarea unora poate afecta experiența de navigare. Vezi și politica de{" "}
+          <Link to="/confidentialitate" className="underline underline-offset-4 hover:opacity-70">
+            confidențialitate
           </Link>
           .
         </p>
+        <button
+          type="button"
+          className="border border-charcoal px-5 py-3 font-mono-xs hover:bg-charcoal hover:text-cream"
+          onClick={() => window.dispatchEvent(new Event("trei-linii:cookie-settings"))}
+        >
+          Deschide preferințele
+        </button>
       </LegalSection>
     </LegalPage>
   );

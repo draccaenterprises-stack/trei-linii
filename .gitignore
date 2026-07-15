@@ -14,11 +14,16 @@ dist-ssr
 .vinxi
 .tanstack/**
 .nitro
+coverage
+playwright-report
+test-results
+reports/lighthouse
 *.local
 .env
 .env.*
 !.env.example
 !.env.production
+!.env.e2e-commerce
 
 # Wrangler / Cloudflare
 .wrangler/

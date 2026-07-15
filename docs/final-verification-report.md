@@ -1,112 +1,105 @@
 # Trei Linii - raport final de verificare
 
-Generat: 2026-07-06T17:38:51.311Z
-Commit: caf9284
-Branch: edit/edt-72c91914-2355-440e-85b0-05d2e9207382
+Generat: 2026-07-14T23:01:45.684Z
+Commit de bază: eebb832
+Branch: codex/live-collections-manifest
 URL public verificat: https://blank-atelier-canvas.lovable.app
 
 ## Rezultat
 
-Status: NU TRECE. Exista verificari locale esuate.
+CODUL TRECE - activarea comercială mai are verificări externe.
 
-## Verificari automate
+- CXD-001 - CXD-039: implementate în cod și acoperite de gate-ul local.
+- CXD-040: gate local complet; verificările externe sunt marcate separat.
 
-[!] lint
-    Comanda: npm run lint
-    Status: failed, exit 2
-    Output relevant:
-    ESLint: 9.39.4
-    TypeError: expand is not a function
-        at Minimatch.braceExpand (/dev-server/node_modules/minimatch/minimatch.js:271:10)
-        at Minimatch.make (/dev-server/node_modules/minimatch/minimatch.js:180:33)
-        at new Minimatch (/dev-server/node_modules/minimatch/minimatch.js:156:8)
-        at doMatch (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:422:13)
-        at match (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:756:11)
-        at /dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:772:10
-        at Array.some (<anonymous>)
-        at pathMatches (/dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:767:44)
-        at /dev-server/node_modules/@eslint/config-array/dist/cjs/index.cjs:1368:8
-        at FlatConfigArray.forEach (<anonymous>)
+## Verificări
 
-[x] build
-    Comanda: npm run build
-    Status: passed, exit 0
-    Output relevant:
-    node_modules/@tanstack/react-query/build/modern/HydrationBoundary.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/HydrationBoundary.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useIsFetching.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useIsFetching.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useMutationState.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useMutationState.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useInfiniteQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useInfiniteQuery.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useMutation.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useMutation.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useSuspenseInfiniteQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseInfiniteQuery.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useSuspenseQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseQuery.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useSuspenseQueries.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useSuspenseQueries.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/errorBoundaryUtils.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/errorBoundaryUtils.js" was ignored.
-    node_modules/@tanstack/react-query/build/modern/useBaseQuery.js (1:0): Module level directives cause errors when bundled, "use client" in "node_modules/@tanstack/react-query/build/modern/useBaseQuery.js" was ignored.
-    [nitro]  WARN  [cloudflare] Wrangler config main is overridden and will be ignored.
+[x] release gate local
+    Comandă: npm run verify:all
+    Status: passed; exit 0
+    All matched files use Prettier code style!
+     Test Files  17 passed (17)
+          Tests  42 passed (42)
+       Duration  1.86s (transform 482ms, setup 1.53s, import 1.25s, tests 936ms, environment 7.34s)
+    All files          |   79.49 |    71.09 |   82.85 |   82.85 |
+    ✓ built in 1.35s
+    ✓ built in 346ms
+    ✓ built in 1.50s
+    Pre-render OK: 17 rute statice scrise în .output/public.
+      8 skipped
+      91 passed (34.5s)
+    Storefront verification passed for http://127.0.0.1:4179 (18 routes).
+    Public SEO verification passed for http://127.0.0.1:4179.
+    Build local verificat complet la http://127.0.0.1:4179.
+    Verificare securitate OK: 377 fișiere sursă/build scanate.
+    found 0 vulnerabilities
+    home-mobile: LCP 2190ms, CLS 0.003, TBT 0ms, performance 94
+    catalog-mobile: LCP 2074ms, CLS 0.001, TBT 0ms, performance 97
+    home-desktop: LCP 127ms, CLS 0.000, TBT 0ms, performance 97
+    Lighthouse OK: mediană din 3 rulări/scenariu. Rapoarte: /Users/coasa/Downloads/trei-linii-live-redesign/reports/lighthouse
 
-[ ] public storefront
-    Comanda: npm run verify:storefront -- https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
-    Status: blocked, exit 1
-    Nota: Poate ramane blocat pana cand Lovable publica ultima versiune a storefront-ului.
-    Output relevant:
-    > verify:storefront
-    > node scripts/verify-storefront.mjs https://blank-atelier-canvas.lovable.app --min-products=8 --check-public-admin --check-public-assets
-    Storefront verification failed for https://blank-atelier-canvas.lovable.app
-    - /shop: produse vizibile insuficiente (0/8); probabil ruleaza o versiune Lovable nepublicata
+[ ] storefront public
+    Comandă: npm run verify:storefront -- https://blank-atelier-canvas.lovable.app
+    Status: external; exit 1
+    Notă: Poate rămâne extern până când ultimul commit este publicat.
+    - /faq: conținut interzis /Edit with Lovable/i
+    - /size-guide: conținut interzis /Edit with Lovable/i
+    - /livrare: conținut interzis /Edit with Lovable/i
+    - /retur: conținut interzis /Edit with Lovable/i
+    - /schimb-marime: conținut interzis /Edit with Lovable/i
+    - /termeni-si-conditii: conținut interzis /Edit with Lovable/i
+    - /termeni-si-conditii: text esențial absent /Termeni și condiții/i
+    - /confidentialitate: conținut interzis /Edit with Lovable/i
+    - /confidentialitate: text esențial absent /Confidențialitate/i
+    - /cookies: conținut interzis /Edit with Lovable/i
+    - /anpc: conținut interzis /Edit with Lovable/i
+    - /sol: conținut interzis /Edit with Lovable/i
+    - /cart: lipsește meta description SSR
+    - /cart: canonical absent sau indică altă rută
+    - /cart: lipsește noindex
+    - /cart: conținut interzis /Edit with Lovable/i
+    - /cart: text esențial absent /Coș/i
+    - /admin: trebuie să răspundă 404, răspunde 200
 
-[x] public SEO/static assets
-    Comanda: npm run verify:seo -- https://blank-atelier-canvas.lovable.app
-    Status: passed, exit 0
-    Nota: Poate ramane blocat pana cand Lovable publica ultima versiune de robots/sitemap.
-    Output relevant:
-    > verify:seo
-    > node scripts/verify-public-seo.mjs https://blank-atelier-canvas.lovable.app
-    Public SEO verification passed for https://blank-atelier-canvas.lovable.app
-
-[x] source secret/demo scan
-    Comanda: rg -n "<forbidden patterns>" src public .env.example --glob "!routeTree.gen.ts"
-    Status: passed, exit 1
-    Nota: Exit 1 inseamna ca rg nu a gasit match-uri.
-
-[x] npm audit lockfile
-    Comanda: npm install --package-lock-only --ignore-scripts
-    Status: passed, exit 0
-    Output relevant:
-    up to date in 2s
-    145 packages are looking for funding
-      run `npm fund` for details
-    npm notice operation is not supported.
-    npm notice operation is not supported.
-
-[!] dependency audit
-    Comanda: npm audit --audit-level=moderate
-    Status: failed, exit 1
-    Output relevant:
-    { error: 'operation is not supported.' }
-    npm notice operation is not supported.
-    npm notice operation is not supported.
-    npm warn audit 404 Not Found - POST https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/-/npm/v1/security/audits/quick - operation is not supported.
-    npm error audit endpoint returned an error
-    npm error A complete log of this run can be found in: /root/.npm/_logs/2026-07-06T17_38_50_065Z-debug-0.log
+[ ] SEO public
+    Comandă: npm run verify:seo -- https://blank-atelier-canvas.lovable.app
+    Status: external; exit 1
+    Notă: Poate rămâne extern până când robots, sitemap și build-ul nou sunt publicate.
+    - robots.txt: lipsește Disallow: /mcp
+    - robots.txt: lipsește Disallow: /.mcp
+    - robots.txt: lipsește Disallow: /.well-known/oauth-protected-resource
+    - sitemap.xml: lipsește ruta /shop/lista
+    - sitemap.xml: lipsește ruta /manifest
+    - sitemap.xml: lipsește ruta /livrare
+    - sitemap.xml: lipsește ruta /retur
+    - sitemap.xml: lipsește ruta /schimb-marime
+    - sitemap.xml: lipsește ruta /termeni-si-conditii
+    - sitemap.xml: lipsește ruta /confidentialitate
+    - sitemap.xml: lipsește ruta /anpc
+    - sitemap.xml: lipsește ruta /sol
+    - /shop/lista: canonical incorect
+    - /favicon-64.png: status 404
+    - /favicon-64.png: content-type nu este imagine
+    - /apple-touch-icon.png: status 404
+    - /apple-touch-icon.png: content-type nu este imagine
+    - /admin: status 200, așteptat 404
 
 [ ] Shopify readiness
-    Comanda: npm run verify:shopify
-    Status: blocked, exit 1
-    Nota: Blocat pana cand tokenul Shopify nou este setat in env.
-    Output relevant:
+    Comandă: npm run verify:shopify
+    Status: external; exit 1
+    Notă: Necesită tokenul Storefront și catalogul real în mediul de verificare.
     > verify:shopify
     > node scripts/verify-shopify-readiness.mjs
     Shopify readiness failed:
-    - Lipseste VITE_SHOPIFY_STORE_DOMAIN.
-    - Lipseste VITE_SHOPIFY_STOREFRONT_TOKEN.
+    - Lipsește VITE_SHOPIFY_STOREFRONT_TOKEN din mediul de verificare.
 
-## Blocaje inainte de comenzi reale
+## Inputuri externe pentru activarea live-shop
 
-- Token Shopify Storefront nou, rotit si setat in Lovable env.
-- Lovable republished dupa ultimul push GitHub, ca site-ul public sa serveasca fisierele actuale.
-- Produse reale publicate pe canalul Shopify Headless.
-- Test checkout real Shopify cu o comanda de test.
-- Date firma reale si politici legale finale validate pentru Romania.
-- Klaviyo configurat sau newsletter dezactivat daca nu se foloseste.
+- tokenul public Shopify Storefront setat numai în mediul de deploy;
+- produse și colecții reale publicate pe canalul Storefront/Headless;
+- datele comerciale reale și textele juridice validate;
+- o comandă Shopify de test și confirmarea hostului de checkout;
+- endpointurile opționale pentru contact, newsletter și analytics, dacă vor fi folosite;
+- republicarea deploy-ului după integrarea ultimului commit.
 
+Niciunul dintre aceste inputuri nu cere schimbări de arhitectură; în lipsa lor, producția rămâne în pre-lansare sigură.

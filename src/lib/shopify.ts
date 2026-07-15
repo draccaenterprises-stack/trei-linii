@@ -1,23 +1,19 @@
 /**
  * Shopify Storefront API integration.
  *
- * Products can fall back to local pre-launch data while Shopify has no
- * products published to the Headless storefront. Checkout only runs for real
- * Shopify ProductVariant IDs.
+ * Preview fixtures are available only in local development. Production never
+ * replaces a failed or empty Shopify catalog with demonstrative products.
  */
 
-import {
-  collections as mockCollections,
-  products as mockProducts,
-  type Badge,
-  type Collection,
-  type ColorVariant,
-  type Product,
-  type ProductVariant,
-  type Size,
-} from "./mock-data";
-
-const DEFAULT_STORE_DOMAIN = "aa01qm-mq.myshopify.com";
+import type {
+  Badge,
+  Collection,
+  ColorVariant,
+  Product,
+  ProductVariant,
+  Size,
+} from "./catalog-types";
+import { SITE_MODE, externalConfig, hasLegalBusinessDetails } from "./site";
 
 function normalizeStoreDomain(value?: string) {
   if (!value) return undefined;
@@ -29,14 +25,26 @@ function normalizeStoreDomain(value?: string) {
 }
 
 export const shopifyConfig = {
-  domain: normalizeStoreDomain(
-    (import.meta.env.VITE_SHOPIFY_STORE_DOMAIN as string | undefined) ?? DEFAULT_STORE_DOMAIN,
-  ),
-  token: (import.meta.env.VITE_SHOPIFY_STOREFRONT_TOKEN as string | undefined) ?? undefined,
-  apiVersion: (import.meta.env.VITE_SHOPIFY_API_VERSION as string | undefined) ?? "2026-01",
+  domain: normalizeStoreDomain(externalConfig.shopify.domain),
+  token: externalConfig.shopify.token || undefined,
+  apiVersion: externalConfig.shopify.apiVersion,
 };
 
 export const isShopifyConfigured = () => Boolean(shopifyConfig.domain && shopifyConfig.token);
+
+export const isE2ECommerceFixtureEnabled = () =>
+  import.meta.env.MODE === "e2e-commerce" && externalConfig.shopify.e2eCommerceFixtureEnabled;
+
+export const isPreviewCatalogEnabled = () =>
+  (import.meta.env.DEV || import.meta.env.MODE.startsWith("e2e")) &&
+  externalConfig.shopify.previewCatalogEnabled;
+
+export class CatalogUnavailableError extends Error {
+  constructor(message = "Catalogul nu este disponibil momentan.", options?: ErrorOptions) {
+    super(message, options);
+    this.name = "CatalogUnavailableError";
+  }
+}
 
 type ShopifyGraphQlResponse<T> = {
   data?: T;
@@ -106,31 +114,45 @@ async function storefrontFetch<T>(query: string, variables?: Record<string, unkn
     throw new Error("Magazinul nu este disponibil momentan.");
   }
 
-  const response = await fetch(
-    `https://${shopifyConfig.domain}/api/${shopifyConfig.apiVersion}/graphql.json`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Shopify-Storefront-Access-Token": shopifyConfig.token,
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12_000);
+
+  try {
+    const response = await fetch(
+      `https://${shopifyConfig.domain}/api/${shopifyConfig.apiVersion}/graphql.json`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Shopify-Storefront-Access-Token": shopifyConfig.token,
+        },
+        body: JSON.stringify({ query, variables }),
+        signal: controller.signal,
       },
-      body: JSON.stringify({ query, variables }),
-    },
-  );
+    );
 
-  if (!response.ok) {
-    throw new Error(`Shopify a raspuns cu status ${response.status}.`);
-  }
+    if (!response.ok) {
+      throw new Error(`Shopify a răspuns cu status ${response.status}.`);
+    }
 
-  const payload = (await response.json()) as ShopifyGraphQlResponse<T>;
-  if (payload.errors?.length) {
-    throw new Error(payload.errors.map((error) => error.message).join("; "));
-  }
-  if (!payload.data) {
-    throw new Error("Raspuns Shopify fara data.");
-  }
+    const payload = (await response.json()) as ShopifyGraphQlResponse<T>;
+    if (payload.errors?.length) {
+      console.error("Shopify Storefront a returnat erori GraphQL.", payload.errors);
+      throw new Error("Magazinul nu a putut procesa cererea.");
+    }
+    if (!payload.data) {
+      throw new Error("Magazinul a returnat un răspuns incomplet.");
+    }
 
-  return payload.data;
+    return payload.data;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error("Conexiunea cu magazinul a expirat.");
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 const PRODUCT_FIELDS = `
@@ -141,7 +163,7 @@ const PRODUCT_FIELDS = `
   availableForSale
   tags
   featuredImage {
-    url
+    url(transform: { maxWidth: 1200, preferredContentType: WEBP })
     altText
   }
   priceRange {
@@ -158,7 +180,7 @@ const PRODUCT_FIELDS = `
   }
   images(first: 10) {
     nodes {
-      url
+      url(transform: { maxWidth: 1200, preferredContentType: WEBP })
       altText
     }
   }
@@ -167,6 +189,7 @@ const PRODUCT_FIELDS = `
       id
       title
       availableForSale
+      quantityAvailable
       selectedOptions {
         name
         value
@@ -211,45 +234,12 @@ function isSystemCollection(handle: string, title: string) {
   );
 }
 
-function toRoman(value: number) {
-  const numerals = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"];
-  return numerals[value - 1] ?? String(value).padStart(2, "0");
-}
-
-function publicCollectionTitle(title: string, index: number) {
-  const match = normalizeText(title).match(/^(?:colectie|collection)[\s-]*(\d+)/);
-  if (match) return `Editia ${toRoman(Number(match[1]))}`;
-  if (isInternalTestLabel(title)) return `Editia ${toRoman(index + 1)}`;
-  return title;
-}
-
-function publicProductTitle(title: string, index = 0) {
-  if (isInternalTestLabel(title))
-    return `Previzualizare design spate ${String(index + 1).padStart(2, "0")}`;
-  return title;
-}
-
 function unique<T>(items: T[]) {
   return [...new Set(items)];
 }
 
-function publicProductHandle(product: ShopifyProductNode, index = 0) {
-  if (isInternalTestLabel(product.title) || isInternalTestLabel(product.handle)) {
-    return `previzualizare-design-spate-${String(index + 1).padStart(2, "0")}`;
-  }
-
-  return product.handle;
-}
-
-function publicProductDescription(product: ShopifyProductNode) {
-  if (isInternalTestLabel(product.title) || isInternalTestLabel(product.description)) {
-    return "Previzualizare pentru directia Trei Linii: tricou oversized cu fata curata si design minimalist pe spate.";
-  }
-
-  return (
-    product.description?.trim() ??
-    "Tricou Trei Linii cu croiala oversized, material dens si finisaj curat."
-  );
+function isInternalTestProduct(product: ShopifyProductNode) {
+  return isInternalTestLabel(product.title) || isInternalTestLabel(product.handle);
 }
 
 function selectedOptionValue(
@@ -332,7 +322,7 @@ function badgeFromProduct(
   return undefined;
 }
 
-function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
+function mapShopifyProduct(product: ShopifyProductNode): Product {
   const variants = product.variants.nodes.map<ProductVariant>((variant) => {
     const size =
       selectedOptionValue(variant.selectedOptions, ["size", "marime"]) ??
@@ -363,8 +353,21 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
     return acc;
   }, {});
 
-  const images = product.images.nodes.map((image) => image.url);
-  if (!images.length && product.featuredImage?.url) images.push(product.featuredImage.url);
+  const media = product.images.nodes.map((image, imageIndex) => ({
+    url: image.url,
+    alt: image.altText?.trim() || `${product.title} - imagine ${imageIndex + 1}`,
+  }));
+  if (!media.length && product.featuredImage?.url) {
+    media.push({
+      url: product.featuredImage.url,
+      alt: product.featuredImage.altText?.trim() || product.title,
+    });
+  }
+  const money = {
+    amount: Number(product.priceRange.minVariantPrice.amount),
+    currencyCode: product.priceRange.minVariantPrice.currencyCode,
+  };
+  const status = variants.some((variant) => variant.availableForSale) ? "active" : "sold-out";
 
   const publicCollectionNodes = product.collections.nodes.filter(
     (collection) => !isSystemCollection(collection.handle, collection.title),
@@ -372,23 +375,21 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
   const firstCollection = publicCollectionNodes[0];
   const publicCollections = unique(publicCollectionNodes.map((collection) => collection.handle));
   const publicCollection = firstCollection?.handle ?? "selectia-deschisa";
-  const firstMockImage = mockProducts[0]?.images[0] ?? "";
-
   return {
     id: product.id,
-    handle: publicProductHandle(product, index),
-    title: publicProductTitle(product.title, index),
-    price: Number(product.priceRange.minVariantPrice.amount),
+    handle: product.handle,
+    title: product.title,
+    money,
+    price: money.amount,
+    status,
     collection: publicCollection,
     collections: publicCollections.length ? publicCollections : [publicCollection],
     badge: badgeFromProduct(product, variants),
-    images: images.length ? images : [firstMockImage],
-    description: publicProductDescription(product),
-    vibe:
-      mockProducts[index % mockProducts.length]?.vibe ??
-      "Design minimalist construit pentru purtare zilnica.",
-    fitNote:
-      "Croiala oversized. Verifica tabelul de marimi inainte de comanda pentru potrivirea corecta.",
+    media,
+    images: media.map((item) => item.url),
+    description: product.description?.trim() || "Descrierea acestei piese va fi publicată curând.",
+    vibe: product.description?.trim() || "Piesă din selecția Trei Linii.",
+    fitNote: "Consultă variantele disponibile și ghidul de mărimi înainte de comandă.",
     sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
     colors: colors.length ? colors : [{ name: "Standard", hex: colorHex("Standard") }],
     stock,
@@ -396,18 +397,12 @@ function mapShopifyProduct(product: ShopifyProductNode, index = 0): Product {
   };
 }
 
-function mapShopifyCollection(collection: ShopifyCollectionNode, index: number): Collection {
-  const fallback = mockCollections[index % mockCollections.length];
-  const looksInternal =
-    isInternalTestLabel(collection.title) || isInternalTestLabel(collection.handle);
-
+function mapShopifyCollection(collection: ShopifyCollectionNode): Collection {
   return {
     handle: collection.handle,
-    title: publicCollectionTitle(collection.title, index),
-    description: looksInternal
-      ? fallback.description
-      : collection.description?.trim() || fallback.description,
-    image: collection.image?.url ?? fallback.image,
+    title: collection.title,
+    description: collection.description?.trim() || "Descrierea colecției va fi publicată curând.",
+    image: collection.image?.url ?? "",
     count: collection.products.nodes.length,
     productIds: collection.products.nodes.map((product) => product.id),
   };
@@ -418,11 +413,7 @@ export function findSelectedVariant(
   size: Size,
   color: string,
 ): ProductVariant | undefined {
-  return (
-    product.variants?.find((variant) => variant.size === size && variant.color === color) ??
-    product.variants?.find((variant) => variant.size === size) ??
-    product.variants?.find((variant) => variant.color === color)
-  );
+  return product.variants?.find((variant) => variant.size === size && variant.color === color);
 }
 
 export function getStockForColor(product: Product, color: string): Record<Size, number> {
@@ -449,8 +440,66 @@ export function isShopifyProductVariantId(value?: string) {
   return Boolean(value?.startsWith("gid://shopify/ProductVariant/"));
 }
 
+export function canPurchaseProduct(product?: Product) {
+  if (isE2ECommerceFixtureEnabled()) {
+    return Boolean(
+      product &&
+      !product.isPreview &&
+      product.variants?.some(
+        (variant) =>
+          variant.availableForSale &&
+          isShopifyProductVariantId(variant.id) &&
+          (variant.quantityAvailable === null || variant.quantityAvailable > 0),
+      ),
+    );
+  }
+
+  if (!product || product.isPreview || SITE_MODE !== "live-shop") return false;
+  if (!hasLegalBusinessDetails() || !isShopifyConfigured()) return false;
+
+  return Boolean(
+    product.variants?.some(
+      (variant) =>
+        variant.availableForSale &&
+        isShopifyProductVariantId(variant.id) &&
+        (variant.quantityAvailable === null || variant.quantityAvailable > 0),
+    ),
+  );
+}
+
+async function previewProducts() {
+  const { products } = await import("./mock-data");
+  const commerceFixture = isE2ECommerceFixtureEnabled();
+  return products.map((product) => ({
+    ...product,
+    isPreview: !commerceFixture,
+    status: commerceFixture ? ("active" as const) : ("preview" as const),
+    badge: undefined,
+    variants: commerceFixture
+      ? product.colors.flatMap((color, colorIndex) =>
+          product.sizes.map((size) => ({
+            id: `gid://shopify/ProductVariant/e2e-${product.id}-${colorIndex}-${size}`,
+            size,
+            color: color.name,
+            availableForSale: (product.stock[size] ?? 0) > 0,
+            quantityAvailable: product.stock[size] ?? 0,
+          })),
+        )
+      : undefined,
+  }));
+}
+
+async function previewCollections() {
+  const { collections } = await import("./mock-data");
+  return collections;
+}
+
 export async function fetchProducts(): Promise<Product[]> {
-  if (!isShopifyConfigured()) return mockProducts;
+  if (!isShopifyConfigured()) {
+    if (isPreviewCatalogEnabled()) return previewProducts();
+    if (SITE_MODE === "pre-launch") return [];
+    throw new CatalogUnavailableError("Conexiunea cu magazinul nu este configurată.");
+  }
 
   try {
     const data = await storefrontFetch<{
@@ -467,16 +516,25 @@ export async function fetchProducts(): Promise<Product[]> {
       }
     `);
 
-    const products = data.products.nodes.map(mapShopifyProduct);
-    return products.length ? products : mockProducts;
+    return data.products.nodes
+      .filter((product) => !isInternalTestProduct(product))
+      .map(mapShopifyProduct);
   } catch (error) {
     console.error("Nu am putut citi produsele din Shopify.", error);
-    return mockProducts;
+    if (isPreviewCatalogEnabled()) return previewProducts();
+    if (SITE_MODE === "pre-launch") return [];
+    throw new CatalogUnavailableError("Nu am putut încărca produsele.", { cause: error });
   }
 }
 
 export async function fetchProductByHandle(handle: string): Promise<Product | undefined> {
-  if (!isShopifyConfigured()) return mockProducts.find((p) => p.handle === handle);
+  if (!isShopifyConfigured()) {
+    if (isPreviewCatalogEnabled()) {
+      return (await previewProducts()).find((product) => product.handle === handle);
+    }
+    if (SITE_MODE === "pre-launch") return undefined;
+    throw new CatalogUnavailableError("Conexiunea cu magazinul nu este configurată.");
+  }
 
   try {
     const data = await storefrontFetch<{
@@ -492,23 +550,27 @@ export async function fetchProductByHandle(handle: string): Promise<Product | un
       { handle },
     );
 
-    if (data.product) return mapShopifyProduct(data.product);
+    if (data.product && !isInternalTestProduct(data.product))
+      return mapShopifyProduct(data.product);
 
     const products = await fetchProducts();
-    return (
-      products.find((p) => p.handle === handle) ?? mockProducts.find((p) => p.handle === handle)
-    );
+    return products.find((p) => p.handle === handle);
   } catch (error) {
     console.error(`Nu am putut citi produsul ${handle} din Shopify.`, error);
-    const products = await fetchProducts();
-    return (
-      products.find((p) => p.handle === handle) ?? mockProducts.find((p) => p.handle === handle)
-    );
+    if (isPreviewCatalogEnabled()) {
+      return (await previewProducts()).find((product) => product.handle === handle);
+    }
+    if (SITE_MODE === "pre-launch") return undefined;
+    throw new CatalogUnavailableError("Nu am putut încărca produsul.", { cause: error });
   }
 }
 
 export async function fetchCollections(): Promise<Collection[]> {
-  if (!isShopifyConfigured()) return mockCollections;
+  if (!isShopifyConfigured()) {
+    if (isPreviewCatalogEnabled()) return previewCollections();
+    if (SITE_MODE === "pre-launch") return [];
+    throw new CatalogUnavailableError("Conexiunea cu magazinul nu este configurată.");
+  }
 
   try {
     const data = await storefrontFetch<{
@@ -523,7 +585,7 @@ export async function fetchCollections(): Promise<Collection[]> {
             title
             description
             image {
-              url
+              url(transform: { maxWidth: 1200, preferredContentType: WEBP })
               altText
             }
             products(first: 100) {
@@ -536,13 +598,19 @@ export async function fetchCollections(): Promise<Collection[]> {
       }
     `);
 
-    const collections = data.collections.nodes
-      .filter((collection) => !isSystemCollection(collection.handle, collection.title))
+    return data.collections.nodes
+      .filter(
+        (collection) =>
+          !isSystemCollection(collection.handle, collection.title) &&
+          !isInternalTestLabel(collection.handle) &&
+          !isInternalTestLabel(collection.title),
+      )
       .map(mapShopifyCollection);
-    return collections.length ? collections : mockCollections;
   } catch (error) {
-    console.error("Nu am putut citi colectiile din Shopify.", error);
-    return mockCollections;
+    console.error("Nu am putut citi colecțiile din Shopify.", error);
+    if (isPreviewCatalogEnabled()) return previewCollections();
+    if (SITE_MODE === "pre-launch") return [];
+    throw new CatalogUnavailableError("Nu am putut încărca colecțiile.", { cause: error });
   }
 }
 
@@ -551,15 +619,38 @@ export interface ShopifyCart {
   checkoutUrl: string;
 }
 
-export async function createCart(): Promise<ShopifyCart> {
+function validateCartLines(lines: Array<{ merchandiseId: string; quantity: number }>) {
+  if (!lines.length) throw new Error("Coșul nu conține produse.");
+  if (
+    lines.some(
+      (line) =>
+        !isShopifyProductVariantId(line.merchandiseId) ||
+        !Number.isInteger(line.quantity) ||
+        line.quantity < 1 ||
+        line.quantity > 20,
+    )
+  ) {
+    throw new Error("Coșul conține o variantă sau o cantitate invalidă.");
+  }
+}
+
+function validateCartId(cartId: string) {
+  if (!cartId.startsWith("gid://shopify/Cart/")) throw new Error("Coș Shopify invalid.");
+}
+
+export async function createCart(
+  lines: Array<{ merchandiseId: string; quantity: number }> = [],
+): Promise<ShopifyCart> {
+  validateCartLines(lines);
   const data = await storefrontFetch<{
     cartCreate: {
       cart: ShopifyCart | null;
       userErrors: Array<{ message: string }>;
     };
-  }>(`
-    mutation CartCreate {
-      cartCreate {
+  }>(
+    `
+    mutation CartCreate($input: CartInput!) {
+      cartCreate(input: $input) {
         cart {
           id
           checkoutUrl
@@ -569,13 +660,16 @@ export async function createCart(): Promise<ShopifyCart> {
         }
       }
     }
-  `);
+  `,
+    { input: { lines } },
+  );
 
   if (data.cartCreate.userErrors.length) {
-    throw new Error(data.cartCreate.userErrors.map((error) => error.message).join("; "));
+    console.error("Shopify cartCreate userErrors.", data.cartCreate.userErrors);
+    throw new Error("Nu am putut pregăti finalizarea comenzii.");
   }
   if (!data.cartCreate.cart) {
-    throw new Error("Shopify nu a returnat cosul.");
+    throw new Error("Shopify nu a returnat coșul.");
   }
 
   return data.cartCreate.cart;
@@ -585,6 +679,8 @@ export async function addCartLines(
   cartId: string,
   lines: Array<{ merchandiseId: string; quantity: number }>,
 ): Promise<ShopifyCart> {
+  validateCartId(cartId);
+  validateCartLines(lines);
   const data = await storefrontFetch<{
     cartLinesAdd: {
       cart: ShopifyCart | null;
@@ -608,15 +704,110 @@ export async function addCartLines(
   );
 
   if (data.cartLinesAdd.userErrors.length) {
-    throw new Error(data.cartLinesAdd.userErrors.map((error) => error.message).join("; "));
+    console.error("Shopify cartLinesAdd userErrors.", data.cartLinesAdd.userErrors);
+    throw new Error("Nu am putut actualiza coșul.");
   }
   if (!data.cartLinesAdd.cart) {
-    throw new Error("Shopify nu a returnat cosul actualizat.");
+    throw new Error("Shopify nu a returnat coșul actualizat.");
   }
 
   return data.cartLinesAdd.cart;
 }
 
+export async function updateCartLines(
+  cartId: string,
+  lines: Array<{ id: string; merchandiseId: string; quantity: number }>,
+): Promise<ShopifyCart> {
+  validateCartId(cartId);
+  validateCartLines(lines);
+  if (lines.some((line) => !line.id.startsWith("gid://shopify/CartLine/"))) {
+    throw new Error("Linie de coș invalidă.");
+  }
+
+  const data = await storefrontFetch<{
+    cartLinesUpdate: {
+      cart: ShopifyCart | null;
+      userErrors: Array<{ message: string }>;
+    };
+  }>(
+    `
+    mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+      cartLinesUpdate(cartId: $cartId, lines: $lines) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `,
+    { cartId, lines },
+  );
+
+  if (data.cartLinesUpdate.userErrors.length) {
+    console.error("Shopify cartLinesUpdate userErrors.", data.cartLinesUpdate.userErrors);
+    throw new Error("Nu am putut actualiza coșul.");
+  }
+  if (!data.cartLinesUpdate.cart) throw new Error("Shopify nu a returnat coșul actualizat.");
+  return data.cartLinesUpdate.cart;
+}
+
+export async function removeCartLines(cartId: string, lineIds: string[]): Promise<ShopifyCart> {
+  validateCartId(cartId);
+  if (!lineIds.length || lineIds.some((lineId) => !lineId.startsWith("gid://shopify/CartLine/"))) {
+    throw new Error("Linie de coș invalidă.");
+  }
+
+  const data = await storefrontFetch<{
+    cartLinesRemove: {
+      cart: ShopifyCart | null;
+      userErrors: Array<{ message: string }>;
+    };
+  }>(
+    `
+    mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+        cart {
+          id
+          checkoutUrl
+        }
+        userErrors {
+          message
+        }
+      }
+    }
+  `,
+    { cartId, lineIds },
+  );
+
+  if (data.cartLinesRemove.userErrors.length) {
+    console.error("Shopify cartLinesRemove userErrors.", data.cartLinesRemove.userErrors);
+    throw new Error("Nu am putut actualiza coșul.");
+  }
+  if (!data.cartLinesRemove.cart) throw new Error("Shopify nu a returnat coșul actualizat.");
+  return data.cartLinesRemove.cart;
+}
+
+export function buildShopifyCheckoutUrl(
+  checkoutUrl: string,
+  requireCustomerAccount = externalConfig.shopify.customerAccountRequired,
+) {
+  const destination = new URL(checkoutUrl);
+  const allowedHosts = new Set([
+    shopifyConfig.domain?.toLowerCase(),
+    ...externalConfig.shopify.checkoutHosts,
+  ]);
+
+  if (destination.protocol !== "https:" || !allowedHosts.has(destination.hostname.toLowerCase())) {
+    throw new Error("Destinația de checkout nu este permisă.");
+  }
+
+  if (requireCustomerAccount) destination.searchParams.set("sso", "silent");
+  return destination.toString();
+}
+
 export function redirectToShopifyCheckout(checkoutUrl: string) {
-  window.location.href = checkoutUrl;
+  window.location.assign(buildShopifyCheckoutUrl(checkoutUrl));
 }
