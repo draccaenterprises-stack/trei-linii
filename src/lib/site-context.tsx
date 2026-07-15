@@ -76,6 +76,8 @@ export interface SiteSettings {
   productCardShowLiveBadges: boolean;
   productCardQuickAdd: boolean;
   productCardMetaText: string;
+  customerAccountRequired: boolean;
+  customerAccountUrl: string;
   trustItemsPreLaunch: TrustItem[];
   trustItemsLiveShop: TrustItem[];
   faqItems: FaqItem[];
@@ -168,6 +170,8 @@ const defaults: SiteSettings = {
   productCardShowLiveBadges: true,
   productCardQuickAdd: true,
   productCardMetaText: "Design pe spate",
+  customerAccountRequired: externalConfig.shopify.customerAccountRequired,
+  customerAccountUrl: externalConfig.shopify.customerAccountUrl,
   trustItemsPreLaunch: [
     {
       id: "fit",

@@ -17,6 +17,10 @@ const checkoutHosts = (env.VITE_CHECKOUT_HOSTS ?? "")
   .split(",")
   .map((value) => normalizeDomain(value))
   .filter(Boolean);
+const customerAccountRequired = !["false", "0"].includes(
+  (env.VITE_REQUIRE_CUSTOMER_ACCOUNT ?? "true").trim().toLowerCase(),
+);
+const customerAccountUrl = env.VITE_CUSTOMER_ACCOUNT_URL?.trim() ?? "";
 const errors = [];
 const warnings = [];
 
@@ -94,6 +98,16 @@ if (!Number.isInteger(minCollections) || minCollections < 1) {
   errors.push("MIN_SHOPIFY_COLLECTIONS trebuie să fie un întreg pozitiv.");
 }
 if (!checkoutHosts.length) errors.push("VITE_CHECKOUT_HOSTS nu conține nicio gazdă permisă.");
+if (customerAccountRequired) {
+  try {
+    const accountUrl = new URL(customerAccountUrl);
+    if (accountUrl.protocol !== "https:") throw new Error();
+  } catch {
+    errors.push(
+      "VITE_CUSTOMER_ACCOUNT_URL trebuie să conțină URL-ul HTTPS copiat din Shopify Customer accounts.",
+    );
+  }
+}
 
 if (!errors.length) {
   try {

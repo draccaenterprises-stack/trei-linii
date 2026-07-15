@@ -30,6 +30,7 @@ vi.mock("@/lib/site-context", () => ({
     accentColor: "#d40059",
     logoText: "Trei Linii",
     siteMode: "live-shop",
+    customerAccountUrl: "https://account.treilinii.ro",
     announcement: "",
     announcementVisible: false,
     launchDate: "",
@@ -51,6 +52,10 @@ describe("Header", () => {
     const cart = screen.getByRole("button", { name: "Deschide coșul, 2 produse" });
     await user.click(cart);
     expect(openCart).toHaveBeenCalledOnce();
+    expect(screen.getByRole("link", { name: "Deschide contul meu" })).toHaveAttribute(
+      "href",
+      "https://account.treilinii.ro",
+    );
   });
 
   it("deschide și închide meniul mobil cu tastatura", async () => {

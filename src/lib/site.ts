@@ -20,6 +20,8 @@ const publicConfigSchema = z.object({
   shopifyStorefrontToken: z.string(),
   shopifyApiVersion: z.string().regex(/^\d{4}-\d{2}$/),
   checkoutHosts: z.array(z.string()),
+  customerAccountRequired: z.boolean(),
+  customerAccountUrl: z.union([z.literal(""), z.string().url()]),
   previewCatalogEnabled: z.boolean(),
   e2eCommerceFixtureEnabled: z.boolean(),
   contactFormEndpoint: z.union([z.literal(""), z.string().url()]),
@@ -70,6 +72,8 @@ const parsedConfig = publicConfigSchema.safeParse({
   shopifyStorefrontToken: env("VITE_SHOPIFY_STOREFRONT_TOKEN"),
   shopifyApiVersion: env("VITE_SHOPIFY_API_VERSION") || "2026-01",
   checkoutHosts: csvEnv("VITE_CHECKOUT_HOSTS"),
+  customerAccountRequired: booleanEnv("VITE_REQUIRE_CUSTOMER_ACCOUNT", true),
+  customerAccountUrl: env("VITE_CUSTOMER_ACCOUNT_URL"),
   previewCatalogEnabled: booleanEnv("VITE_ENABLE_PREVIEW_CATALOG", true),
   e2eCommerceFixtureEnabled: booleanEnv("VITE_ENABLE_E2E_COMMERCE_FIXTURE", false),
   contactFormEndpoint: env("VITE_CONTACT_FORM_ENDPOINT"),
@@ -99,16 +103,21 @@ type SiteModeConfig = Pick<
   | "cui"
   | "regCom"
   | "address"
+  | "customerAccountRequired"
+  | "customerAccountUrl"
 >;
 
 export function deriveSiteMode(config: SiteModeConfig): "pre-launch" | "live-shop" {
+  const customerAccountsReady =
+    !config.customerAccountRequired || Boolean(config.customerAccountUrl);
   const commerceReady = Boolean(
     config.shopifyStoreDomain &&
     config.shopifyStorefrontToken &&
     config.company &&
     config.cui &&
     config.regCom &&
-    config.address,
+    config.address &&
+    customerAccountsReady,
   );
 
   return config.siteMode === "live-shop" && commerceReady ? "live-shop" : "pre-launch";
@@ -122,6 +131,8 @@ export const externalConfig = Object.freeze({
     token: publicConfig.shopifyStorefrontToken,
     apiVersion: publicConfig.shopifyApiVersion,
     checkoutHosts: publicConfig.checkoutHosts,
+    customerAccountRequired: publicConfig.customerAccountRequired,
+    customerAccountUrl: publicConfig.customerAccountUrl,
     previewCatalogEnabled: publicConfig.previewCatalogEnabled,
     e2eCommerceFixtureEnabled: publicConfig.e2eCommerceFixtureEnabled,
   },

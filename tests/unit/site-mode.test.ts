@@ -9,6 +9,8 @@ const readyConfig = {
   cui: "RO123",
   regCom: "J00/1/2026",
   address: "București",
+  customerAccountRequired: true,
+  customerAccountUrl: "https://account.treilinii.ro",
 };
 
 describe("site mode", () => {
@@ -16,6 +18,14 @@ describe("site mode", () => {
     expect(deriveSiteMode(readyConfig)).toBe("live-shop");
     expect(deriveSiteMode({ ...readyConfig, company: "" })).toBe("pre-launch");
     expect(deriveSiteMode({ ...readyConfig, shopifyStorefrontToken: "" })).toBe("pre-launch");
+    expect(deriveSiteMode({ ...readyConfig, customerAccountUrl: "" })).toBe("pre-launch");
+    expect(
+      deriveSiteMode({
+        ...readyConfig,
+        customerAccountRequired: false,
+        customerAccountUrl: "",
+      }),
+    ).toBe("live-shop");
   });
 
   it("respectă cererea explicită de pre-lansare", () => {

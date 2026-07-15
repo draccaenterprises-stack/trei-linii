@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Minus, Plus } from "lucide-react";
-import { ShopifyCheckoutButton } from "@/components/CartDrawer";
+import { CustomerAccountNotice, ShopifyCheckoutButton } from "@/components/CartDrawer";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { getStockForColor } from "@/lib/shopify";
@@ -80,6 +80,7 @@ function CartPage() {
                 <span className="font-mono-xs">Total</span>
                 <span className="tabular-nums text-lg">{formatRON(subtotal)}</span>
               </div>
+              <CustomerAccountNotice />
               <ShopifyCheckoutButton />
               <p className="font-mono-xs opacity-50 text-center">
                 Vei fi redirecționat către finalizarea securizată a comenzii.

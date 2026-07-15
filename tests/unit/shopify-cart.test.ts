@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   addCartLines,
+  buildShopifyCheckoutUrl,
   createCart,
   removeCartLines,
   shopifyConfig,
@@ -65,6 +66,18 @@ describe("Shopify cart adapter", () => {
     );
     await expect(createCart([{ merchandiseId: "preview-1", quantity: 1 }])).rejects.toThrow(
       "variantă sau o cantitate invalidă",
+    );
+  });
+
+  it("păstrează allowlist-ul și adaugă SSO pentru conturile obligatorii", () => {
+    expect(buildShopifyCheckoutUrl("https://store.myshopify.com/checkouts/1?locale=ro", true)).toBe(
+      "https://store.myshopify.com/checkouts/1?locale=ro&sso=silent",
+    );
+    expect(buildShopifyCheckoutUrl("https://store.myshopify.com/checkouts/1", false)).toBe(
+      "https://store.myshopify.com/checkouts/1",
+    );
+    expect(() => buildShopifyCheckoutUrl("https://example.com/checkouts/1", true)).toThrow(
+      "Destinația de checkout nu este permisă",
     );
   });
 });

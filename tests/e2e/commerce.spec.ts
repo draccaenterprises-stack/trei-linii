@@ -56,6 +56,9 @@ test("journey mobil: Shop, PDP, variante, coș, refresh și checkout guard", asy
   await expect(
     page.getByRole("link", { name: "Tricou Oversized Linie 01", exact: true }),
   ).toBeVisible();
+  await expect(
+    page.getByText("Cont necesar. Primești pe email un cod unic, apoi continui direct la plată."),
+  ).toBeVisible();
 
   await page.reload();
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Produse - 1");

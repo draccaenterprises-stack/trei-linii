@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Menu, X } from "lucide-react";
+import { Menu, UserRound, X } from "lucide-react";
 import * as React from "react";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
@@ -170,7 +170,7 @@ function useHideOnScroll() {
 export function Header() {
   const hidden = useHideOnScroll();
   const { count, open } = useCart();
-  const { accentColor, logoText, siteMode } = useSite();
+  const { accentColor, customerAccountUrl, logoText, siteMode } = useSite();
   const pathname = useRouterState({ select: (r) => r.location.pathname });
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
@@ -203,6 +203,17 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
+          {siteMode === "live-shop" && customerAccountUrl ? (
+            <a
+              href={customerAccountUrl}
+              className="inline-flex min-h-11 items-center gap-2 font-mono-xs transition-opacity hover:opacity-65"
+              aria-label="Deschide contul meu"
+              title="Contul meu"
+            >
+              <UserRound className="h-4 w-4" strokeWidth={1.25} aria-hidden="true" />
+              <span className="hidden lg:inline">Cont</span>
+            </a>
+          ) : null}
           {siteMode === "live-shop" ? (
             <button
               type="button"
@@ -266,6 +277,15 @@ export function Header() {
                       {item.label}
                     </Link>
                   ))}
+                  {siteMode === "live-shop" && customerAccountUrl ? (
+                    <a
+                      href={customerAccountUrl}
+                      className="mt-3 inline-flex items-center gap-3 border-t border-cream/15 pt-6 font-mono-xs text-cream"
+                    >
+                      <UserRound className="h-4 w-4" strokeWidth={1.25} aria-hidden="true" />
+                      Contul meu
+                    </a>
+                  ) : null}
                 </nav>
               </Dialog.Content>
             </Dialog.Portal>

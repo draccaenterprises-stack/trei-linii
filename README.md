@@ -50,6 +50,7 @@ checkout-ul devin active numai când sunt îndeplinite simultan condițiile urm�
 
 - `VITE_SITE_MODE=live-shop`;
 - domeniul și tokenul public Shopify Storefront sunt configurate;
+- conturile Shopify sunt configurate, iar URL-ul de autentificare este setat;
 - datele comerciale obligatorii sunt completate;
 - produsul are o variantă Shopify reală și disponibilă.
 
@@ -67,6 +68,8 @@ VITE_SHOPIFY_STORE_DOMAIN
 VITE_SHOPIFY_STOREFRONT_TOKEN
 VITE_SHOPIFY_API_VERSION
 VITE_CHECKOUT_HOSTS
+VITE_REQUIRE_CUSTOMER_ACCOUNT
+VITE_CUSTOMER_ACCOUNT_URL
 VITE_LEGAL_COMPANY
 VITE_LEGAL_CUI
 VITE_LEGAL_REG_COM
@@ -95,6 +98,11 @@ Storefront API. Frontend-ul preia din Shopify:
 - variantele de mărime și culoare;
 - disponibilitatea și cantitatea, când API-ul o oferă;
 - URL-ul de checkout emis de Shopify Cart API.
+
+Checkout-ul este configurat pentru conturi Shopify obligatorii. Linkul de cont folosește URL-ul
+copiat din `Settings > Customer accounts`, iar redirecționarea la checkout adaugă `sso=silent`
+pentru a recunoaște sesiunea activă a clientului. Enforcement-ul trebuie activat și în
+`Settings > Checkout > Customer contact method`; controlul din frontend nu îl înlocuiește.
 
 Produsele interne de test și colecțiile de sistem sunt filtrate. Catalogul real nu este redenumit
 și nu este completat cu produse locale în producție. Checkout-ul acceptă numai URL-uri HTTPS ale

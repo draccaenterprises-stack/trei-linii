@@ -635,7 +635,7 @@ function validateCartLines(lines: Array<{ merchandiseId: string; quantity: numbe
 }
 
 function validateCartId(cartId: string) {
-  if (!cartId.startsWith("gid://shopify/Cart/")) throw new Error("Cos Shopify invalid.");
+  if (!cartId.startsWith("gid://shopify/Cart/")) throw new Error("Coș Shopify invalid.");
 }
 
 export async function createCart(
@@ -721,7 +721,7 @@ export async function updateCartLines(
   validateCartId(cartId);
   validateCartLines(lines);
   if (lines.some((line) => !line.id.startsWith("gid://shopify/CartLine/"))) {
-    throw new Error("Linie de cos invalida.");
+    throw new Error("Linie de coș invalidă.");
   }
 
   const data = await storefrontFetch<{
@@ -757,7 +757,7 @@ export async function updateCartLines(
 export async function removeCartLines(cartId: string, lineIds: string[]): Promise<ShopifyCart> {
   validateCartId(cartId);
   if (!lineIds.length || lineIds.some((lineId) => !lineId.startsWith("gid://shopify/CartLine/"))) {
-    throw new Error("Linie de cos invalida.");
+    throw new Error("Linie de coș invalidă.");
   }
 
   const data = await storefrontFetch<{
@@ -790,7 +790,10 @@ export async function removeCartLines(cartId: string, lineIds: string[]): Promis
   return data.cartLinesRemove.cart;
 }
 
-export function redirectToShopifyCheckout(checkoutUrl: string) {
+export function buildShopifyCheckoutUrl(
+  checkoutUrl: string,
+  requireCustomerAccount = externalConfig.shopify.customerAccountRequired,
+) {
   const destination = new URL(checkoutUrl);
   const allowedHosts = new Set([
     shopifyConfig.domain?.toLowerCase(),
@@ -798,8 +801,13 @@ export function redirectToShopifyCheckout(checkoutUrl: string) {
   ]);
 
   if (destination.protocol !== "https:" || !allowedHosts.has(destination.hostname.toLowerCase())) {
-    throw new Error("Destinatia de checkout nu este permisa.");
+    throw new Error("Destinația de checkout nu este permisă.");
   }
 
-  window.location.assign(destination.toString());
+  if (requireCustomerAccount) destination.searchParams.set("sso", "silent");
+  return destination.toString();
+}
+
+export function redirectToShopifyCheckout(checkoutUrl: string) {
+  window.location.assign(buildShopifyCheckoutUrl(checkoutUrl));
 }

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Minus, Plus, X } from "lucide-react";
+import { LockKeyhole, Minus, Plus, X } from "lucide-react";
 import { formatRON } from "@/lib/format";
 import { useCart, type CartLine } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
@@ -200,6 +200,7 @@ export function CheckoutFooter({ subtotal }: { subtotal: number }) {
       <p className="font-mono-xs opacity-50">
         Livrarea și taxele se calculează la finalizarea comenzii.
       </p>
+      <CustomerAccountNotice />
       <ShopifyCheckoutButton />
       <Link
         to="/cart"
@@ -212,9 +213,22 @@ export function CheckoutFooter({ subtotal }: { subtotal: number }) {
   );
 }
 
+export function CustomerAccountNotice() {
+  const { customerAccountRequired } = useSite();
+
+  if (!customerAccountRequired) return null;
+
+  return (
+    <p className="flex items-start gap-2 text-sm leading-relaxed text-charcoal/70">
+      <LockKeyhole className="mt-0.5 h-4 w-4 shrink-0 text-accent-text" aria-hidden="true" />
+      <span>Cont necesar. Primești pe email un cod unic, apoi continui direct la plată.</span>
+    </p>
+  );
+}
+
 export function ShopifyCheckoutButton({ className = "" }: { className?: string }) {
   const { lines } = useCart();
-  const { siteMode } = useSite();
+  const { customerAccountRequired, siteMode } = useSite();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const shopifyReady = isShopifyConfigured();
@@ -279,7 +293,9 @@ export function ShopifyCheckoutButton({ className = "" }: { className?: string }
                   ? "Actualizează produsele din coș"
                   : loading
                     ? "Se redirecționează..."
-                    : "Continuă spre plata securizată"}
+                    : customerAccountRequired
+                      ? "Autentificare și plată"
+                      : "Continuă spre plata securizată"}
       </button>
       <FeedbackRegion message={error} tone="error" />
     </div>
