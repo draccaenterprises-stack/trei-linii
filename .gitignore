@@ -17,6 +17,7 @@ dist-ssr
 coverage
 playwright-report
 test-results
+.playwright-cli/
 reports/lighthouse
 *.local
 .env

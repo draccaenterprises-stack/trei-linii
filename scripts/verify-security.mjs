@@ -106,6 +106,22 @@ if (existsSync(resolve(root, "src/routes/admin.tsx"))) {
   errors.push("Ruta publică src/routes/admin.tsx există încă.");
 }
 
+for (const publicMcpPath of [
+  "src/routes/mcp.ts",
+  "src/routes/[.mcp]",
+  "src/routes/[.well-known]/oauth-protected-resource.ts",
+  "src/lib/mcp",
+]) {
+  if (existsSync(resolve(root, publicMcpPath))) {
+    errors.push(`${publicMcpPath}: serverul MCP public nu trebuie inclus în storefront.`);
+  }
+}
+
+const packageJson = readFileSync(resolve(root, "package.json"), "utf8");
+if (packageJson.includes('"@lovable.dev/mcp-js"')) {
+  errors.push("package.json: dependența MCP publică nu trebuie inclusă în storefront.");
+}
+
 const productionEnv = readFileSync(resolve(root, ".env.production"), "utf8");
 if (/^VITE_SHOPIFY_STOREFRONT_TOKEN=\S+/m.test(productionEnv)) {
   errors.push(
