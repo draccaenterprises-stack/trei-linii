@@ -65,9 +65,6 @@ CODUL TRECE - activarea comercială mai are verificări externe.
     Comandă: npm run verify:seo -- https://blank-atelier-canvas.lovable.app
     Status: external; exit 1
     Notă: Poate rămâne extern până când robots, sitemap și build-ul nou sunt publicate.
-    - robots.txt: lipsește Disallow: /mcp
-    - robots.txt: lipsește Disallow: /.mcp
-    - robots.txt: lipsește Disallow: /.well-known/oauth-protected-resource
     - sitemap.xml: lipsește ruta /shop/lista
     - sitemap.xml: lipsește ruta /manifest
     - sitemap.xml: lipsește ruta /livrare
