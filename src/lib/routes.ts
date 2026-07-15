@@ -51,11 +51,4 @@ export const indexableRoutes = routeRegistry
   .filter((route) => route.indexable)
   .map((route) => route.path);
 
-export const nonIndexableRoutes = [
-  "/admin",
-  "/cart",
-  "/journal",
-  "/mcp",
-  "/.mcp",
-  "/.well-known/oauth-protected-resource",
-] as const;
+export const nonIndexableRoutes = ["/admin", "/cart", "/journal"] as const;

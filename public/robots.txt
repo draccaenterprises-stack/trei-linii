@@ -3,8 +3,5 @@ Allow: /
 Disallow: /admin
 Disallow: /cart
 Disallow: /journal
-Disallow: /mcp
-Disallow: /.mcp
-Disallow: /.well-known/oauth-protected-resource
 
 Sitemap: https://blank-atelier-canvas.lovable.app/sitemap.xml

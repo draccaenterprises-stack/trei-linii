@@ -122,6 +122,13 @@ if (packageJson.includes('"@lovable.dev/mcp-js"')) {
   errors.push("package.json: dependența MCP publică nu trebuie inclusă în storefront.");
 }
 
+const routeRegistry = readFileSync(resolve(root, "src/lib/routes.ts"), "utf8");
+for (const legacyMcpRoute of ["/mcp", "/.mcp", "/.well-known/oauth-protected-resource"]) {
+  if (routeRegistry.includes(`"${legacyMcpRoute}"`)) {
+    errors.push(`src/lib/routes.ts: marcajul MCP vechi ${legacyMcpRoute} nu trebuie inclus.`);
+  }
+}
+
 const productionEnv = readFileSync(resolve(root, ".env.production"), "utf8");
 if (/^VITE_SHOPIFY_STOREFRONT_TOKEN=\S+/m.test(productionEnv)) {
   errors.push(
