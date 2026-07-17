@@ -7,6 +7,31 @@ type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
 };
 
+const contentSecurityPolicy = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self' mailto:",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
+  "img-src 'self' data: blob: https://cdn.shopify.com",
+  "connect-src 'self' https://*.myshopify.com https://a.klaviyo.com https://www.google-analytics.com https://region1.google-analytics.com https://connect.facebook.net",
+  "upgrade-insecure-requests",
+].join("; ");
+
+const securityHeaders = {
+  "Content-Security-Policy": contentSecurityPolicy,
+  "Cross-Origin-Opener-Policy": "same-origin-allow-popups",
+  "Cross-Origin-Resource-Policy": "same-site",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(self)",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+} as const;
+
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 async function getServerEntry(): Promise<ServerEntry> {
@@ -109,15 +134,47 @@ export function escapeHtmlNullBytes(response: Response): Response {
   });
 }
 
+function isLovablePreview(url: string): boolean {
+  const hostname = new URL(url).hostname;
+  return hostname.startsWith("id-preview--") && hostname.endsWith(".lovable.app");
+}
+
+export function applySecurityHeaders(response: Response, requestUrl: string): Response {
+  const headers = new Headers(response.headers);
+  const preview = isLovablePreview(requestUrl);
+
+  for (const [name, value] of Object.entries(securityHeaders)) {
+    if (preview && name === "X-Frame-Options") continue;
+    headers.set(
+      name,
+      preview && name === "Content-Security-Policy"
+        ? value.replace(
+            "frame-ancestors 'none'",
+            "frame-ancestors https://lovable.dev https://*.lovable.dev",
+          )
+        : value,
+    );
+  }
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
-      return escapeHtmlNullBytes(await normalizeCatastrophicSsrResponse(response));
+      return applySecurityHeaders(
+        escapeHtmlNullBytes(await normalizeCatastrophicSsrResponse(response)),
+        request.url,
+      );
     } catch (error) {
       console.error(error);
-      return brandedErrorResponse();
+      return applySecurityHeaders(brandedErrorResponse(), request.url);
     }
   },
 };
