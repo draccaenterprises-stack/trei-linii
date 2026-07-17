@@ -8,7 +8,10 @@ const env = {
   ...process.env,
 };
 const domain = normalizeDomain(env.VITE_SHOPIFY_STORE_DOMAIN ?? env.SHOPIFY_STORE_DOMAIN);
-const token = env.VITE_SHOPIFY_STOREFRONT_TOKEN ?? env.SHOPIFY_STOREFRONT_TOKEN;
+const token =
+  env.SHOPIFY_STOREFRONT_TOKEN?.trim() ||
+  env.SHOPIFY_STOREFRONT_ACCESS_TOKEN?.trim() ||
+  env.VITE_SHOPIFY_STOREFRONT_TOKEN?.trim();
 const compromisedToken = env.COMPROMISED_SHOPIFY_STOREFRONT_TOKEN?.trim();
 const apiVersion = env.VITE_SHOPIFY_API_VERSION ?? env.SHOPIFY_API_VERSION ?? "2026-01";
 const minProducts = Number(env.MIN_SHOPIFY_PRODUCTS ?? 1);
@@ -86,7 +89,11 @@ function assertMutation(name, payload) {
 }
 
 if (!domain) errors.push("Lipsește VITE_SHOPIFY_STORE_DOMAIN.");
-if (!token) errors.push("Lipsește VITE_SHOPIFY_STOREFRONT_TOKEN din mediul de verificare.");
+if (!token) {
+  errors.push(
+    "Lipsește SHOPIFY_STOREFRONT_TOKEN (sau tokenul public VITE echivalent) din mediul de verificare.",
+  );
+}
 if (token && compromisedToken && token === compromisedToken) {
   errors.push("Tokenul Storefront coincide cu valoarea marcată drept compromisă.");
 }

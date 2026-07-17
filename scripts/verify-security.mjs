@@ -28,6 +28,7 @@ const secretPatterns = [
   /\bglpat-[A-Za-z0-9_-]{20,}\b/,
 ];
 const forbiddenPublicEnv = /\bVITE_[A-Z0-9_]*(?:SECRET|PRIVATE_KEY|ADMIN_TOKEN)[A-Z0-9_]*\b/;
+const serverOnlyShopifyEnv = /(?:^|[^A-Z0-9_])SHOPIFY_STOREFRONT_(?:ACCESS_)?TOKEN(?:[^A-Z0-9_]|$)/;
 const forbiddenClaims = [
   /47 de persoane/i,
   /9 persoane au produsul/i,
@@ -92,6 +93,11 @@ for (const file of files) {
   }
   if (forbiddenPublicEnv.test(source))
     errors.push(`${file}: secret declarat cu prefix public VITE_`);
+  if (file.startsWith(".output/public/") && serverOnlyShopifyEnv.test(source)) {
+    errors.push(
+      `${file}: identificatorul secretului Shopify server-side a ajuns în buildul public`,
+    );
+  }
   for (const value of forbiddenValues) {
     if (source.includes(value)) errors.push(`${file}: valoare interzisă detectată`);
   }

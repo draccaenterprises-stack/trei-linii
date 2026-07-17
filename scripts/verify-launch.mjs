@@ -6,6 +6,7 @@ const reportPath = "docs/final-verification-report.md";
 const sensitiveValues = [
   process.env.VITE_SHOPIFY_STOREFRONT_TOKEN,
   process.env.SHOPIFY_STOREFRONT_TOKEN,
+  process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN,
   process.env.COMPROMISED_SHOPIFY_STOREFRONT_TOKEN,
   ...(process.env.FORBIDDEN_SOURCE_PATTERNS?.split(",") ?? []),
   ...(process.env.FORBIDDEN_PUBLIC_SECRETS?.split(",") ?? []),
@@ -119,7 +120,7 @@ function writeReport() {
     ]),
     "## Inputuri externe pentru activarea live-shop",
     "",
-    "- tokenul public Shopify Storefront setat numai în mediul de deploy;",
+    "- tokenul Shopify Storefront setat numai ca secret server-side în mediul de deploy;",
     "- produse și colecții reale publicate pe canalul Storefront/Headless;",
     "- datele comerciale reale și textele juridice validate;",
     "- o comandă Shopify de test și confirmarea hostului de checkout;",

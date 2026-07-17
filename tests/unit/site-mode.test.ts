@@ -5,6 +5,7 @@ const readyConfig = {
   siteMode: "live-shop" as const,
   shopifyStoreDomain: "store.myshopify.com",
   shopifyStorefrontToken: "public-token",
+  shopifyServerProxyEnabled: false,
   company: "Trei Linii SRL",
   cui: "RO123",
   regCom: "J00/1/2026",
@@ -18,6 +19,13 @@ describe("site mode", () => {
     expect(deriveSiteMode(readyConfig)).toBe("live-shop");
     expect(deriveSiteMode({ ...readyConfig, company: "" })).toBe("pre-launch");
     expect(deriveSiteMode({ ...readyConfig, shopifyStorefrontToken: "" })).toBe("pre-launch");
+    expect(
+      deriveSiteMode({
+        ...readyConfig,
+        shopifyStorefrontToken: "",
+        shopifyServerProxyEnabled: true,
+      }),
+    ).toBe("live-shop");
     expect(deriveSiteMode({ ...readyConfig, customerAccountUrl: "" })).toBe("pre-launch");
     expect(
       deriveSiteMode({

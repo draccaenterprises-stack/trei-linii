@@ -18,6 +18,7 @@ const publicConfigSchema = z.object({
   legalUpdatedAt: z.string(),
   shopifyStoreDomain: z.string(),
   shopifyStorefrontToken: z.string(),
+  shopifyServerProxyEnabled: z.boolean(),
   shopifyApiVersion: z.string().regex(/^\d{4}-\d{2}$/),
   checkoutHosts: z.array(z.string()),
   customerAccountRequired: z.boolean(),
@@ -70,6 +71,7 @@ const parsedConfig = publicConfigSchema.safeParse({
   legalUpdatedAt: env("VITE_LEGAL_UPDATED_AT"),
   shopifyStoreDomain: env("VITE_SHOPIFY_STORE_DOMAIN"),
   shopifyStorefrontToken: env("VITE_SHOPIFY_STOREFRONT_TOKEN"),
+  shopifyServerProxyEnabled: booleanEnv("VITE_SHOPIFY_SERVER_PROXY", false),
   shopifyApiVersion: env("VITE_SHOPIFY_API_VERSION") || "2026-01",
   checkoutHosts: csvEnv("VITE_CHECKOUT_HOSTS"),
   customerAccountRequired: booleanEnv("VITE_REQUIRE_CUSTOMER_ACCOUNT", true),
@@ -99,6 +101,7 @@ type SiteModeConfig = Pick<
   | "siteMode"
   | "shopifyStoreDomain"
   | "shopifyStorefrontToken"
+  | "shopifyServerProxyEnabled"
   | "company"
   | "cui"
   | "regCom"
@@ -112,7 +115,7 @@ export function deriveSiteMode(config: SiteModeConfig): "pre-launch" | "live-sho
     !config.customerAccountRequired || Boolean(config.customerAccountUrl);
   const commerceReady = Boolean(
     config.shopifyStoreDomain &&
-    config.shopifyStorefrontToken &&
+    (config.shopifyStorefrontToken || config.shopifyServerProxyEnabled) &&
     config.company &&
     config.cui &&
     config.regCom &&
@@ -129,6 +132,7 @@ export const externalConfig = Object.freeze({
   shopify: {
     domain: publicConfig.shopifyStoreDomain,
     token: publicConfig.shopifyStorefrontToken,
+    serverProxyEnabled: publicConfig.shopifyServerProxyEnabled,
     apiVersion: publicConfig.shopifyApiVersion,
     checkoutHosts: publicConfig.checkoutHosts,
     customerAccountRequired: publicConfig.customerAccountRequired,
