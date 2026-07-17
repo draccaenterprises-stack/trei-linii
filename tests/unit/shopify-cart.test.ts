@@ -31,6 +31,7 @@ describe("Shopify cart adapter", () => {
   beforeEach(() => {
     shopifyConfig.domain = "store.myshopify.com";
     shopifyConfig.token = "public-token";
+    shopifyConfig.serverProxyEnabled = false;
     shopifyConfig.apiVersion = "2026-01";
     vi.stubGlobal(
       "fetch",

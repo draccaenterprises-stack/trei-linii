@@ -13,6 +13,30 @@ import type {
   ProductVariant,
   Size,
 } from "./catalog-types";
+import type {
+  ShopifyCollectionNode,
+  ShopifyGraphQlResponse,
+  ShopifyProductNode,
+  ShopifySelectedOption,
+} from "./shopify-contract";
+import {
+  addCartLinesInShopify,
+  createCartInShopify,
+  fetchCollectionsFromShopify,
+  fetchProductFromShopify,
+  fetchProductsFromShopify,
+  removeCartLinesInShopify,
+  updateCartLinesInShopify,
+} from "./shopify.functions";
+import {
+  CART_CREATE_MUTATION,
+  CART_LINES_ADD_MUTATION,
+  CART_LINES_REMOVE_MUTATION,
+  CART_LINES_UPDATE_MUTATION,
+  COLLECTIONS_QUERY,
+  PRODUCT_BY_HANDLE_QUERY,
+  PRODUCTS_QUERY,
+} from "./shopify-queries";
 import { SITE_MODE, externalConfig, hasLegalBusinessDetails } from "./site";
 
 function normalizeStoreDomain(value?: string) {
@@ -27,10 +51,12 @@ function normalizeStoreDomain(value?: string) {
 export const shopifyConfig = {
   domain: normalizeStoreDomain(externalConfig.shopify.domain),
   token: externalConfig.shopify.token || undefined,
+  serverProxyEnabled: externalConfig.shopify.serverProxyEnabled,
   apiVersion: externalConfig.shopify.apiVersion,
 };
 
-export const isShopifyConfigured = () => Boolean(shopifyConfig.domain && shopifyConfig.token);
+export const isShopifyConfigured = () =>
+  Boolean(shopifyConfig.domain && (shopifyConfig.token || shopifyConfig.serverProxyEnabled));
 
 export const isE2ECommerceFixtureEnabled = () =>
   import.meta.env.MODE === "e2e-commerce" && externalConfig.shopify.e2eCommerceFixtureEnabled;
@@ -46,71 +72,19 @@ export class CatalogUnavailableError extends Error {
   }
 }
 
-type ShopifyGraphQlResponse<T> = {
-  data?: T;
-  errors?: Array<{ message: string }>;
-};
+async function storefrontFetch<T>(
+  query: string,
+  variables: Record<string, unknown> | undefined,
+  serverRequest: () => Promise<T>,
+): Promise<T> {
+  if (!shopifyConfig.domain) {
+    throw new Error("Magazinul nu este disponibil momentan.");
+  }
 
-type ShopifyMoney = {
-  amount: string;
-  currencyCode: string;
-};
-
-type ShopifyImage = {
-  url: string;
-  altText?: string | null;
-};
-
-type ShopifySelectedOption = {
-  name: string;
-  value: string;
-};
-
-type ShopifyProductNode = {
-  id: string;
-  handle: string;
-  title: string;
-  description: string;
-  availableForSale: boolean;
-  totalInventory?: number | null;
-  tags: string[];
-  featuredImage: ShopifyImage | null;
-  priceRange: {
-    minVariantPrice: ShopifyMoney;
-  };
-  collections: {
-    nodes: Array<{
-      handle: string;
-      title: string;
-    }>;
-  };
-  images: {
-    nodes: ShopifyImage[];
-  };
-  variants: {
-    nodes: Array<{
-      id: string;
-      title: string;
-      availableForSale: boolean;
-      quantityAvailable?: number | null;
-      selectedOptions: ShopifySelectedOption[];
-      price: ShopifyMoney;
-    }>;
-  };
-};
-
-type ShopifyCollectionNode = {
-  handle: string;
-  title: string;
-  description: string;
-  image: ShopifyImage | null;
-  products: {
-    nodes: Array<{ id: string }>;
-  };
-};
-
-async function storefrontFetch<T>(query: string, variables?: Record<string, unknown>): Promise<T> {
-  if (!shopifyConfig.domain || !shopifyConfig.token) {
+  if (shopifyConfig.serverProxyEnabled) {
+    return serverRequest();
+  }
+  if (!shopifyConfig.token) {
     throw new Error("Magazinul nu este disponibil momentan.");
   }
 
@@ -154,53 +128,6 @@ async function storefrontFetch<T>(query: string, variables?: Record<string, unkn
     clearTimeout(timeout);
   }
 }
-
-const PRODUCT_FIELDS = `
-  id
-  handle
-  title
-  description
-  availableForSale
-  tags
-  featuredImage {
-    url(transform: { maxWidth: 1200, preferredContentType: WEBP })
-    altText
-  }
-  priceRange {
-    minVariantPrice {
-      amount
-      currencyCode
-    }
-  }
-  collections(first: 3) {
-    nodes {
-      handle
-      title
-    }
-  }
-  images(first: 10) {
-    nodes {
-      url(transform: { maxWidth: 1200, preferredContentType: WEBP })
-      altText
-    }
-  }
-  variants(first: 100) {
-    nodes {
-      id
-      title
-      availableForSale
-      quantityAvailable
-      selectedOptions {
-        name
-        value
-      }
-      price {
-        amount
-        currencyCode
-      }
-    }
-  }
-`;
 
 function normalizeText(value: string) {
   return value
@@ -506,15 +433,7 @@ export async function fetchProducts(): Promise<Product[]> {
       products: {
         nodes: ShopifyProductNode[];
       };
-    }>(`
-      query Products {
-        products(first: 50) {
-          nodes {
-            ${PRODUCT_FIELDS}
-          }
-        }
-      }
-    `);
+    }>(PRODUCTS_QUERY, undefined, fetchProductsFromShopify);
 
     return data.products.nodes
       .filter((product) => !isInternalTestProduct(product))
@@ -539,16 +458,7 @@ export async function fetchProductByHandle(handle: string): Promise<Product | un
   try {
     const data = await storefrontFetch<{
       product: ShopifyProductNode | null;
-    }>(
-      `
-      query ProductByHandle($handle: String!) {
-        product(handle: $handle) {
-          ${PRODUCT_FIELDS}
-        }
-      }
-    `,
-      { handle },
-    );
+    }>(PRODUCT_BY_HANDLE_QUERY, { handle }, () => fetchProductFromShopify({ data: { handle } }));
 
     if (data.product && !isInternalTestProduct(data.product))
       return mapShopifyProduct(data.product);
@@ -577,26 +487,7 @@ export async function fetchCollections(): Promise<Collection[]> {
       collections: {
         nodes: ShopifyCollectionNode[];
       };
-    }>(`
-      query Collections {
-        collections(first: 20) {
-          nodes {
-            handle
-            title
-            description
-            image {
-              url(transform: { maxWidth: 1200, preferredContentType: WEBP })
-              altText
-            }
-            products(first: 100) {
-              nodes {
-                id
-              }
-            }
-          }
-        }
-      }
-    `);
+    }>(COLLECTIONS_QUERY, undefined, fetchCollectionsFromShopify);
 
     return data.collections.nodes
       .filter(
@@ -647,22 +538,7 @@ export async function createCart(
       cart: ShopifyCart | null;
       userErrors: Array<{ message: string }>;
     };
-  }>(
-    `
-    mutation CartCreate($input: CartInput!) {
-      cartCreate(input: $input) {
-        cart {
-          id
-          checkoutUrl
-        }
-        userErrors {
-          message
-        }
-      }
-    }
-  `,
-    { input: { lines } },
-  );
+  }>(CART_CREATE_MUTATION, { input: { lines } }, () => createCartInShopify({ data: { lines } }));
 
   if (data.cartCreate.userErrors.length) {
     console.error("Shopify cartCreate userErrors.", data.cartCreate.userErrors);
@@ -686,21 +562,8 @@ export async function addCartLines(
       cart: ShopifyCart | null;
       userErrors: Array<{ message: string }>;
     };
-  }>(
-    `
-    mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
-      cartLinesAdd(cartId: $cartId, lines: $lines) {
-        cart {
-          id
-          checkoutUrl
-        }
-        userErrors {
-          message
-        }
-      }
-    }
-  `,
-    { cartId, lines },
+  }>(CART_LINES_ADD_MUTATION, { cartId, lines }, () =>
+    addCartLinesInShopify({ data: { cartId, lines } }),
   );
 
   if (data.cartLinesAdd.userErrors.length) {
@@ -729,21 +592,8 @@ export async function updateCartLines(
       cart: ShopifyCart | null;
       userErrors: Array<{ message: string }>;
     };
-  }>(
-    `
-    mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
-      cartLinesUpdate(cartId: $cartId, lines: $lines) {
-        cart {
-          id
-          checkoutUrl
-        }
-        userErrors {
-          message
-        }
-      }
-    }
-  `,
-    { cartId, lines },
+  }>(CART_LINES_UPDATE_MUTATION, { cartId, lines }, () =>
+    updateCartLinesInShopify({ data: { cartId, lines } }),
   );
 
   if (data.cartLinesUpdate.userErrors.length) {
@@ -765,21 +615,8 @@ export async function removeCartLines(cartId: string, lineIds: string[]): Promis
       cart: ShopifyCart | null;
       userErrors: Array<{ message: string }>;
     };
-  }>(
-    `
-    mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
-      cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
-        cart {
-          id
-          checkoutUrl
-        }
-        userErrors {
-          message
-        }
-      }
-    }
-  `,
-    { cartId, lineIds },
+  }>(CART_LINES_REMOVE_MUTATION, { cartId, lineIds }, () =>
+    removeCartLinesInShopify({ data: { cartId, lineIds } }),
   );
 
   if (data.cartLinesRemove.userErrors.length) {

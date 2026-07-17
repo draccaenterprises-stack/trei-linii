@@ -139,20 +139,38 @@ function isLovablePreview(url: string): boolean {
   return hostname.startsWith("id-preview--") && hostname.endsWith(".lovable.app");
 }
 
+function isInsecureLoopback(url: string): boolean {
+  const parsed = new URL(url);
+  return (
+    parsed.protocol === "http:" &&
+    (parsed.hostname === "localhost" ||
+      parsed.hostname === "127.0.0.1" ||
+      parsed.hostname === "[::1]")
+  );
+}
+
 export function applySecurityHeaders(response: Response, requestUrl: string): Response {
   const headers = new Headers(response.headers);
   const preview = isLovablePreview(requestUrl);
+  const insecureLoopback = isInsecureLoopback(requestUrl);
 
   for (const [name, value] of Object.entries(securityHeaders)) {
     if (preview && name === "X-Frame-Options") continue;
+    if (insecureLoopback && name === "Strict-Transport-Security") continue;
+
+    const localValue =
+      insecureLoopback && name === "Content-Security-Policy"
+        ? value.replace(/; upgrade-insecure-requests(?:;|$)/, "")
+        : value;
+
     headers.set(
       name,
       preview && name === "Content-Security-Policy"
-        ? value.replace(
+        ? localValue.replace(
             "frame-ancestors 'none'",
             "frame-ancestors https://lovable.dev https://*.lovable.dev",
           )
-        : value,
+        : localValue,
     );
   }
 

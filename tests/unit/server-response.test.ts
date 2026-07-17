@@ -49,4 +49,13 @@ describe("headerele de securitate SSR", () => {
     expect(policy).not.toContain("frame-ancestors 'none'");
     expect(response.headers.has("x-frame-options")).toBe(false);
   });
+
+  it("nu forțează HTTPS pentru resursele din mediul local", () => {
+    const response = applySecurityHeaders(new Response("local"), "http://localhost:4175/");
+    const policy = response.headers.get("content-security-policy");
+
+    expect(policy).not.toContain("upgrade-insecure-requests");
+    expect(response.headers.has("strict-transport-security")).toBe(false);
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+  });
 });

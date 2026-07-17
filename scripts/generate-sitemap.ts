@@ -29,7 +29,11 @@ const siteUrl = (
   "https://blank-atelier-canvas.lovable.app"
 ).replace(/\/$/, "");
 const storeDomain = process.env.VITE_SHOPIFY_STORE_DOMAIN || fileEnv.VITE_SHOPIFY_STORE_DOMAIN;
-const token = process.env.VITE_SHOPIFY_STOREFRONT_TOKEN || fileEnv.VITE_SHOPIFY_STOREFRONT_TOKEN;
+const token =
+  process.env.SHOPIFY_STOREFRONT_TOKEN ||
+  process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN ||
+  process.env.VITE_SHOPIFY_STOREFRONT_TOKEN ||
+  fileEnv.VITE_SHOPIFY_STOREFRONT_TOKEN;
 const apiVersion =
   process.env.VITE_SHOPIFY_API_VERSION || fileEnv.VITE_SHOPIFY_API_VERSION || "2026-01";
 
