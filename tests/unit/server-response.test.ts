@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { escapeHtmlNullBytes } from "@/server";
+import { applySecurityHeaders, escapeHtmlNullBytes } from "@/server";
 
 describe("răspunsurile HTML pentru WebKit", () => {
   it("înlocuiește octeții NUL din stream cu o secvență JavaScript validă", async () => {
@@ -20,5 +20,33 @@ describe("răspunsurile HTML pentru WebKit", () => {
     const untouched = escapeHtmlNullBytes(response);
 
     expect(await untouched.arrayBuffer()).toEqual(await new Response("a\0b").arrayBuffer());
+  });
+});
+
+describe("headerele de securitate SSR", () => {
+  it("protejează răspunsurile publice împotriva încadrării și tipurilor interpretate", () => {
+    const response = applySecurityHeaders(
+      new Response("ok", { headers: { "cache-control": "public, max-age=60" } }),
+      "https://blank-atelier-canvas.lovable.app/",
+    );
+
+    expect(response.headers.get("content-security-policy")).toContain("frame-ancestors 'none'");
+    expect(response.headers.get("content-security-policy")).not.toContain("'unsafe-eval'");
+    expect(response.headers.get("x-frame-options")).toBe("DENY");
+    expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(response.headers.get("permissions-policy")).toContain("camera=()");
+    expect(response.headers.get("cache-control")).toBe("public, max-age=60");
+  });
+
+  it("permite doar editorului Lovable să încadreze domeniul de preview", () => {
+    const response = applySecurityHeaders(
+      new Response("preview"),
+      "https://id-preview--project-id.lovable.app/",
+    );
+    const policy = response.headers.get("content-security-policy");
+
+    expect(policy).toContain("frame-ancestors https://lovable.dev https://*.lovable.dev");
+    expect(policy).not.toContain("frame-ancestors 'none'");
+    expect(response.headers.has("x-frame-options")).toBe(false);
   });
 });
