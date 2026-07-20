@@ -263,12 +263,15 @@
     box-shadow: 0 18px 42px rgb(26 26 24 / 0.14);
   }
 
-  @media (max-width: 767px) {
+  @media (hover: none), (pointer: coarse) {
     .pc-view-btn {
       -webkit-tap-highlight-color: transparent;
+      opacity: 1 !important;
       touch-action: manipulation;
     }
+  }
 
+  @media (max-width: 767px) {
     .shop-collage-item {
       box-shadow: 0 12px 30px rgb(26 26 24 / 0.13);
     }
