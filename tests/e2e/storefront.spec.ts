@@ -107,6 +107,22 @@ test("animația Vezi produs pornește din centrul butonului pe mobil", async ({ 
   ).toBe(true);
 });
 
+test("butonul Vezi produs rămâne vizibil pe tablete touch", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-390", "Folosește contextul WebKit cu touch.");
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await page.goto("/shop");
+  await waitForHydration(page);
+
+  expect(
+    await page.evaluate(() => window.matchMedia("(hover: none), (pointer: coarse)").matches),
+  ).toBe(true);
+
+  const button = page.getByRole("button", { name: /Vezi produs/ }).first();
+  await button.scrollIntoViewIfNeeded();
+  await expect(button).toBeVisible();
+  await expect(button).toHaveCSS("opacity", "1");
+});
+
 test("galeria rapidă se închide cu Escape și restabilește focusul", async ({ page }) => {
   await page.goto("/shop");
   await waitForHydration(page);
