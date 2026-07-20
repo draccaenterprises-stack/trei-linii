@@ -137,19 +137,6 @@ function normalizeText(value: string) {
     .trim();
 }
 
-function isInternalTestLabel(value: string) {
-  const normalized = normalizeText(value);
-  return (
-    /^model\s*\d+/.test(normalized) ||
-    /^colectie\s*\d+/.test(normalized) ||
-    /^collection\s*\d+/.test(normalized) ||
-    normalized.includes(" test") ||
-    normalized.endsWith(" test") ||
-    normalized === "home page" ||
-    normalized === "homepage"
-  );
-}
-
 function isSystemCollection(handle: string, title: string) {
   const normalizedHandle = normalizeText(handle);
   const normalizedTitle = normalizeText(title);
@@ -163,10 +150,6 @@ function isSystemCollection(handle: string, title: string) {
 
 function unique<T>(items: T[]) {
   return [...new Set(items)];
-}
-
-function isInternalTestProduct(product: ShopifyProductNode) {
-  return isInternalTestLabel(product.title) || isInternalTestLabel(product.handle);
 }
 
 function selectedOptionValue(
@@ -435,9 +418,9 @@ export async function fetchProducts(): Promise<Product[]> {
       };
     }>(PRODUCTS_QUERY, undefined, fetchProductsFromShopify);
 
-    return data.products.nodes
-      .filter((product) => !isInternalTestProduct(product))
-      .map(mapShopifyProduct);
+    // Shopify publication controls are the source of truth. Product names such as
+    // "Model 1" are valid working titles and must not disappear from the storefront.
+    return data.products.nodes.map(mapShopifyProduct);
   } catch (error) {
     console.error("Nu am putut citi produsele din Shopify.", error);
     if (isPreviewCatalogEnabled()) return previewProducts();
@@ -460,8 +443,7 @@ export async function fetchProductByHandle(handle: string): Promise<Product | un
       product: ShopifyProductNode | null;
     }>(PRODUCT_BY_HANDLE_QUERY, { handle }, () => fetchProductFromShopify({ data: { handle } }));
 
-    if (data.product && !isInternalTestProduct(data.product))
-      return mapShopifyProduct(data.product);
+    if (data.product) return mapShopifyProduct(data.product);
 
     const products = await fetchProducts();
     return products.find((p) => p.handle === handle);
@@ -490,12 +472,7 @@ export async function fetchCollections(): Promise<Collection[]> {
     }>(COLLECTIONS_QUERY, undefined, fetchCollectionsFromShopify);
 
     return data.collections.nodes
-      .filter(
-        (collection) =>
-          !isSystemCollection(collection.handle, collection.title) &&
-          !isInternalTestLabel(collection.handle) &&
-          !isInternalTestLabel(collection.title),
-      )
+      .filter((collection) => !isSystemCollection(collection.handle, collection.title))
       .map(mapShopifyCollection);
   } catch (error) {
     console.error("Nu am putut citi colecțiile din Shopify.", error);
