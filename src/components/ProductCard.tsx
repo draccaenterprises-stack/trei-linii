@@ -7,7 +7,7 @@ import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import { preloadQuickViewImages } from "@/lib/quick-view";
-import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
+import { canPurchaseProduct, getPhotoImages, getStockForColor } from "@/lib/shopify";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { FeedbackRegion } from "@/components/FeedbackRegion";
 
@@ -519,10 +519,13 @@ export function ProductCard({
   const quickAddStock = getStockForColor(product, quickAddColor);
   const availableSizes = product.sizes.filter((size) => quickAddStock[size] > 0);
   const showPrice = siteMode === "live-shop";
+  // Card imagery uses worn photography only; isolated vector design never leads a card.
+  const cardImages = getPhotoImages(product);
   const primaryImage = productCardBackImageFirst
-    ? (product.images[1] ?? product.images[0])
-    : product.images[0];
-  const hoverImage = primaryImage === product.images[0] ? product.images[1] : product.images[0];
+    ? (cardImages[1] ?? cardImages[0])
+    : cardImages[0];
+  const hoverImage = primaryImage === cardImages[0] ? cardImages[1] : cardImages[0];
+
   const productCanBePurchased = canPurchaseProduct(product);
   const [quickMessage, setQuickMessage] = React.useState("");
 

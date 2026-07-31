@@ -2,103 +2,235 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://blank-atelier-canvas.lovable.app</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/shop</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/shop/lista</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/lookbook</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/manifest</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/about</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/contact</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/faq</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/size-guide</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/livrare</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/retur</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/schimb-marime</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/termeni-si-conditii</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/confidentialitate</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/cookies</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/anpc</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://blank-atelier-canvas.lovable.app/sol</loc>
-    <lastmod>2026-07-17</lastmod>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/model1-tricou</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/model2-tricou</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/confluence-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/offset-portal-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/migration-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/release-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/orbit-break-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/folded-horizon-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/three-windows-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/gravity-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/hinge-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/signal-field-tricou-oversized-1</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/cut-circle-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/open-structure-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/shared-axis-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/tidal-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/pulse-gap-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/counterweight-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/fracture-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/parallel-turn-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/three-suns-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://blank-atelier-canvas.lovable.app/product/soft-architecture-tricou-oversized</loc>
+    <lastmod>2026-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>

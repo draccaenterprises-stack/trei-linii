@@ -137,6 +137,44 @@ function normalizeText(value: string) {
     .trim();
 }
 
+/** A vector asset is an isolated design file: an .svg URL or alt text mentioning "vector". */
+export function isVectorMedia(media: { url: string; alt?: string | null }) {
+  const path = media.url.split(/[?#]/)[0]?.toLowerCase() ?? "";
+  return path.endsWith(".svg") || normalizeText(media.alt ?? "").includes("vector");
+}
+
+/** Worn photography first, isolated vector design last; relative order kept inside each group. */
+export function sortMediaPhotosFirst<T extends { url: string; alt?: string | null }>(
+  media: T[],
+): T[] {
+  return [...media.filter((item) => !isVectorMedia(item)), ...media.filter(isVectorMedia)];
+}
+
+/** Photo URLs for a product, falling back to every image when only vectors exist. */
+export function getPhotoImages(product: {
+  media?: Array<{ url: string; alt?: string | null }>;
+  images: string[];
+}): string[] {
+  const source = product.media?.length
+    ? product.media
+    : product.images.map((url) => ({ url, alt: "" }));
+  const photos = source.filter((item) => !isVectorMedia(item)).map((item) => item.url);
+  return photos.length ? photos : product.images;
+}
+
+/** Finds the isolated design asset whose alt text matches a keyword (diacritics-insensitive). */
+export function findVectorImage(
+  product: { media?: Array<{ url: string; alt?: string | null }> },
+  altKeyword: string,
+): string | undefined {
+  const needle = normalizeText(altKeyword);
+  return product.media?.find(
+    (item) => isVectorMedia(item) && normalizeText(item.alt ?? "").includes(needle),
+  )?.url;
+}
+
+
+
 function isSystemCollection(handle: string, title: string) {
   const normalizedHandle = normalizeText(handle);
   const normalizedTitle = normalizeText(title);
@@ -263,16 +301,19 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
     return acc;
   }, {});
 
-  const media = product.images.nodes.map((image, imageIndex) => ({
-    url: image.url,
-    alt: image.altText?.trim() || `${product.title} - imagine ${imageIndex + 1}`,
-  }));
+  const media = sortMediaPhotosFirst(
+    product.images.nodes.map((image, imageIndex) => ({
+      url: image.url,
+      alt: image.altText?.trim() || `${product.title} - imagine ${imageIndex + 1}`,
+    })),
+  );
   if (!media.length && product.featuredImage?.url) {
     media.push({
       url: product.featuredImage.url,
       alt: product.featuredImage.altText?.trim() || product.title,
     });
   }
+
   const money = {
     amount: Number(product.priceRange.minVariantPrice.amount),
     currencyCode: product.priceRange.minVariantPrice.currencyCode,

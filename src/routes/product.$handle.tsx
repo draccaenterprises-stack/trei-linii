@@ -16,7 +16,7 @@ import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { productRepository } from "@/lib/product-repository";
-import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
+import { canPurchaseProduct, getPhotoImages, getStockForColor } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
 import { SITE_URL } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
@@ -105,7 +105,14 @@ function ProductPage() {
   const [purchaseMessage, setPurchaseMessage] = useState("");
   const selectedColorStock = useMemo(() => getStockForColor(product, color), [product, color]);
   const productCanBePurchased = canPurchaseProduct(product);
-  const galleryImages = product.images.length ? product.images : [""];
+  // Worn photography leads the gallery; isolated vector design stays at the end.
+  const galleryImages = useMemo<string[]>(() => {
+    const photos = getPhotoImages(product);
+    const rest = product.images.filter((image: string) => !photos.includes(image));
+    const ordered = [...photos, ...rest];
+    return ordered.length ? ordered : [""];
+  }, [product]);
+
 
   useEffect(() => {
     trackEvent("view_item", {
