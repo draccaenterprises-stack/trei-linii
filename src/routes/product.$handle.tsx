@@ -108,7 +108,7 @@ function ProductPage() {
   // Worn photography leads the gallery; isolated vector design stays at the end.
   const galleryImages = useMemo<string[]>(() => {
     const photos = getPhotoImages(product);
-    const rest = product.images.filter((image) => !photos.includes(image));
+    const rest = product.images.filter((image: string) => !photos.includes(image));
     const ordered = [...photos, ...rest];
     return ordered.length ? ordered : [""];
   }, [product]);
