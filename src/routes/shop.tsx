@@ -5,7 +5,14 @@ import { QuickViewOverlay } from "@/components/ProductCard";
 import { formatRON } from "@/lib/format";
 import type { Collection, Product, Size } from "@/lib/catalog-types";
 import { loadCatalog } from "@/lib/product-repository";
-import { canPurchaseProduct, getStockForColor, isPreviewCatalogEnabled } from "@/lib/shopify";
+import {
+  canPurchaseProduct,
+  findVectorImage,
+  getPhotoImages,
+  getStockForColor,
+  isPreviewCatalogEnabled,
+} from "@/lib/shopify";
+
 import { useCart } from "@/lib/cart-context";
 import { clamp, createFrameScheduler } from "@/lib/motion";
 import { pageMeta } from "@/lib/seo";
