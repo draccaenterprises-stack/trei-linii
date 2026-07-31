@@ -16,7 +16,7 @@ import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { productRepository } from "@/lib/product-repository";
-import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
+import { canPurchaseProduct, getPhotoImages, getStockForColor } from "@/lib/shopify";
 import { useSite } from "@/lib/site-context";
 import { SITE_URL } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
