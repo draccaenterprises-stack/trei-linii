@@ -105,7 +105,14 @@ function ProductPage() {
   const [purchaseMessage, setPurchaseMessage] = useState("");
   const selectedColorStock = useMemo(() => getStockForColor(product, color), [product, color]);
   const productCanBePurchased = canPurchaseProduct(product);
-  const galleryImages = product.images.length ? product.images : [""];
+  // Worn photography leads the gallery; isolated vector design stays at the end.
+  const galleryImages = useMemo<string[]>(() => {
+    const photos = getPhotoImages(product);
+    const rest = product.images.filter((image) => !photos.includes(image));
+    const ordered = [...photos, ...rest];
+    return ordered.length ? ordered : [""];
+  }, [product]);
+
 
   useEffect(() => {
     trackEvent("view_item", {
