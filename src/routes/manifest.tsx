@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import heroImg from "@/assets/hero.webp";
 import lookbookOne from "@/assets/lookbook-1.webp";
 import lookbookThree from "@/assets/lookbook-3.jpg";
+import type { Product } from "@/lib/catalog-types";
 import { formatRON } from "@/lib/format";
 import { productRepository } from "@/lib/product-repository";
 import { pageMeta } from "@/lib/seo";
@@ -272,7 +273,7 @@ function Manifest() {
             </div>
 
             <div className="manifest-reveal mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((product, index) => (
+              {products.map((product: Product, index: number) => (
                 <Link
                   key={product.id}
                   to="/product/$handle"
