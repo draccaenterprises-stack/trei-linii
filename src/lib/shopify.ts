@@ -263,16 +263,19 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
     return acc;
   }, {});
 
-  const media = product.images.nodes.map((image, imageIndex) => ({
-    url: image.url,
-    alt: image.altText?.trim() || `${product.title} - imagine ${imageIndex + 1}`,
-  }));
+  const media = sortMediaPhotosFirst(
+    product.images.nodes.map((image, imageIndex) => ({
+      url: image.url,
+      alt: image.altText?.trim() || `${product.title} - imagine ${imageIndex + 1}`,
+    })),
+  );
   if (!media.length && product.featuredImage?.url) {
     media.push({
       url: product.featuredImage.url,
       alt: product.featuredImage.altText?.trim() || product.title,
     });
   }
+
   const money = {
     amount: Number(product.priceRange.minVariantPrice.amount),
     currencyCode: product.priceRange.minVariantPrice.currencyCode,
