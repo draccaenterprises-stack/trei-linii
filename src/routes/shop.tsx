@@ -511,12 +511,21 @@ function Chapter({
   const isDark = index === 2;
   const reverse = index % 2 === 1;
   const number = String(index + 1).padStart(2, "0");
-  const contextImage = product.images[2] ?? product.images[1] ?? product.images[0];
+  // Collage = worn photography. Context slot = isolated design, matched to the background:
+  // dark section gets the white-line vector, light sections the black-line vector.
+  const photos = getPhotoImages(product);
+  const contextImage =
+    findVectorImage(product, isDark ? "textile inchise" : "textile deschise") ??
+    findVectorImage(product, isDark ? "textile deschise" : "textile inchise") ??
+    photos[2] ??
+    photos[1] ??
+    photos[0];
 
   const pattern = COLLAGE_PATTERNS[index % COLLAGE_PATTERNS.length];
   const slots = pattern
-    .map((slot, i) => ({ slot, src: product.images[i] ?? (i === 0 ? "" : undefined) }))
+    .map((slot, i) => ({ slot, src: photos[i] ?? (i === 0 ? "" : undefined) }))
     .filter((entry): entry is { slot: CollageSlot; src: string } => entry.src !== undefined);
+
 
   const [overlay, setOverlay] = useState<null | {
     x: number;
