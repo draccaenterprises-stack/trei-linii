@@ -519,10 +519,13 @@ export function ProductCard({
   const quickAddStock = getStockForColor(product, quickAddColor);
   const availableSizes = product.sizes.filter((size) => quickAddStock[size] > 0);
   const showPrice = siteMode === "live-shop";
+  // Card imagery uses worn photography only; isolated vector design never leads a card.
+  const cardImages = getPhotoImages(product);
   const primaryImage = productCardBackImageFirst
-    ? (product.images[1] ?? product.images[0])
-    : product.images[0];
-  const hoverImage = primaryImage === product.images[0] ? product.images[1] : product.images[0];
+    ? (cardImages[1] ?? cardImages[0])
+    : cardImages[0];
+  const hoverImage = primaryImage === cardImages[0] ? cardImages[1] : cardImages[0];
+
   const productCanBePurchased = canPurchaseProduct(product);
   const [quickMessage, setQuickMessage] = React.useState("");
 
