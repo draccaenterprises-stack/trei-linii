@@ -123,7 +123,7 @@ function addPreviewProducts(groups: CollectionGroup[], previewTemplates: Product
   });
 }
 
-function buildCollectionGroups(
+export function buildCollectionGroups(
   products: Product[],
   collections: Collection[],
   previewTemplates: Product[],
