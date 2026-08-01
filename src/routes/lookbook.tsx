@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { lookbookImages } from "@/lib/brand-content";
-import heroImg from "@/assets/hero.webp";
+import { editorialGestures as heroImg } from "@/lib/brand-images";
 import { pageMeta } from "@/lib/seo";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 

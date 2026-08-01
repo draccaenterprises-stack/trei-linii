@@ -1,11 +1,13 @@
-import lookbookOne from "@/assets/lookbook-1.webp";
-import lookbookTwo from "@/assets/lookbook-2.webp";
-import lookbookThree from "@/assets/lookbook-3.jpg";
+import {
+  editorialCounterweight,
+  editorialGravity,
+  editorialConfluence,
+} from "@/lib/brand-images";
 
 export const lookbookImages = [
-  { src: lookbookOne, caption: "Proporții relaxate - vedere din spate" },
-  { src: lookbookTwo, caption: "Volum și cădere - lumină naturală" },
-  { src: lookbookThree, caption: "Design pe spate - purtare zilnică" },
+  { src: editorialCounterweight, caption: "Contragreutate - vedere din spate" },
+  { src: editorialGravity, caption: "Gravitație - lumină naturală" },
+  { src: editorialConfluence, caption: "Confluență - purtare zilnică" },
 ];
 
 export const homepageSections = [

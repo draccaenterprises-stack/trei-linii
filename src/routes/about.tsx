@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroImg from "@/assets/hero.webp";
-import lookbookOne from "@/assets/lookbook-1.webp";
-import lookbookTwo from "@/assets/lookbook-2.webp";
-import productDetail from "@/assets/product-2b.webp";
+import {
+  editorialConfluence as heroImg,
+  editorialCounterweight as lookbookOne,
+  editorialSharedBreath as lookbookTwo,
+  editorialShiftedPlate as productDetail,
+} from "@/lib/brand-images";
 import { pageMeta } from "@/lib/seo";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 

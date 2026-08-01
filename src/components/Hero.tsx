@@ -1,9 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import heroImg from "@/assets/hero.webp";
-import lookbookOne from "@/assets/lookbook-1.webp";
-import lookbookTwo from "@/assets/lookbook-2.webp";
-import productDetail from "@/assets/product-2b.webp";
+import { heroTriptych, heroCream, heroNight, heroStairs } from "@/lib/brand-images";
+
 import type { Product } from "@/lib/catalog-types";
 import { useCart } from "@/lib/cart-context";
 import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
@@ -21,7 +19,7 @@ export function Hero({ products = [] }: { products?: Product[] }) {
   const fallbackSlides = useMemo(
     () => [
       {
-        src: heroImg,
+        src: heroTriptych,
         alt: "Model purtând un tricou oversized Trei Linii într-un cadru urban",
         title: ["Piesa ", "semnătură", " intră direct în coș."],
         text: "Prima piesă Trei Linii: față curată, spate construit pe linii.",
@@ -32,8 +30,8 @@ export function Hero({ products = [] }: { products?: Product[] }) {
         copy: "max-w-5xl",
       },
       {
-        src: lookbookOne,
-        alt: "Cadru lookbook Trei Linii cu tricou oversized",
+        src: heroCream,
+        alt: "Tricou oversized crem Trei Linii, design pe spate, cadru arhitectural",
         title: ["Vezi cum cade tricoul în ", "mișcare", "."],
         text: "Cadre editoriale, fit oversized și spatele în prim-plan.",
         cta: "Vezi shop",
@@ -42,8 +40,8 @@ export function Hero({ products = [] }: { products?: Product[] }) {
         copy: "max-w-4xl",
       },
       {
-        src: lookbookTwo,
-        alt: "Styling urban Trei Linii pentru tricou cu design pe spate",
+        src: heroNight,
+        alt: "Tricou negru Trei Linii fotografiat seara în context urban",
         title: ["Alege printul care rămâne în ", "spate", "."],
         text: "Modele compacte și grafică gândită pentru rotația zilnică.",
         cta: "Alege modelul",
@@ -52,8 +50,8 @@ export function Hero({ products = [] }: { products?: Product[] }) {
         copy: "max-w-3xl md:ml-auto md:text-right",
       },
       {
-        src: productDetail,
-        alt: "Detaliu tricou Trei Linii cu print pe spate",
+        src: heroStairs,
+        alt: "Tricou olive Trei Linii pe scări de beton",
         title: ["Materialul dă ", "formă", ", designul dă ritmul."],
         text: "Fiecare piesă își prezintă materialul, croiala și detaliile înainte de comandă.",
         cta: "Explorează shopul",
