@@ -16,7 +16,13 @@ import { SizeSelector, VariantSelector } from "@/components/VariantSelectors";
 import { useCart } from "@/lib/cart-context";
 import { formatRON } from "@/lib/format";
 import { productRepository } from "@/lib/product-repository";
-import { canPurchaseProduct, getPhotoImages, getStockForColor } from "@/lib/shopify";
+import {
+  canPurchaseProduct,
+  getDescriptionParagraphs,
+  getPhotoImages,
+  getStockForColor,
+} from "@/lib/shopify";
+
 import { useSite } from "@/lib/site-context";
 import { SITE_URL } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
@@ -213,8 +219,12 @@ function ProductPage() {
               </p>
             </div>
 
-            <p className="mt-8 text-muted-foreground leading-relaxed">{product.description}</p>
-            <p className="mt-3 text-sm italic text-muted-foreground">{product.vibe}</p>
+            <div className="mt-8 space-y-4 text-muted-foreground leading-relaxed">
+              {getDescriptionParagraphs(product).map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+
 
             <div className="mt-6 grid grid-cols-2 gap-3 font-mono-xs">
               <div className="border border-border p-3">

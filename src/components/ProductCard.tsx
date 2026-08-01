@@ -7,7 +7,13 @@ import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import { preloadQuickViewImages } from "@/lib/quick-view";
-import { canPurchaseProduct, getPhotoImages, getStockForColor } from "@/lib/shopify";
+import {
+  canPurchaseProduct,
+  getDescriptionParagraphs,
+  getPhotoImages,
+  getStockForColor,
+} from "@/lib/shopify";
+
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { FeedbackRegion } from "@/components/FeedbackRegion";
 
@@ -401,9 +407,12 @@ function QuickViewPurchaseControls({
       <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-12 md:items-start">
         <div className="md:col-span-5">
           <p className="font-mono-xs text-accent-text">Adaugă direct în coș</p>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground md:text-base">
-            {product.description}
-          </p>
+          <div className="mt-3 max-w-md space-y-3 text-sm leading-relaxed text-muted-foreground md:text-base">
+            {getDescriptionParagraphs(product).map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+
           <p className="mt-5 font-display text-3xl">{formatRON(product.price)}</p>
         </div>
 

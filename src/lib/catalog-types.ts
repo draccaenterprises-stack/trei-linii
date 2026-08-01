@@ -41,6 +41,7 @@ export interface Product {
   media: ProductMedia[];
   images: string[];
   description: string;
+  descriptionParagraphs?: string[];
   vibe: string;
   fitNote: string;
   sizes: Size[];

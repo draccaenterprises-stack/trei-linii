@@ -3,6 +3,7 @@ export const PRODUCT_FIELDS = `
   handle
   title
   description
+  descriptionHtml
   availableForSale
   tags
   featuredImage {

@@ -173,6 +173,55 @@ export function findVectorImage(
   )?.url;
 }
 
+const HTML_ENTITIES: Record<string, string> = {
+  "&amp;": "&",
+  "&lt;": "<",
+  "&gt;": ">",
+  "&quot;": '"',
+  "&#39;": "'",
+  "&apos;": "'",
+  "&nbsp;": " ",
+};
+
+/** Plain text from a Shopify rich-text fragment; markup is stripped, never rendered. */
+function stripHtml(fragment: string) {
+  return fragment
+    .replace(/<[^>]*>/g, "")
+    .replace(/&(?:amp|lt|gt|quot|#39|apos|nbsp);/g, (entity) => HTML_ENTITIES[entity] ?? entity)
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Splits a Shopify description into paragraphs so the UI can space them visually.
+ * The HTML is never injected into the DOM: only its text content is kept.
+ */
+export function parseDescriptionParagraphs(
+  descriptionHtml?: string | null,
+  description?: string | null,
+): string[] {
+  if (descriptionHtml?.trim()) {
+    const blocks = descriptionHtml
+      .split(/<\/(?:p|div|li|h[1-6])>|<br\s*\/?>/i)
+      .map(stripHtml)
+      .filter(Boolean);
+    if (blocks.length) return blocks;
+  }
+
+  return (description ?? "")
+    .split(/\n{1,}/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+}
+
+/** Paragraphs for any catalog product, including preview fixtures without Shopify HTML. */
+export function getDescriptionParagraphs(product: {
+  descriptionParagraphs?: string[];
+  description?: string;
+}): string[] {
+  if (product.descriptionParagraphs?.length) return product.descriptionParagraphs;
+  return parseDescriptionParagraphs(undefined, product.description);
+}
 
 
 function isSystemCollection(handle: string, title: string) {
@@ -325,7 +374,12 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
   );
   const firstCollection = publicCollectionNodes[0];
   const publicCollections = unique(publicCollectionNodes.map((collection) => collection.handle));
+  const descriptionParagraphs = parseDescriptionParagraphs(
+    product.descriptionHtml,
+    product.description,
+  );
   const publicCollection = firstCollection?.handle ?? "selectia-deschisa";
+
   return {
     id: product.id,
     handle: product.handle,
@@ -338,8 +392,11 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
     badge: badgeFromProduct(product, variants),
     media,
     images: media.map((item) => item.url),
-    description: product.description?.trim() || "Descrierea acestei piese va fi publicată curând.",
-    vibe: product.description?.trim() || "Piesă din selecția Trei Linii.",
+    description:
+      descriptionParagraphs.join("\n\n") || "Descrierea acestei piese va fi publicată curând.",
+    descriptionParagraphs,
+    vibe: descriptionParagraphs[0] ?? "Piesă din selecția Trei Linii.",
+
     fitNote: "Consultă variantele disponibile și ghidul de mărimi înainte de comandă.",
     sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
     colors: colors.length ? colors : [{ name: "Standard", hex: colorHex("Standard") }],

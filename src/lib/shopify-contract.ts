@@ -23,6 +23,7 @@ export type ShopifyProductNode = {
   handle: string;
   title: string;
   description: string;
+  descriptionHtml?: string | null;
   availableForSale: boolean;
   totalInventory?: number | null;
   tags: string[];
