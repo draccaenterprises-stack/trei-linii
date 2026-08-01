@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import {
   editorialSharedBreath as heroImg,
   editorialShiftedPlate as lookbookOne,
-  editorialGravity as lookbookThree,
+  editorialSection as lookbookThree,
 } from "@/lib/brand-images";
 import type { Product } from "@/lib/catalog-types";
 import { formatRON } from "@/lib/format";
@@ -311,7 +311,7 @@ function Manifest() {
       <section className="relative isolate flex min-h-[66svh] items-end overflow-hidden bg-charcoal px-5 py-14 text-cream md:px-10 md:py-20">
         <ResponsiveImage
           src={lookbookThree}
-          alt="Tricou Trei Linii în context urban"
+          alt="Tricou negru Trei Linii fotografiat din spate în pasaj de beton"
           width={1600}
           height={1200}
           sizes="100vw"
