@@ -387,8 +387,11 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
     badge: badgeFromProduct(product, variants),
     media,
     images: media.map((item) => item.url),
-    description: product.description?.trim() || "Descrierea acestei piese va fi publicată curând.",
-    vibe: product.description?.trim() || "Piesă din selecția Trei Linii.",
+    description:
+      descriptionParagraphs.join("\n\n") || "Descrierea acestei piese va fi publicată curând.",
+    descriptionParagraphs,
+    vibe: descriptionParagraphs[0] ?? "Piesă din selecția Trei Linii.",
+
     fitNote: "Consultă variantele disponibile și ghidul de mărimi înainte de comandă.",
     sizes: sizes.length ? sizes : ["S", "M", "L", "XL"],
     colors: colors.length ? colors : [{ name: "Standard", hex: colorHex("Standard") }],
