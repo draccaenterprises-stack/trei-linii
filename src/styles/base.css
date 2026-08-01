@@ -155,8 +155,8 @@
   }
 
   .shop-reveal {
-    content-visibility: auto;
-    contain-intrinsic-size: 920px;
+    /* No content-visibility here: skipping off-screen chapters made long
+       collections collapse to the first product on some mobile browsers. */
     opacity: 1;
     transform: none;
   }
