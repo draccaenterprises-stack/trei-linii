@@ -7,7 +7,13 @@ import { formatRON } from "@/lib/format";
 import { useCart } from "@/lib/cart-context";
 import { useSite } from "@/lib/site-context";
 import { preloadQuickViewImages } from "@/lib/quick-view";
-import { canPurchaseProduct, getPhotoImages, getStockForColor } from "@/lib/shopify";
+import {
+  canPurchaseProduct,
+  getDescriptionParagraphs,
+  getPhotoImages,
+  getStockForColor,
+} from "@/lib/shopify";
+
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { FeedbackRegion } from "@/components/FeedbackRegion";
 
