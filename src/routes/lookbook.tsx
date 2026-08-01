@@ -21,7 +21,7 @@ export const Route = createFileRoute("/lookbook")({
 function Lookbook() {
   // One frame per collection direction: olive/black gestures, counterweight,
   // the white pressure piece and the black section piece.
-  const images = [editorialGestures, editorialCounterweight, editorialPressure, editorialSection];
+  const images = [editorialPressure, editorialCounterweight, editorialGestures, editorialSection];
   return (
     <div className="py-12 md:py-20">
       <header className="px-5 md:px-10 mb-16 md:mb-24 max-w-[1600px] mx-auto">
@@ -41,7 +41,7 @@ function Lookbook() {
           <div className="md:col-span-8 img-zoom">
             <ResponsiveImage
               src={images[0]}
-              alt="Cadru editorial Trei Linii în decor urban"
+              alt="Tricou alb Trei Linii cu print pe spate, fundal de beton"
               width={1200}
               height={1500}
               priority
@@ -66,7 +66,7 @@ function Lookbook() {
           <div className="md:col-span-5 md:col-start-2 img-zoom">
             <ResponsiveImage
               src={images[2]}
-              alt="Tricou alb Trei Linii cu print pe spate, cadru arhitectural"
+              alt="Tricou negru Trei Linii, grafică pe spate, lumină naturală"
               width={1200}
               height={1600}
               sizes="(min-width: 768px) 42vw, 100vw"
