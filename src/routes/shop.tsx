@@ -510,7 +510,9 @@ function Chapter({
   index: number;
   refCallback: (node: HTMLElement | null) => void;
 }) {
-  const isDark = index === 2;
+  // Every third visible card of the filtered grid gets the darker treatment (3, 6, 9, ...).
+  const isDark = (index + 1) % 3 === 0;
+
   const reverse = index % 2 === 1;
   const number = String(index + 1).padStart(2, "0");
   // Collage = worn photography. Context slot = isolated design, matched to the background:
