@@ -1,6 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { lookbookImages } from "@/lib/brand-content";
-import { editorialGestures as heroImg } from "@/lib/brand-images";
+import {
+  editorialGestures,
+  editorialCounterweight,
+  editorialPressure,
+  editorialSection,
+} from "@/lib/brand-images";
 import { pageMeta } from "@/lib/seo";
 import { ResponsiveImage } from "@/components/ResponsiveImage";
 
@@ -15,7 +19,9 @@ export const Route = createFileRoute("/lookbook")({
 });
 
 function Lookbook() {
-  const images = [heroImg, ...lookbookImages.map((l) => l.src)];
+  // One frame per collection direction: olive/black gestures, counterweight,
+  // the white pressure piece and the black section piece.
+  const images = [editorialPressure, editorialCounterweight, editorialGestures, editorialSection];
   return (
     <div className="py-12 md:py-20">
       <header className="px-5 md:px-10 mb-16 md:mb-24 max-w-[1600px] mx-auto">
@@ -35,7 +41,7 @@ function Lookbook() {
           <div className="md:col-span-8 img-zoom">
             <ResponsiveImage
               src={images[0]}
-              alt="Cadru editorial Trei Linii în decor urban"
+              alt="Tricou alb Trei Linii cu print pe spate, fundal de beton"
               width={1200}
               height={1500}
               priority
@@ -60,7 +66,7 @@ function Lookbook() {
           <div className="md:col-span-5 md:col-start-2 img-zoom">
             <ResponsiveImage
               src={images[2]}
-              alt="Detaliu de croială din lookbookul Trei Linii"
+              alt="Tricou negru Trei Linii, grafică pe spate, lumină naturală"
               width={1200}
               height={1600}
               sizes="(min-width: 768px) 42vw, 100vw"
@@ -82,7 +88,7 @@ function Lookbook() {
           <div className="md:col-span-7 md:col-start-6 img-zoom">
             <ResponsiveImage
               src={images[3]}
-              alt="Ținută Trei Linii în mișcare"
+              alt="Tricou negru Trei Linii cu trei linii pe spate, pasaj de beton"
               width={1200}
               height={1440}
               sizes="(min-width: 768px) 58vw, 100vw"

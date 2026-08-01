@@ -9,6 +9,8 @@ import confluenceAsset from "@/assets/01_confluence_olive_01.png.asset.json";
 import gesturesAsset from "@/assets/03_gestures_black_01.png.asset.json";
 import sharedBreathAsset from "@/assets/09_shared_breath_olive_01.png.asset.json";
 import shiftedPlateAsset from "@/assets/05_shifted_plate_black_01.png.asset.json";
+import pressureAsset from "@/assets/06_pressure_white_01.png.asset.json";
+import sectionAsset from "@/assets/01_section_black_01.png.asset.json";
 
 export const heroTriptych = heroTriptychAsset.url;
 export const heroCream = heroCreamAsset.url;
@@ -21,3 +23,5 @@ export const editorialConfluence = confluenceAsset.url;
 export const editorialGestures = gesturesAsset.url;
 export const editorialSharedBreath = sharedBreathAsset.url;
 export const editorialShiftedPlate = shiftedPlateAsset.url;
+export const editorialPressure = pressureAsset.url;
+export const editorialSection = sectionAsset.url;
