@@ -23,9 +23,10 @@ export function Hero({ products = [] }: { products?: Product[] }) {
       {
         src: heroImg,
         alt: "Model purtând un tricou oversized Trei Linii într-un cadru urban",
-        title: ["Tricoul ", "main", " intră direct în coș."],
+        title: ["Piesa ", "semnătură", " intră direct în coș."],
         text: "Prima piesă Trei Linii: față curată, spate construit pe linii.",
-        cta: "Adaugă tricoul main",
+        cta: "Adaugă piesa semnătură",
+
         action: "cart" as const,
         align: "items-end",
         copy: "max-w-5xl",
