@@ -1,9 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import heroImg from "@/assets/hero.webp";
-import lookbookOne from "@/assets/lookbook-1.webp";
-import lookbookTwo from "@/assets/lookbook-2.webp";
-import productDetail from "@/assets/product-2b.webp";
+import { heroTriptych, heroCream, heroNight, heroStairs } from "@/lib/brand-images";
+
 import type { Product } from "@/lib/catalog-types";
 import { useCart } from "@/lib/cart-context";
 import { canPurchaseProduct, getStockForColor } from "@/lib/shopify";
