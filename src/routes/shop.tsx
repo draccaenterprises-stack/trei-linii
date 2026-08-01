@@ -123,41 +123,36 @@ function addPreviewProducts(groups: CollectionGroup[], previewTemplates: Product
   });
 }
 
-function buildCollectionGroups(
+export function buildCollectionGroups(
   products: Product[],
   collections: Collection[],
   previewTemplates: Product[],
 ): CollectionGroup[] {
   const groups = collections
-    .map((collection) => ({
-      collection,
-      products: products.filter((product) => {
+    .map((collection) => {
+      const members = products.filter((product) => {
         if (collection.productIds?.includes(product.id)) return true;
         if (product.collections?.includes(collection.handle)) return true;
         return product.collection === collection.handle;
-      }),
-    }))
+      });
+
+      // Respect the curated Shopify collection order when it is known.
+      const order = collection.productIds ?? [];
+      const ordered = [...members].sort((a, b) => {
+        const ai = order.indexOf(a.id);
+        const bi = order.indexOf(b.id);
+        if (ai === -1 && bi === -1) return 0;
+        if (ai === -1) return 1;
+        if (bi === -1) return -1;
+        return ai - bi;
+      });
+
+      return { collection, products: ordered };
+    })
     .filter((group) => group.products.length > 0);
 
-  const assignedProductIds = new Set(
-    groups.flatMap((group) => group.products.map((product) => product.id)),
-  );
-  const unassignedProducts = products.filter((product) => !assignedProductIds.has(product.id));
-
-  if (unassignedProducts.length) {
-    groups.push({
-      collection: {
-        handle: "selectia-deschisa",
-        title: "Selecția deschisă",
-        description:
-          "Piese disponibile separat, în afara unei colecții numerotate. Aceeași regulă vizuală, lăsată să stea singură.",
-        image: unassignedProducts[0]?.images[0] ?? "",
-        count: unassignedProducts.length,
-        productIds: unassignedProducts.map((product) => product.id),
-      },
-      products: unassignedProducts,
-    });
-  }
+  // Products outside any curated collection stay on /shop/lista only —
+  // they must never become a synthetic numbered collection here.
 
   if (!groups.length && products.length) {
     groups.push({
