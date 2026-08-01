@@ -143,11 +143,21 @@ export function Hero({ products = [] }: { products?: Product[] }) {
                 className={`mx-auto flex min-h-[90vh] max-w-[1600px] px-5 pb-[8vh] pr-12 md:px-10 ${slide.align}`}
               >
                 <div className={`w-full ${slide.copy}`}>
-                  <h1 className="font-display text-6xl font-medium leading-[1.02] whitespace-pre-line [text-wrap:balance] sm:text-7xl md:text-8xl lg:text-9xl">
-                    {slide.title[0]}
-                    <span className="italic text-accent-text">{slide.title[1]}</span>
-                    {slide.title[2]}
-                  </h1>
+                  {/* Only the first slide is the document heading: a single H1 per page. */}
+                  {index === 0 ? (
+                    <h1 className="font-display text-6xl font-medium leading-[1.02] whitespace-pre-line [text-wrap:balance] sm:text-7xl md:text-8xl lg:text-9xl">
+                      {slide.title[0]}
+                      <span className="italic text-accent-text">{slide.title[1]}</span>
+                      {slide.title[2]}
+                    </h1>
+                  ) : (
+                    <p className="font-display text-6xl font-medium leading-[1.02] whitespace-pre-line [text-wrap:balance] sm:text-7xl md:text-8xl lg:text-9xl">
+                      {slide.title[0]}
+                      <span className="italic text-accent-text">{slide.title[1]}</span>
+                      {slide.title[2]}
+                    </p>
+                  )}
+
                   <p className="mt-5 max-w-xl text-base leading-relaxed text-cream/78 md:text-lg">
                     {slide.text}
                   </p>
