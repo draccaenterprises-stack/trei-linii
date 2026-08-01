@@ -1,6 +1,6 @@
 import p1a from "@/assets/product-1a.jpg";
 import p2a from "@/assets/product-2a.jpg";
-import p2b from "@/assets/product-2b.webp";
+import { editorialGravity as p2b } from "@/lib/brand-images";
 import p3a from "@/assets/product-3a.jpg";
 import p3b from "@/assets/product-3b.jpg";
 import p4a from "@/assets/product-4a.jpg";

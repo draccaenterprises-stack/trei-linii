@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import heroImg from "@/assets/hero.webp";
-import lookbookOne from "@/assets/lookbook-1.webp";
-import lookbookThree from "@/assets/lookbook-3.jpg";
+import {
+  editorialSharedBreath as heroImg,
+  editorialShiftedPlate as lookbookOne,
+  editorialGravity as lookbookThree,
+} from "@/lib/brand-images";
 import type { Product } from "@/lib/catalog-types";
 import { formatRON } from "@/lib/format";
 import { productRepository } from "@/lib/product-repository";
