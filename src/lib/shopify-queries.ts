@@ -47,7 +47,7 @@ export const PRODUCT_FIELDS = `
 
 export const PRODUCTS_QUERY = `
   query Products {
-    products(first: 50) {
+    products(first: 100) {
       nodes {
         ${PRODUCT_FIELDS}
       }
