@@ -41,6 +41,12 @@ const urmeProducts = titles.map((title, index) =>
 );
 // Shopify's products query returns a different order than the curated collection.
 const shuffled = [urmeProducts[3], urmeProducts[0], ...urmeProducts.slice(4), urmeProducts[1], urmeProducts[2]];
+const straturiTitles = ["Secțiune", "Sub Suprafață", "Margine Ruptă", "Sediment", "Placă Deplasată", "Presiune", "Decupaj", "Îndoire", "Eroziune", "Miez"];
+const straturiProducts = straturiTitles.map((title, index) =>
+  makeProduct(`gid://shopify/Product/${index + 300}`, title, "colectia-3-straturi"),
+);
+// Shopify's products query returns collection 3 out of curated order too.
+const straturiShuffled = [...straturiProducts].reverse();
 const orphan = makeProduct("gid://shopify/Product/999", "model1 tricou", "");
 
 const collections: Collection[] = [
@@ -60,9 +66,17 @@ const collections: Collection[] = [
     count: 10,
     productIds: urmeProducts.map((product) => product.id),
   },
+  {
+    handle: "colectia-3-straturi",
+    title: "Colecția 3 — STRATURI",
+    description: "",
+    image: "",
+    count: 10,
+    productIds: straturiProducts.map((product) => product.id),
+  },
 ];
 
-const products = [makeProduct("gid://shopify/Product/1", "Soft Architecture", "colectie-1"), ...shuffled, orphan];
+const products = [makeProduct("gid://shopify/Product/1", "Soft Architecture", "colectie-1"), ...shuffled, ...straturiShuffled, orphan];
 
 describe("grupurile de colecții pe /shop", () => {
   const groups = buildCollectionGroups(products, collections, []);
@@ -71,6 +85,7 @@ describe("grupurile de colecții pe /shop", () => {
     expect(groups.map((group) => group.collection.title)).toEqual([
       "Colectie 1",
       "Colecția 2 — URME",
+      "Colecția 3 — STRATURI",
     ]);
     expect(groups.some((group) => group.collection.handle === "selectia-deschisa")).toBe(false);
   });
@@ -79,5 +94,11 @@ describe("grupurile de colecții pe /shop", () => {
     const urme = groups.find((group) => group.collection.handle === "colecția-2-urme");
     expect(urme?.products).toHaveLength(10);
     expect(urme?.products.map((product) => product.title)).toEqual(titles);
+  });
+
+  it("randează toate cele 10 produse ale colecției 3, în ordinea colecției", () => {
+    const straturi = groups.find((group) => group.collection.handle === "colectia-3-straturi");
+    expect(straturi?.products).toHaveLength(10);
+    expect(straturi?.products.map((product) => product.title)).toEqual(straturiTitles);
   });
 });
