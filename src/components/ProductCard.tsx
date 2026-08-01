@@ -511,9 +511,12 @@ function QuickViewPurchaseControls({
 export function ProductCard({
   product,
   showQuickView = true,
+  tinted = false,
 }: {
   product: Product;
   showQuickView?: boolean;
+  /** Every third visible card of a grid gets a slightly darker card background. */
+  tinted?: boolean;
 }) {
   const { addItem } = useCart();
   const {
@@ -561,7 +564,11 @@ export function ProductCard({
   }, []);
 
   return (
-    <article className="product-card group">
+    <article
+      className={`product-card group ${
+        tinted ? "bg-warm-grey/70 p-3 md:p-4" : ""
+      }`}
+    >
       <div className="group/media relative">
         <Link to="/product/$handle" params={{ handle: product.handle }} className="block">
           <div className="relative img-zoom aspect-[3/4] bg-warm-grey">
@@ -699,9 +706,9 @@ export function ProductGrid({
   if (carousel) {
     return (
       <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] md:mx-0 md:px-0 [&::-webkit-scrollbar]:hidden">
-        {products.map((p) => (
+        {products.map((p, i) => (
           <div key={p.id} className="w-[74%] shrink-0 snap-start md:w-[300px]">
-            <ProductCard product={p} showQuickView={showQuickView} />
+            <ProductCard product={p} showQuickView={showQuickView} tinted={(i + 1) % 3 === 0} />
           </div>
         ))}
       </div>
@@ -710,8 +717,13 @@ export function ProductGrid({
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-12 md:gap-x-6 md:gap-y-16">
-      {products.map((p) => (
-        <ProductCard key={p.id} product={p} showQuickView={showQuickView} />
+      {products.map((p, i) => (
+        <ProductCard
+          key={p.id}
+          product={p}
+          showQuickView={showQuickView}
+          tinted={(i + 1) % 3 === 0}
+        />
       ))}
     </div>
   );
