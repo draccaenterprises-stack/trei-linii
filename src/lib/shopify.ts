@@ -374,7 +374,12 @@ function mapShopifyProduct(product: ShopifyProductNode): Product {
   );
   const firstCollection = publicCollectionNodes[0];
   const publicCollections = unique(publicCollectionNodes.map((collection) => collection.handle));
+  const descriptionParagraphs = parseDescriptionParagraphs(
+    product.descriptionHtml,
+    product.description,
+  );
   const publicCollection = firstCollection?.handle ?? "selectia-deschisa";
+
   return {
     id: product.id,
     handle: product.handle,
